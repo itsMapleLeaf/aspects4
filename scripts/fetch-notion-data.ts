@@ -19,8 +19,8 @@ import {
 import { prettify } from "./lib/utils.ts"
 
 const notionPageId = "1b1b0b885c0e803d8566fb10e0b5130c"
-const dataFolder = resolve("public/data")
-const pageContentPath = resolve(dataFolder, "guide.md")
+const dataFolder = resolve("src/data")
+const pageContentPath = resolve("public/guide.md")
 
 const notionSecret = process.env.NOTION_SECRET
 if (!notionSecret) {

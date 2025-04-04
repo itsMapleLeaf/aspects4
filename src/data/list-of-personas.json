@@ -1,0 +1,32 @@
+[
+  {
+    "description": "Indirectly tips the scales of conflict in their favor",
+    "ability": "Practiced Influencer - Your Presence rolls have +1 dice.",
+    "persona": "Manipulator"
+  },
+  {
+    "description": "Empowers and strengthens allies",
+    "ability": "Resourceful - Increase your max fatigue by 3.",
+    "persona": "Commander"
+  },
+  {
+    "description": "Focuses on the well-being and recovery of others",
+    "ability": "Blessed Healer - Your Light rolls have +1 dice.",
+    "persona": "Vitalist"
+  },
+  {
+    "description": "Protects others from threats",
+    "ability": "Resilient - Your Strength rolls have +1 dice.",
+    "persona": "Protector"
+  },
+  {
+    "description": "Excels in agility, adaptability, and field tactics",
+    "ability": "Well Studied - Your Intellect rolls have +1 dice.",
+    "persona": "Strategist"
+  },
+  {
+    "description": "Solves problems with physical force and prowess",
+    "ability": "Heart of Flame - Your Fire rolls have +1 dice.",
+    "persona": "Fighter"
+  }
+]

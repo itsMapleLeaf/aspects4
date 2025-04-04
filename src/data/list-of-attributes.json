@@ -1,0 +1,22 @@
+[
+  {
+    "description": "Logic, analysis, understanding",
+    "attribute": "Intellect"
+  },
+  {
+    "description": "Manipulation, influence over others",
+    "attribute": "Presence"
+  },
+  {
+    "description": "Precision and acrobatics",
+    "attribute": "Dexterity"
+  },
+  {
+    "description": "Finding and picking up on things through the senses",
+    "attribute": "Sense"
+  },
+  {
+    "description": "Applying force and heavy hits",
+    "attribute": "Strength"
+  }
+]

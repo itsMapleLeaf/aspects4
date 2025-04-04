@@ -1,0 +1,50 @@
+[
+  {
+    "activation": "Persistent",
+    "description": "Increase or decrease max fatigue by [Quality]",
+    "rarity": "Rare",
+    "effect": "Max Fatigue"
+  },
+  {
+    "activation": "Persistent",
+    "description": "Increase or decrease max hits by [Quality]",
+    "rarity": "Rare",
+    "effect": "Max Hits"
+  },
+  {
+    "activation": "One-time, Persistent",
+    "description": "Add or remove [Quality]×2 to [Modifier] rolls",
+    "rarity": "Uncommon",
+    "effect": "Aspect Art"
+  },
+  {
+    "activation": "One-time, Persistent",
+    "description": "Add or remove +[Quality] to [Aspect] rolls",
+    "rarity": "Rare",
+    "effect": "Aspect"
+  },
+  {
+    "activation": "One-time, Persistent",
+    "description": "Add or remove [Quality]×2 to [Skill] rolls",
+    "rarity": "Uncommon",
+    "effect": "Skill"
+  },
+  {
+    "activation": "One-time, Persistent",
+    "description": "Add or remove +[Quality] to [Attribute] rolls",
+    "rarity": "Rare",
+    "effect": "Attribute"
+  },
+  {
+    "activation": "One-time",
+    "description": "Heal or take [Quality] fatigue",
+    "rarity": "Common",
+    "effect": "Energizing"
+  },
+  {
+    "activation": "One-time",
+    "description": "Heal or take [Quality] hits",
+    "rarity": "Common",
+    "effect": "Healing"
+  }
+]

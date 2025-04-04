@@ -1,0 +1,32 @@
+[
+  {
+    "ability": "One with Darkness - Your Darkness rolls have +1 dice.",
+    "memberCreatures": "demons, succubus/incubus, vampires",
+    "lineage": "Umbral"
+  },
+  {
+    "ability": "Trillion Senses - Your Sense rolls have +1 dice.",
+    "memberCreatures": "insects, arachnids, bugs, most creatures with exoskeletons",
+    "lineage": "Arthropod"
+  },
+  {
+    "ability": "One with the Wind - Your Wind rolls have +1 dice.",
+    "memberCreatures": "eagles, ravens, penguins, flamingos, all other birds",
+    "lineage": "Avian"
+  },
+  {
+    "ability": "Fluid Instinct - Your Water rolls have +1 dice.",
+    "memberCreatures": "fish, dolphins, other water-bound creatures",
+    "lineage": "Aquatic"
+  },
+  {
+    "ability": "Hardened Scales - Increase your max hits by 3.",
+    "memberCreatures": "dragons, lizard, snake, alligator, crocodile",
+    "lineage": "Scalebearer"
+  },
+  {
+    "ability": "Adaptable - Your Dexterity rolls have +1 dice.",
+    "memberCreatures": "dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons",
+    "lineage": "Furbearer"
+  }
+]

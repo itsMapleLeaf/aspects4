@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Darkness",
+    "material": "Illusions, reality bending, psychology"
+  },
+  {
+    "name": "Light",
+    "material": "Illumination, healing, enhancements"
+  },
+  {
+    "name": "Wind",
+    "material": "Air, sound, weather"
+  },
+  {
+    "name": "Water",
+    "material": "Liquids, vapor, ice"
+  },
+  {
+    "name": "Fire",
+    "material": "Flame, heat, tectonics"
+  }
+]
