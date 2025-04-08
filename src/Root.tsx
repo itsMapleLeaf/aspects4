@@ -1,3 +1,4 @@
+import { ArkErrors, type } from "arktype"
 import { clamp } from "es-toolkit"
 import { twMerge, type ClassNameValue } from "tailwind-merge"
 import { CharacterSheet } from "./components/CharacterSheet.tsx"
@@ -30,81 +31,122 @@ export function Root() {
 	)
 }
 
+type ViewportTransform = typeof ViewportTransform.inferOut
+const ViewportTransform = type({
+	offset: { x: "number", y: "number" },
+	zoom: "number.integer",
+})
+
+const defaultViewportTransform: ViewportTransform = {
+	offset: { x: 0, y: 0 },
+	zoom: 0,
+}
+
 const scaleCoefficient = 1.3
 
+function getViewportScale(zoom: number) {
+	return scaleCoefficient ** zoom
+}
+
+function handleViewportZoom(
+	transform: ViewportTransform,
+	event: { clientX: number; clientY: number; deltaY: number },
+): ViewportTransform {
+	const scale = getViewportScale(transform.zoom)
+	const newZoom = clamp(transform.zoom - Math.sign(event.deltaY), -10, 10)
+	const newScale = 1 * scaleCoefficient ** newZoom
+
+	const newOffsetX =
+		event.clientX - (event.clientX - transform.offset.x) * (newScale / scale)
+	const newOffsetY =
+		event.clientY - (event.clientY - transform.offset.y) * (newScale / scale)
+
+	return { zoom: newZoom, offset: { x: newOffsetX, y: newOffsetY } }
+}
+
 function SceneViewer() {
-	const [offset, setOffset] = useLocalStorage<readonly [number, number]>(
-		"viewport:offset",
-		[0, 0],
-		(input) => {
-			if (!Array.isArray(input)) return [0, 0]
-			return [Number(input[0]) || 0, Number(input[1]) || 0]
-		},
-	)
-	const [zoom, setZoom] = useLocalStorage("viewport:zoom", 0, Number)
-	const scale = 1 * scaleCoefficient ** zoom
+	const [viewportTransform, setViewportTransform] =
+		useLocalStorage<ViewportTransform>(
+			"viewportTransform",
+			defaultViewportTransform,
+			(input) => {
+				const result = ViewportTransform(input)
+				if (result instanceof ArkErrors) {
+					console.warn(result)
+					return defaultViewportTransform
+				}
+				return result
+			},
+		)
+
+	const handlePointerDown = (event: React.PointerEvent) => {
+		event.preventDefault()
+
+		if (event.button !== 2) return
+
+		handleDrag((event) => {
+			if (!(event.buttons & 2)) return
+			setViewportTransform((transform) => ({
+				...transform,
+				offset: {
+					x: transform.offset.x + event.movementX,
+					y: transform.offset.y + event.movementY,
+				},
+			}))
+		})
+	}
+
+	const handleWheel = (event: React.WheelEvent) => {
+		setViewportTransform((transform) => handleViewportZoom(transform, event))
+	}
 
 	return (
 		<div
 			className="relative h-dvh w-dvw overflow-clip"
-			onPointerDown={(event) => {
-				event.preventDefault()
-
-				if (event.button === 2) {
-					const controller = new AbortController()
-
-					window.addEventListener(
-						"pointermove",
-						(event) => {
-							if (event.buttons & 2) {
-								setOffset(([x, y]) => [
-									x + event.movementX,
-									y + event.movementY,
-								])
-							}
-						},
-						{ signal: controller.signal },
-					)
-
-					window.addEventListener("pointerup", () => controller.abort(), {
-						signal: controller.signal,
-					})
-
-					window.addEventListener("blur", () => controller.abort(), {
-						signal: controller.signal,
-					})
-
-					window.addEventListener(
-						"contextmenu",
-						(event) => event.preventDefault(),
-						{ once: true },
-					)
-				}
-			}}
-			onWheel={(event) => {
-				const newZoom = clamp(zoom - Math.sign(event.deltaY), -10, 10)
-				const newScale = 1 * scaleCoefficient ** newZoom
-
-				const [x, y] = offset
-
-				const newOffsetX =
-					event.clientX - (event.clientX - x) * (newScale / scale)
-				const newOffsetY =
-					event.clientY - (event.clientY - y) * (newScale / scale)
-
-				setZoom(newZoom)
-				setOffset([newOffsetX, newOffsetY])
-			}}
+			onPointerDown={handlePointerDown}
+			onWheel={handleWheel}
 		>
 			<div
 				className="absolute top-0 left-0 origin-top-left transition-[scale,translate] duration-100 ease-out"
 				style={{
-					translate: `${offset[0]}px ${offset[1]}px`,
-					scale,
+					translate: `${viewportTransform.offset.x}px ${viewportTransform.offset.y}px`,
+					scale: getViewportScale(viewportTransform.zoom),
 				}}
 			>
 				<img src={mapUrl} draggable={false} className="max-w-[unset]" />
 			</div>
 		</div>
+	)
+}
+
+function handleDrag(onDrag: (event: PointerEvent) => void) {
+	const controller = new AbortController()
+
+	window.addEventListener("pointermove", onDrag, {
+		signal: controller.signal,
+	})
+
+	window.addEventListener(
+		"pointerup",
+		() => {
+			controller.abort()
+		},
+		{ signal: controller.signal },
+	)
+
+	window.addEventListener(
+		"blur",
+		() => {
+			controller.abort()
+		},
+		{ signal: controller.signal },
+	)
+
+	window.addEventListener(
+		"contextmenu",
+		(event) => {
+			event.preventDefault()
+		},
+		{ once: true },
 	)
 }
