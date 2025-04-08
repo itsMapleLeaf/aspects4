@@ -34,8 +34,17 @@ export function Root() {
 }
 
 function Sidebar() {
+	const [selectedTabId, setSelectedTabId] = useLocalStorage<
+		string | undefined | null
+	>("Sidebar:selectedTabId", null, (input) =>
+		input == null ? null : String(input),
+	)
+
 	return (
-		<Ariakit.TabProvider defaultActiveId="Characters">
+		<Ariakit.TabProvider
+			selectedId={selectedTabId}
+			setSelectedId={setSelectedTabId}
+		>
 			<div className="flex h-full flex-col items-start gap-2 p-4">
 				<Ariakit.TabList className={panel("flex gap-1 p-1")}>
 					<SidebarTab
@@ -60,14 +69,27 @@ function Sidebar() {
 }
 
 function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
+	const store = Ariakit.useTabContext()
+	const selectedTabId = Ariakit.useStoreState(
+		store,
+		(state) => state?.selectedId,
+	)
 	return (
 		<Ariakit.TooltipProvider placement="bottom-start">
-			<Ariakit.TooltipAnchor
-				render={<Ariakit.Tab id={name} />}
-				className="flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5"
+			<Ariakit.Tab
+				id={name}
+				className="aria-selected:text-primary-300 flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5 aria-selected:bg-white/5"
+				render={<Ariakit.TooltipAnchor />}
+				onClick={() => {
+					if (selectedTabId === name) {
+						store?.setSelectedId(null)
+					} else {
+						store?.setSelectedId(name)
+					}
+				}}
 			>
 				{icon}
-			</Ariakit.TooltipAnchor>
+			</Ariakit.Tab>
 			<Ariakit.Tooltip className="translate-y-1 rounded border border-gray-300 bg-white px-2 py-0.5 text-sm font-bold text-gray-900 opacity-0 transition data-enter:translate-y-0 data-enter:opacity-100">
 				{name}
 			</Ariakit.Tooltip>
@@ -148,11 +170,7 @@ function CharacterManager() {
 	}
 
 	return (
-		<Ariakit.TabProvider
-			activeId={activeCharacterKey}
-			setActiveId={setActiveCharacterKey}
-			orientation="vertical"
-		>
+		<Ariakit.TabProvider selectedId={activeCharacterKey} orientation="vertical">
 			<div className="flex h-full w-full gap-2">
 				<Ariakit.TabList className={panel("flex w-44 flex-col gap-1 p-1")}>
 					{characters.map((character) => (
@@ -161,6 +179,13 @@ function CharacterManager() {
 							id={character.key}
 							type="button"
 							className="aria-selected:text-primary-300 flex h-9 items-center rounded px-3 transition-colors hover:bg-white/5 aria-selected:bg-white/5"
+							onClick={() => {
+								if (activeCharacterKey === character.key) {
+									setActiveCharacterKey(null)
+								} else {
+									setActiveCharacterKey(character.key)
+								}
+							}}
 						>
 							{character.name}
 						</Ariakit.Tab>
