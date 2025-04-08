@@ -15,6 +15,16 @@ import attributeList from "../data/list-of-attributes.json"
 import skillList from "../data/list-of-skills.json"
 import { Icon } from "./ui/Icon.tsx"
 
+const attributeOrder = [
+	"Strength",
+	"Sense",
+	"Dexterity",
+	"Intellect",
+	"Presence",
+]
+
+const aspectOrder = ["Fire", "Water", "Wind", "Light", "Darkness"]
+
 export function CharacterSheet({
 	character,
 	onNameChange,
@@ -97,29 +107,40 @@ export function CharacterSheet({
 			<div className="grid gap-8 sm:grid-cols-2">
 				<Section heading={`Attributes (${attributePointsAssigned}/15)`}>
 					<div className={"flex flex-col gap-2"}>
-						{attributeList.map((item) => (
-							<StatField
-								key={item.attribute}
-								label={item.attribute}
-								min={1}
-								max={5}
-								{...bindNumber(`attribute:${item.attribute}`, 1)}
-							/>
-						))}
+						{attributeList
+							.toSorted(
+								(a, b) =>
+									attributeOrder.indexOf(a.attribute) -
+									attributeOrder.indexOf(b.attribute),
+							)
+							.map((item) => (
+								<StatField
+									key={item.attribute}
+									label={item.attribute}
+									min={1}
+									max={5}
+									{...bindNumber(`attribute:${item.attribute}`, 1)}
+								/>
+							))}
 					</div>
 				</Section>
 
 				<Section heading={`Aspects (${aspectPointsAssigned}/10)`}>
 					<div className={"flex flex-col gap-2"}>
-						{aspectList.map((item) => (
-							<StatField
-								key={item.name}
-								label={item.name}
-								min={0}
-								max={5}
-								{...bindNumber(`aspect:${item.name}`, 0)}
-							/>
-						))}
+						{aspectList
+							.toSorted(
+								(a, b) =>
+									aspectOrder.indexOf(a.name) - aspectOrder.indexOf(b.name),
+							)
+							.map((item) => (
+								<StatField
+									key={item.name}
+									label={item.name}
+									min={0}
+									max={5}
+									{...bindNumber(`aspect:${item.name}`, 0)}
+								/>
+							))}
 					</div>
 				</Section>
 
