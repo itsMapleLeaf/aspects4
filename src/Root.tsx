@@ -1,11 +1,16 @@
 import * as Ariakit from "@ariakit/react"
-import { ArkErrors, type } from "arktype"
-import { clamp } from "es-toolkit"
+import { ArkErrors } from "arktype"
 import type { ReactNode } from "react"
 import { twMerge, type ClassNameValue } from "tailwind-merge"
 import { CharacterSheet } from "./components/CharacterSheet.tsx"
 import { Icon } from "./components/ui/Icon.tsx"
 import { useLocalStorage } from "./hooks/useLocalStorage.ts"
+import {
+	defaultViewportTransform,
+	getViewportScale,
+	handleViewportZoom,
+	ViewportTransform,
+} from "./lib/viewport.ts"
 import mapUrl from "./map.jpg"
 
 // import aspectSkillList from "./data/list-of-aspect-skills.json"
@@ -25,7 +30,7 @@ export function Root() {
 	return (
 		<>
 			<SceneViewer />
-			<div className="pointer-events-children fixed inset-y-0 left-0">
+			<div className="fixed inset-y-0 left-0">
 				<Sidebar />
 			</div>
 		</>
@@ -46,12 +51,13 @@ function Sidebar() {
 						icon={<Icon icon="mingcute:pic-fill" className="size-5" />}
 					/>
 				</Ariakit.TabList>
-				<div className={panel("flex-1 overflow-y-auto will-change-scroll")}>
-					<Ariakit.TabPanel id="Characters">
-						<CharacterSheet />
-					</Ariakit.TabPanel>
-					<Ariakit.TabPanel id="Assets">assets</Ariakit.TabPanel>
-				</div>
+
+				<Ariakit.TabPanel id="Characters" className="min-h-0 flex-1">
+					<CharacterManager />
+				</Ariakit.TabPanel>
+				<Ariakit.TabPanel id="Assets" className="min-h-0 flex-1">
+					assets
+				</Ariakit.TabPanel>
 			</div>
 		</Ariakit.TabProvider>
 	)
@@ -73,37 +79,36 @@ function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
 	)
 }
 
-type ViewportTransform = typeof ViewportTransform.inferOut
-const ViewportTransform = type({
-	offset: { x: "number", y: "number" },
-	zoom: "number.integer",
-})
-
-const defaultViewportTransform: ViewportTransform = {
-	offset: { x: 0, y: 0 },
-	zoom: 0,
-}
-
-const scaleCoefficient = 1.3
-
-function getViewportScale(zoom: number) {
-	return scaleCoefficient ** zoom
-}
-
-function handleViewportZoom(
-	transform: ViewportTransform,
-	event: { clientX: number; clientY: number; deltaY: number },
-): ViewportTransform {
-	const scale = getViewportScale(transform.zoom)
-	const newZoom = clamp(transform.zoom - Math.sign(event.deltaY), -10, 10)
-	const newScale = 1 * scaleCoefficient ** newZoom
-
-	const newOffsetX =
-		event.clientX - (event.clientX - transform.offset.x) * (newScale / scale)
-	const newOffsetY =
-		event.clientY - (event.clientY - transform.offset.y) * (newScale / scale)
-
-	return { zoom: newZoom, offset: { x: newOffsetX, y: newOffsetY } }
+function CharacterManager() {
+	const characters = ["Luna", "Maybelle", "Fernspire"]
+	return (
+		<Ariakit.TabProvider>
+			<div className="flex h-full w-full gap-2">
+				<Ariakit.TabList className={panel("flex w-40 flex-col gap-1 p-1")}>
+					{characters.map((name) => (
+						<Ariakit.Tab
+							key={name}
+							id={name}
+							type="button"
+							className="flex h-9 items-center rounded px-3 transition-colors hover:bg-white/5"
+						>
+							{name}
+						</Ariakit.Tab>
+					))}
+				</Ariakit.TabList>
+				{characters.map((name) => (
+					<Ariakit.TabPanel
+						id={name}
+						className={panel(
+							"w-148 flex-1 overflow-y-auto p-4 will-change-scroll",
+						)}
+					>
+						<CharacterSheet key={name} />
+					</Ariakit.TabPanel>
+				))}
+			</div>
+		</Ariakit.TabProvider>
+	)
 }
 
 function SceneViewer() {
