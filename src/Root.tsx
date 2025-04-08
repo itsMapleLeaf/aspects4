@@ -18,7 +18,7 @@ import mapUrl from "./map.jpg"
 
 const panel = (...classes: ClassNameValue[]) =>
 	twMerge(
-		"rounded-md border overflow-clip border-gray-800 bg-gray-900 p-3",
+		"rounded-md border overflow-clip border-gray-800 bg-gray-900 p-3 shadow-md shadow-black/50",
 		...classes,
 	)
 
@@ -26,8 +26,11 @@ export function Root() {
 	return (
 		<>
 			<SceneViewer />
-			<div className="fixed inset-y-0 left-0">
+			<div className="fixed top-0 left-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Sidebar />
+			</div>
+			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
+				<Chat />
 			</div>
 		</>
 	)
@@ -45,7 +48,7 @@ function Sidebar() {
 			selectedId={selectedTabId}
 			setSelectedId={setSelectedTabId}
 		>
-			<div className="flex h-full flex-col items-start gap-2 p-4">
+			<div className="flex h-full flex-col items-start gap-2">
 				<Ariakit.TabList className={panel("flex gap-1 p-1")}>
 					<SidebarTab
 						name="Characters"
@@ -241,12 +244,10 @@ function SceneViewer() {
 		)
 
 	const handlePointerDown = (event: React.PointerEvent) => {
-		event.preventDefault()
-
 		if (event.button !== 2) return
 
+		event.preventDefault()
 		handleDrag((event) => {
-			if (!(event.buttons & 2)) return
 			setViewportTransform((transform) => ({
 				...transform,
 				offset: {
@@ -283,9 +284,16 @@ function SceneViewer() {
 function handleDrag(onDrag: (event: PointerEvent) => void) {
 	const controller = new AbortController()
 
-	window.addEventListener("pointermove", onDrag, {
-		signal: controller.signal,
-	})
+	window.addEventListener(
+		"pointermove",
+		(event) => {
+			if (!(event.buttons & 2)) return
+			onDrag(event)
+		},
+		{
+			signal: controller.signal,
+		},
+	)
 
 	window.addEventListener(
 		"pointerup",
@@ -309,5 +317,40 @@ function handleDrag(onDrag: (event: PointerEvent) => void) {
 			event.preventDefault()
 		},
 		{ once: true },
+	)
+}
+
+function Chat() {
+	return (
+		<div className="flex h-full w-64 flex-col gap-2">
+			<div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-y-auto">
+				<div className={panel("flex flex-col")}>
+					<p className="text-sm text-gray-300">sender</p>
+					<p>message</p>
+				</div>
+				<div className={panel("flex flex-col")}>
+					<p className="text-sm text-gray-300">sender</p>
+					<p>message</p>
+				</div>
+				<div className={panel("flex flex-col")}>
+					<p className="text-sm text-gray-300">sender</p>
+					<p>message</p>
+				</div>
+				<div className={panel("flex flex-col")}>
+					<p className="text-sm text-gray-300">sender</p>
+					<p>message</p>
+				</div>
+				<div className={panel("flex flex-col")}>
+					<p className="text-sm text-gray-300">sender</p>
+					<p>message</p>
+				</div>
+			</div>
+			<div className={panel("p-0")}>
+				<textarea
+					placeholder="Say something!"
+					className="block field-sizing-content w-full resize-none px-3 py-2"
+				/>
+			</div>
+		</div>
 	)
 }
