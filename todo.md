@@ -1,0 +1,35 @@
+- app
+  - [ ] ask for a room name with a default (space slug probably) then create and navigate to new room
+- rooms
+  - [ ] tie messages to rooms
+  - [ ] ask for user name
+  - [ ] generic settings/actions panel to change name or rename room
+  - [ ] stretch: room deletion after a month or something??
+- assets
+  - files will be local, uploads only happen when adding to scene
+  - [ ] import button
+  - [ ] import via drag n drop
+  - [ ] drag asset into scene
+  - [ ] move assets
+  - [ ] resize assets
+  - [ ] rotate assets (???)
+  - [ ] remove assets, delete corresponding image on server
+- scene viewer
+  - [x] drag control
+  - [x] zoom control
+  - [ ] viewport control buttons (zoom in, zoom out, reset)
+- sheets
+  - [ ] click to roll die
+  - [ ] persona + bonuses
+  - [ ] lineage + bonuses
+  - [ ] bonds + bonuses
+  - [ ] items (???)
+  - [ ] delete button
+  - [ ] drag n drop reorder
+  - [ ] json export
+  - [ ] avatar?
+- chat
+  - [ ] /roll command
+  - [ ] italics and bold (markdown, both forms)
+    - simple tree parser/render on client
+- journals (?)
