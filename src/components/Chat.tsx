@@ -15,7 +15,7 @@ export function Chat() {
 	const createMessage = useMutation(api.messages.create)
 	return (
 		<section aria-label="Chat" className="flex h-full w-64 flex-col gap-2">
-			<ul className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-y-auto">
+			<ul className="-m-2 flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-y-auto p-2">
 				{messages?.map((message) => (
 					<li key={message._id} className={panel("flex flex-col")}>
 						<p className="text-sm text-gray-300">
