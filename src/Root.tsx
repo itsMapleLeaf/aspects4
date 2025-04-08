@@ -1,7 +1,10 @@
+import * as Ariakit from "@ariakit/react"
 import { ArkErrors, type } from "arktype"
 import { clamp } from "es-toolkit"
+import type { ReactNode } from "react"
 import { twMerge, type ClassNameValue } from "tailwind-merge"
 import { CharacterSheet } from "./components/CharacterSheet.tsx"
+import { Icon } from "./components/ui/Icon.tsx"
 import { useLocalStorage } from "./hooks/useLocalStorage.ts"
 import mapUrl from "./map.jpg"
 
@@ -22,12 +25,51 @@ export function Root() {
 	return (
 		<>
 			<SceneViewer />
-			<div className="fixed inset-y-0 left-0 max-w-xl p-4" hidden>
-				<div className={panel("h-full overflow-y-auto will-change-scroll")}>
-					<CharacterSheet />
-				</div>
+			<div className="pointer-events-children fixed inset-y-0 left-0">
+				<Sidebar />
 			</div>
 		</>
+	)
+}
+
+function Sidebar() {
+	return (
+		<Ariakit.TabProvider defaultActiveId="Characters">
+			<div className="flex h-full flex-col items-start gap-2 p-4">
+				<Ariakit.TabList className={panel("flex gap-1 p-1")}>
+					<SidebarTab
+						name="Characters"
+						icon={<Icon icon="mingcute:group-2-fill" className="size-5" />}
+					/>
+					<SidebarTab
+						name="Assets"
+						icon={<Icon icon="mingcute:pic-fill" className="size-5" />}
+					/>
+				</Ariakit.TabList>
+				<div className={panel("flex-1 overflow-y-auto will-change-scroll")}>
+					<Ariakit.TabPanel id="Characters">
+						<CharacterSheet />
+					</Ariakit.TabPanel>
+					<Ariakit.TabPanel id="Assets">assets</Ariakit.TabPanel>
+				</div>
+			</div>
+		</Ariakit.TabProvider>
+	)
+}
+
+function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
+	return (
+		<Ariakit.TooltipProvider placement="bottom-start">
+			<Ariakit.TooltipAnchor
+				render={<Ariakit.Tab id={name} />}
+				className="flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5"
+			>
+				{icon}
+			</Ariakit.TooltipAnchor>
+			<Ariakit.Tooltip className="translate-y-1 rounded border border-gray-300 bg-white px-2 py-0.5 text-sm font-bold text-gray-900 opacity-0 transition data-enter:translate-y-0 data-enter:opacity-100">
+				{name}
+			</Ariakit.Tooltip>
+		</Ariakit.TooltipProvider>
 	)
 }
 
