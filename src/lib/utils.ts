@@ -37,3 +37,8 @@ export function compactJoin(
 ): string {
 	return values.filter(Boolean).join(separator)
 }
+
+export function safeParseNumber(input: unknown) {
+	const value = Number(input)
+	return Number.isNaN(value) ? undefined : value
+}

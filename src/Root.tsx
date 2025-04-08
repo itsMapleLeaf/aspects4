@@ -1,10 +1,13 @@
 import * as Ariakit from "@ariakit/react"
 import { ArkErrors } from "arktype"
-import type { ReactNode } from "react"
+import { mapValues } from "es-toolkit"
+import { type ReactNode } from "react"
 import { twMerge, type ClassNameValue } from "tailwind-merge"
+import type { JsonObject } from "type-fest"
 import { CharacterSheet } from "./components/CharacterSheet.tsx"
 import { Icon } from "./components/ui/Icon.tsx"
 import { useLocalStorage } from "./hooks/useLocalStorage.ts"
+import { Character } from "./lib/character.ts"
 import {
 	defaultViewportTransform,
 	getViewportScale,
@@ -12,16 +15,6 @@ import {
 	ViewportTransform,
 } from "./lib/viewport.ts"
 import mapUrl from "./map.jpg"
-
-// import aspectSkillList from "./data/list-of-aspect-skills.json"
-// import skillList from "./data/list-of-skills.json"
-
-// const skillsByAttribute = Object.groupBy(skillList, (skill) => skill.attribute)
-
-// const aspectSkillsByAspect = Object.groupBy(
-// 	aspectSkillList,
-// 	(skill) => skill.aspect,
-// )
 
 const panel = (...classes: ClassNameValue[]) =>
 	twMerge("rounded-md border border-gray-800 bg-gray-900 p-3", ...classes)
@@ -80,30 +73,123 @@ function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
 }
 
 function CharacterManager() {
-	const characters = ["Luna", "Maybelle", "Fernspire"]
+	const [characterDict, setCharacterDict] = useLocalStorage<
+		Record<Character["key"], Character>
+	>("CharacterManager:characters", {}, (input) => {
+		if (typeof input !== "object") return {}
+		if (input == null) return {}
+		if (Array.isArray(input)) return {}
+
+		return mapValues(input as JsonObject, (value) => {
+			const character = Character(value)
+			if (character instanceof ArkErrors) {
+				console.warn(character)
+				return {
+					key: crypto.randomUUID(),
+					name: "New Character",
+					data: {},
+				}
+			}
+			return character
+		})
+	})
+
+	const characters = Object.values(characterDict)
+
+	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorage<
+		string | undefined | null
+	>("CharacterManager:activeCharacterKey", null, (input) =>
+		input == null ? null : String(input),
+	)
+
+	function addNewCharacter() {
+		setCharacterDict((characters) => {
+			const newCharacter: Character = {
+				key: crypto.randomUUID(),
+				name: "New Character",
+				data: {},
+			}
+			setActiveCharacterKey(newCharacter.key)
+			return { ...characters, [newCharacter.key]: newCharacter }
+		})
+	}
+
+	function setCharacterName(character: Character, name: Character["name"]) {
+		setCharacterDict((characters) => ({
+			...characters,
+			[character.key]: {
+				key: crypto.randomUUID(),
+				data: {},
+				...characters[character.key],
+				name,
+			},
+		}))
+	}
+
+	function updateCharacterData(
+		key: Character["key"],
+		newData: Character["data"],
+	) {
+		setCharacterDict((characters) => ({
+			...characters,
+			[key]: {
+				key: crypto.randomUUID(),
+				name: "",
+				...characters[key],
+				data: {
+					...characters[key]?.data,
+					...newData,
+				},
+			},
+		}))
+	}
+
 	return (
-		<Ariakit.TabProvider>
+		<Ariakit.TabProvider
+			activeId={activeCharacterKey}
+			setActiveId={setActiveCharacterKey}
+			orientation="vertical"
+		>
 			<div className="flex h-full w-full gap-2">
-				<Ariakit.TabList className={panel("flex w-40 flex-col gap-1 p-1")}>
-					{characters.map((name) => (
+				<Ariakit.TabList className={panel("flex w-44 flex-col gap-1 p-1")}>
+					{characters.map((character) => (
 						<Ariakit.Tab
-							key={name}
-							id={name}
+							key={character.key}
+							id={character.key}
 							type="button"
-							className="flex h-9 items-center rounded px-3 transition-colors hover:bg-white/5"
+							className="aria-selected:text-primary-300 flex h-9 items-center rounded px-3 transition-colors hover:bg-white/5 aria-selected:bg-white/5"
 						>
-							{name}
+							{character.name}
 						</Ariakit.Tab>
 					))}
+
+					<button
+						type="button"
+						className="flex h-9 items-center gap-2 rounded px-3 transition-colors hover:bg-white/5"
+						onClick={addNewCharacter}
+					>
+						<Icon icon="mingcute:user-add-2-fill" />
+						New Character
+					</button>
 				</Ariakit.TabList>
-				{characters.map((name) => (
+
+				{characters.map((character) => (
 					<Ariakit.TabPanel
-						id={name}
+						id={character.key}
+						key={character.key}
 						className={panel(
 							"w-148 flex-1 overflow-y-auto p-4 will-change-scroll",
 						)}
 					>
-						<CharacterSheet key={name} />
+						<CharacterSheet
+							character={character}
+							onNameChange={(name) => {
+								setCharacterName(character, name)
+							}}
+							onDataChange={(newData) => {
+								updateCharacterData(character.key, newData)
+							}}
+						/>
 					</Ariakit.TabPanel>
 				))}
 			</div>

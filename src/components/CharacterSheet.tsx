@@ -1,13 +1,72 @@
-import { clamp } from "es-toolkit"
-import { ComponentProps, ReactNode, useId, useState } from "react"
+import { clamp, sum } from "es-toolkit"
+import {
+	ComponentProps,
+	ReactNode,
+	useId,
+	useState,
+	type ChangeEvent,
+} from "react"
 import { twMerge } from "tailwind-merge"
+import type { Character } from "~/lib/character.ts"
+import { safeParseNumber } from "~/lib/utils.ts"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
 import skillList from "../data/list-of-skills.json"
 import { Icon } from "./ui/Icon.tsx"
 
-export function CharacterSheet() {
+export function CharacterSheet({
+	character,
+	onNameChange,
+	onDataChange,
+}: {
+	character: Character
+	onNameChange: (name: Character["name"]) => void
+	onDataChange: (data: Character["data"]) => void
+}) {
+	const attributeScores = {
+		strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
+		sense: safeParseNumber(character.data[`attribute:Sense`]) ?? 1,
+		dexterity: safeParseNumber(character.data[`attribute:Dexterity`]) ?? 1,
+		intellect: safeParseNumber(character.data[`attribute:Intellect`]) ?? 1,
+		presence: safeParseNumber(character.data[`attribute:Presence`]) ?? 1,
+	}
+
+	const aspectScores = {
+		fire: safeParseNumber(character.data[`aspect:Fire`]) ?? 0,
+		water: safeParseNumber(character.data[`aspect:Water`]) ?? 0,
+		wind: safeParseNumber(character.data[`aspect:Wind`]) ?? 0,
+		light: safeParseNumber(character.data[`aspect:Light`]) ?? 0,
+		darkness: safeParseNumber(character.data[`aspect:Darkness`]) ?? 0,
+	}
+
+	const attributePointsAssigned = sum(Object.values(attributeScores))
+	const aspectPointsAssigned = sum(Object.values(aspectScores))
+
+	const skillPointsAssigned = sum(
+		Object.entries(character.data)
+			.filter((entry) => entry[0].startsWith("skill"))
+			.map((entry) => safeParseNumber(entry[1]) ?? 0),
+	)
+
+	const maxHits = attributeScores.strength + attributeScores.dexterity + 3
+
+	const maxFatigue =
+		attributeScores.sense + attributeScores.intellect + attributeScores.presence
+
+	const bindString = (key: keyof Character["data"]) => ({
+		value: String(character.data[key] || ""),
+		onChange: (event: ChangeEvent<{ value: string }>) =>
+			onDataChange({ [key]: event.target.value }),
+	})
+
+	const bindNumber = (key: keyof Character["data"], fallback = 0) => {
+		return {
+			value: safeParseNumber(character.data[key]) ?? fallback,
+			onChange: (value: number) => onDataChange({ [key]: value }),
+		}
+	}
+
 	return (
 		<div className={"flex flex-col gap-3"}>
 			<div className="flex items-start gap-3">
@@ -15,57 +74,68 @@ export function CharacterSheet() {
 					<Icon icon="mingcute:pic-line" className="size-24 text-gray-700" />
 				</div>
 
-				<InputField label="Name" className="flex-1" />
-				<Field label="Hits" htmlFor="hits">
-					<NumberInput
-						id="hits"
-						className="w-16"
-						value={0}
-						onChange={() => {}}
-					/>
+				<InputField
+					label="Name"
+					className="flex-1"
+					value={character.name}
+					onChange={(event) => onNameChange(event.target.value)}
+				/>
+
+				<Field label={`Hits / ${maxHits}`} htmlFor="hits">
+					<NumberInput id="hits" className="w-21" {...bindNumber("hits")} />
 				</Field>
-				<Field label="Fatigue" htmlFor="fatigue">
+
+				<Field label={`Fatigue / ${maxFatigue}`} htmlFor="fatigue">
 					<NumberInput
 						id="fatigue"
-						className="w-16"
-						value={0}
-						onChange={() => {}}
+						className="w-21"
+						{...bindNumber("fatigue")}
 					/>
 				</Field>
 			</div>
 
 			<div className="grid gap-8 sm:grid-cols-2">
-				<div className={"flex flex-col gap-2"}>
-					{attributeList.map((item) => (
-						<StatField
-							key={item.attribute}
-							label={item.attribute}
-							value={1}
-							onChange={() => {}}
-						/>
-					))}
+				<Section heading={`Attributes (${attributePointsAssigned}/15)`}>
+					<div className={"flex flex-col gap-2"}>
+						{attributeList.map((item) => (
+							<StatField
+								key={item.attribute}
+								label={item.attribute}
+								min={1}
+								max={5}
+								{...bindNumber(`attribute:${item.attribute}`, 1)}
+							/>
+						))}
+					</div>
+				</Section>
+
+				<Section heading={`Aspects (${aspectPointsAssigned}/10)`}>
+					<div className={"flex flex-col gap-2"}>
+						{aspectList.map((item) => (
+							<StatField
+								key={item.name}
+								label={item.name}
+								min={0}
+								max={5}
+								{...bindNumber(`aspect:${item.name}`, 0)}
+							/>
+						))}
+					</div>
+				</Section>
+
+				<div className="col-span-full">
+					{skillPointsAssigned}/3 skill points used
 				</div>
 
-				<div className={"flex flex-col gap-2"}>
-					{aspectList.map((item) => (
-						<StatField
-							key={item.name}
-							label={item.name}
-							value={1}
-							onChange={() => {}}
-						/>
-					))}
-				</div>
-
-				<Section heading="Skills">
+				<Section heading="Core Skills">
 					{skillList
 						.toSorted((a, b) => a.skill.localeCompare(b.skill))
 						.map((skill) => (
 							<StatField
 								key={skill.skill}
 								label={`${skill.skill} (${skill.attribute})`}
-								value={0}
-								onChange={() => {}}
+								max={3}
+								{...bindNumber(`skill:${skill.skill}`)}
 							/>
 						))}
 				</Section>
@@ -77,19 +147,19 @@ export function CharacterSheet() {
 							<StatField
 								key={skill.modifier}
 								label={`${skill.modifier} (${skill.aspect})`}
-								value={0}
-								onChange={() => {}}
+								max={3}
+								{...bindNumber(`skill:${skill.modifier}`)}
 							/>
 						))}
 				</Section>
 			</div>
 
-			<div className={"grid gap-2"}>
-				<TextAreaField label="Items" />
-				<TextAreaField label="Persona" />
-				<TextAreaField label="Lineage" />
-				<TextAreaField label="Bonds" />
-				<TextAreaField label="Details" />
+			<div className="grid gap-2">
+				<TextAreaField label="Items" {...bindString("items")} />
+				<TextAreaField label="Bonds" {...bindString("bonds")} />
+				<TextAreaField label="Persona" {...bindString("persona")} />
+				<TextAreaField label="Lineage" {...bindString("lineage")} />
+				<TextAreaField label="Details" {...bindString("details")} />
 			</div>
 		</div>
 	)
