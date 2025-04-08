@@ -17,7 +17,10 @@ import {
 import mapUrl from "./map.jpg"
 
 const panel = (...classes: ClassNameValue[]) =>
-	twMerge("rounded-md border border-gray-800 bg-gray-900 p-3", ...classes)
+	twMerge(
+		"rounded-md border overflow-clip border-gray-800 bg-gray-900 p-3",
+		...classes,
+	)
 
 export function Root() {
 	return (
@@ -177,19 +180,19 @@ function CharacterManager() {
 					<Ariakit.TabPanel
 						id={character.key}
 						key={character.key}
-						className={panel(
-							"w-148 flex-1 overflow-y-auto p-4 will-change-scroll",
-						)}
+						className={panel("min-h-0 w-148 flex-1 p-0")}
 					>
-						<CharacterSheet
-							character={character}
-							onNameChange={(name) => {
-								setCharacterName(character, name)
-							}}
-							onDataChange={(newData) => {
-								updateCharacterData(character.key, newData)
-							}}
-						/>
+						<div className="h-full overflow-y-auto p-4 will-change-scroll">
+							<CharacterSheet
+								character={character}
+								onNameChange={(name) => {
+									setCharacterName(character, name)
+								}}
+								onDataChange={(newData) => {
+									updateCharacterData(character.key, newData)
+								}}
+							/>
+						</div>
 					</Ariakit.TabPanel>
 				))}
 			</div>
