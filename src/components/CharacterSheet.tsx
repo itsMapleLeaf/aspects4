@@ -1,4 +1,5 @@
-import { ComponentProps, ReactNode, useId } from "react"
+import { clamp } from "es-toolkit"
+import { ComponentProps, ReactNode, useId, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
@@ -15,18 +16,22 @@ export function CharacterSheet() {
 				</div>
 
 				<InputField label="Name" className="flex-1" />
-				<InputField
-					label="Hits"
-					type="number"
-					defaultValue={0}
-					className="w-16"
-				/>
-				<InputField
-					label="Fatigue"
-					type="number"
-					defaultValue={0}
-					className="w-16"
-				/>
+				<Field label="Hits" htmlFor="hits">
+					<NumberInput
+						id="hits"
+						className="w-16"
+						value={0}
+						onChange={() => {}}
+					/>
+				</Field>
+				<Field label="Fatigue" htmlFor="fatigue">
+					<NumberInput
+						id="fatigue"
+						className="w-16"
+						value={0}
+						onChange={() => {}}
+					/>
+				</Field>
 			</div>
 
 			<div className="grid gap-8 sm:grid-cols-2">
@@ -35,14 +40,20 @@ export function CharacterSheet() {
 						<StatField
 							key={item.attribute}
 							label={item.attribute}
-							defaultValue={1}
+							value={1}
+							onChange={() => {}}
 						/>
 					))}
 				</div>
 
 				<div className={"flex flex-col gap-2"}>
 					{aspectList.map((item) => (
-						<StatField key={item.name} label={item.name} defaultValue={1} />
+						<StatField
+							key={item.name}
+							label={item.name}
+							value={1}
+							onChange={() => {}}
+						/>
 					))}
 				</div>
 
@@ -53,7 +64,8 @@ export function CharacterSheet() {
 							<StatField
 								key={skill.skill}
 								label={`${skill.skill} (${skill.attribute})`}
-								defaultValue={0}
+								value={0}
+								onChange={() => {}}
 							/>
 						))}
 				</Section>
@@ -65,7 +77,8 @@ export function CharacterSheet() {
 							<StatField
 								key={skill.modifier}
 								label={`${skill.modifier} (${skill.aspect})`}
-								defaultValue={0}
+								value={0}
+								onChange={() => {}}
 							/>
 						))}
 				</Section>
@@ -113,14 +126,14 @@ function StatField({
 	className,
 	label,
 	...props
-}: ComponentProps<"input"> & { label: ReactNode }) {
+}: ComponentProps<typeof NumberInput> & { label: ReactNode }) {
 	const id = useId()
 	return (
 		<div className={twMerge("flex items-center gap-3", className)}>
 			<label htmlFor={id} className="flex-1 font-semibold">
 				{label}
 			</label>
-			<Input id={id} className="w-10 text-center" {...props} />
+			<NumberInput className="w-10 text-center" {...props} />
 		</div>
 	)
 }
@@ -179,5 +192,71 @@ function TextArea({ className, ...props }: ComponentProps<"textarea">) {
 			)}
 			{...props}
 		/>
+	)
+}
+
+function NumberInput({
+	id,
+	className,
+	value,
+	min = 0,
+	max = Number.POSITIVE_INFINITY,
+	onChange,
+}: {
+	id?: string
+	className?: string
+	value: number
+	min?: number
+	max?: number
+	onChange: (value: number) => void
+}) {
+	const [editing, setEditing] = useState(false)
+	return (
+		<div className={twMerge("text-center", className)}>
+			{editing ?
+				<input
+					id={id}
+					inputMode="numeric"
+					className="h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 text-center focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none"
+					defaultValue={value}
+					autoFocus
+					onFocus={(event) => {
+						event.currentTarget.select()
+					}}
+					onBlur={(event) => {
+						onChange(clamp(Number(event.currentTarget.value) || 0, min, max))
+						setEditing(false)
+					}}
+					onKeyDown={(event) => {
+						if (event.key === "Enter") {
+							event.preventDefault()
+							onChange(clamp(Number(event.currentTarget.value) || 0, min, max))
+							setEditing(false)
+						}
+						if (event.key === "ArrowUp") {
+							event.preventDefault()
+							event.currentTarget.value = String(
+								clamp((Number(event.currentTarget.value) || 0) + 1, min, max),
+							)
+						}
+						if (event.key === "ArrowDown") {
+							event.preventDefault()
+							event.currentTarget.value = String(
+								clamp((Number(event.currentTarget.value) || 0) - 1, min, max),
+							)
+						}
+					}}
+				/>
+			:	<button
+					id={id}
+					type="button"
+					className="h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none"
+					onClick={() => setEditing(true)}
+					onFocus={() => setEditing(true)}
+				>
+					{value}
+				</button>
+			}
+		</div>
 	)
 }
