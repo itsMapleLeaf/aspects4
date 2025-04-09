@@ -1,5 +1,5 @@
 import * as Ariakit from "@ariakit/react"
-import { useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { api } from "../../convex/_generated/api"
@@ -8,6 +8,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage.ts"
 import { panel } from "../styles/panel.ts"
 import { CharacterManager } from "./CharacterManager.tsx"
 import { Chat } from "./Chat.tsx"
+import { EditableText } from "./EditableText.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
@@ -16,6 +17,7 @@ import { Input } from "./ui/Input.tsx"
 
 export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 	const room = useQuery(api.rooms.get, { roomId })
+	const updateRoom = useMutation(api.rooms.update)
 
 	const [playerName, setPlayerName] = useLocalStorage<string | null>(
 		"Room:playerName",
@@ -39,12 +41,83 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 		<>
 			<SceneViewer />
 			<div className="fixed top-0 left-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Sidebar />
+				<Sidebar
+					tabs={[
+						{
+							name: "Characters",
+							icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
+							content: <CharacterManager />,
+						},
+						{
+							name: "Assets",
+							icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
+							content: <div>assets</div>,
+						},
+						{
+							name: "Settings",
+							icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
+							content: (
+								<RoomSettings
+									roomName={room?.name || ""}
+									playerName={playerName}
+									onUpdateRoom={(name) => updateRoom({ roomId, name })}
+									onUpdatePlayerName={setPlayerName}
+								/>
+							),
+						},
+					]}
+				/>
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Chat roomId={roomId} playerName={playerName} />
 			</div>
 		</>
+	)
+}
+
+interface RoomSettingsProps {
+	roomName: string
+	playerName: string
+	onUpdateRoom: (name: string) => void
+	onUpdatePlayerName: (name: string) => void
+}
+
+function RoomSettings({
+	roomName,
+	playerName,
+	onUpdateRoom,
+	onUpdatePlayerName,
+}: RoomSettingsProps) {
+	return (
+		<div className={panel("flex w-64 flex-col gap-4 p-4")}>
+			<h2 className="text-xl font-light">Settings</h2>
+
+			<div className="flex flex-col gap-4">
+				<EditableText
+					label="Room Name"
+					value={roomName}
+					onChange={(value) => {
+						if (value.trim() && value !== roomName) {
+							onUpdateRoom(value.trim())
+						}
+					}}
+					placeholder="Enter room name"
+				/>
+			</div>
+
+			<div className="flex flex-col gap-4">
+				<EditableText
+					label="Your Name"
+					value={playerName}
+					onChange={(value) => {
+						if (value.trim() && value !== playerName) {
+							onUpdatePlayerName(value.trim())
+						}
+					}}
+					placeholder="Enter your name"
+				/>
+			</div>
+		</div>
 	)
 }
 
@@ -85,7 +158,17 @@ function PlayerNameDialog({ onSubmit }: { onSubmit: (name: string) => void }) {
 	)
 }
 
-function Sidebar() {
+interface TabConfig {
+	name: string
+	icon: ReactNode
+	content: ReactNode
+}
+
+interface SidebarProps {
+	tabs: TabConfig[]
+}
+
+function Sidebar({ tabs }: SidebarProps) {
 	const [selectedTabId, setSelectedTabId] = useLocalStorage<
 		string | undefined | null
 	>("Sidebar:selectedTabId", null, (input) =>
@@ -99,22 +182,20 @@ function Sidebar() {
 		>
 			<div className="flex h-full flex-col items-start gap-2">
 				<Ariakit.TabList className={panel("flex gap-1 p-1")}>
-					<SidebarTab
-						name="Characters"
-						icon={<Icon icon="mingcute:group-2-fill" className="size-5" />}
-					/>
-					<SidebarTab
-						name="Assets"
-						icon={<Icon icon="mingcute:pic-fill" className="size-5" />}
-					/>
+					{tabs.map((tab) => (
+						<SidebarTab key={tab.name} name={tab.name} icon={tab.icon} />
+					))}
 				</Ariakit.TabList>
 
-				<Ariakit.TabPanel id="Characters" className="min-h-0 flex-1">
-					<CharacterManager />
-				</Ariakit.TabPanel>
-				<Ariakit.TabPanel id="Assets" className="min-h-0 flex-1">
-					assets
-				</Ariakit.TabPanel>
+				{tabs.map((tab) => (
+					<Ariakit.TabPanel
+						key={tab.name}
+						id={tab.name}
+						className="min-h-0 flex-1"
+					>
+						{tab.content}
+					</Ariakit.TabPanel>
+				))}
 			</div>
 		</Ariakit.TabProvider>
 	)

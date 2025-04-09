@@ -6,12 +6,19 @@ import { Id } from "../../convex/_generated/dataModel"
 const shortTimeFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
 })
+
 const fullDateFormat = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "long",
 	timeStyle: "medium",
 })
 
-export function Chat({ roomId, playerName }: { roomId: Id<"rooms">; playerName: string }) {
+export function Chat({
+	roomId,
+	playerName,
+}: {
+	roomId: Id<"rooms">
+	playerName: string
+}) {
 	const messages = useQuery(api.messages.list, { roomId })
 	const createMessage = useMutation(api.messages.create)
 	return (

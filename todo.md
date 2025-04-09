@@ -3,7 +3,7 @@
 - rooms
   - [x] tie messages to rooms
   - [x] ask for user name
-  - [ ] generic settings/actions panel to change name or rename room
+  - [x] generic settings/actions panel to change name or rename room
   - [ ] stretch: room deletion after a month or something??
 - assets
   - files will be local, uploads only happen when adding to scene
