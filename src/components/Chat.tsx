@@ -11,7 +11,7 @@ const fullDateFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "medium",
 })
 
-export function Chat({ roomId }: { roomId: Id<"rooms"> }) {
+export function Chat({ roomId, playerName }: { roomId: Id<"rooms">; playerName: string }) {
 	const messages = useQuery(api.messages.list, { roomId })
 	const createMessage = useMutation(api.messages.create)
 	return (
@@ -44,7 +44,7 @@ export function Chat({ roomId }: { roomId: Id<"rooms"> }) {
 							event.currentTarget.value = ""
 
 							createMessage({
-								sender: "someone",
+								sender: playerName,
 								content,
 								roomId,
 							}).catch((error) => {

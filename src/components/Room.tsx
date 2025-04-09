@@ -1,6 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { useQuery } from "convex/react"
 import type { ReactNode } from "react"
+import { useState } from "react"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
@@ -8,10 +9,23 @@ import { panel } from "../styles/panel.ts"
 import { CharacterManager } from "./CharacterManager.tsx"
 import { Chat } from "./Chat.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
+import { Button } from "./ui/Button.tsx"
+import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { Input } from "./ui/Input.tsx"
 
 export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 	const room = useQuery(api.rooms.get, { roomId })
+
+	const [playerName, setPlayerName] = useLocalStorage<string | null>(
+		"Room:playerName",
+		null,
+		(input) => (input == null ? null : String(input)),
+	)
+
+	if (playerName === null) {
+		return <PlayerNameDialog onSubmit={setPlayerName} />
+	}
 
 	if (room === undefined) {
 		return (
@@ -28,9 +42,46 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 				<Sidebar />
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Chat roomId={roomId} />
+				<Chat roomId={roomId} playerName={playerName} />
 			</div>
 		</>
+	)
+}
+
+function PlayerNameDialog({ onSubmit }: { onSubmit: (name: string) => void }) {
+	const [nameInput, setNameInput] = useState("")
+
+	return (
+		<Dialog open>
+			<DialogPanel title="Enter Your Name">
+				<form
+					action={() => {
+						const name = nameInput.trim()
+						if (name) {
+							onSubmit(name)
+						}
+					}}
+					className="flex flex-col gap-4"
+				>
+					<Input
+						label="Your name"
+						placeholder="Enter your player name"
+						required
+						value={nameInput}
+						onChange={(e) => setNameInput(e.target.value)}
+						autoFocus
+					/>
+					<Button
+						type="submit"
+						appearance="default"
+						size="default"
+						className="w-full"
+					>
+						Enter Room
+					</Button>
+				</form>
+			</DialogPanel>
+		</Dialog>
 	)
 }
 

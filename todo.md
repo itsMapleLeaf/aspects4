@@ -2,7 +2,7 @@
   - [x] ask for a room name then create and navigate to new room
 - rooms
   - [x] tie messages to rooms
-  - [ ] ask for user name
+  - [x] ask for user name
   - [ ] generic settings/actions panel to change name or rename room
   - [ ] stretch: room deletion after a month or something??
 - assets
