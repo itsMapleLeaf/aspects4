@@ -1,5 +1,8 @@
 import * as Ariakit from "@ariakit/react"
+import { useQuery } from "convex/react"
 import type { ReactNode } from "react"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
 import { panel } from "../styles/panel.ts"
 import { CharacterManager } from "./CharacterManager.tsx"
@@ -7,7 +10,17 @@ import { Chat } from "./Chat.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
 import { Icon } from "./ui/Icon.tsx"
 
-export function Room() {
+export function Room({ roomId }: { roomId: Id<"rooms"> }) {
+	const room = useQuery(api.rooms.get, { roomId })
+
+	if (room === undefined) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Loading room...
+			</div>
+		)
+	}
+
 	return (
 		<>
 			<SceneViewer />
@@ -15,7 +28,7 @@ export function Room() {
 				<Sidebar />
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Chat />
+				<Chat roomId={roomId} />
 			</div>
 		</>
 	)

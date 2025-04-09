@@ -2,9 +2,19 @@ import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 
 export const list = query({
-	args: {},
-	async handler(ctx) {
-		const messages = await ctx.db.query("messages").order("desc").take(20)
+	args: {
+		roomId: v.id("rooms"),
+	},
+	async handler(ctx, { roomId }) {
+		let messagesQuery = ctx.db.query("messages")
+
+		if (roomId) {
+			messagesQuery = messagesQuery.filter((q) =>
+				q.eq(q.field("roomId"), roomId),
+			)
+		}
+
+		const messages = await messagesQuery.order("desc").take(20)
 		return messages.toReversed()
 	},
 })
@@ -13,9 +23,10 @@ export const create = mutation({
 	args: {
 		sender: v.string(),
 		content: v.string(),
+		roomId: v.id("rooms"),
 	},
-	async handler(ctx, { sender, content }) {
-		await ctx.db.insert("messages", { sender, content })
+	async handler(ctx, { sender, content, roomId }) {
+		await ctx.db.insert("messages", { sender, content, roomId })
 	},
 })
 

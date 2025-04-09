@@ -1,7 +1,7 @@
 - app
-  - [ ] ask for a room name with a default (space slug probably) then create and navigate to new room
+  - [x] ask for a room name then create and navigate to new room
 - rooms
-  - [ ] tie messages to rooms
+  - [x] tie messages to rooms
   - [ ] ask for user name
   - [ ] generic settings/actions panel to change name or rename room
   - [ ] stretch: room deletion after a month or something??

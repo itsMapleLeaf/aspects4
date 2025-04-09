@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "convex/react"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
 
 const shortTimeFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
@@ -10,8 +11,8 @@ const fullDateFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "medium",
 })
 
-export function Chat() {
-	const messages = useQuery(api.messages.list)
+export function Chat({ roomId }: { roomId: Id<"rooms"> }) {
+	const messages = useQuery(api.messages.list, { roomId })
 	const createMessage = useMutation(api.messages.create)
 	return (
 		<section aria-label="Chat" className="flex h-full w-64 flex-col gap-2">
@@ -45,6 +46,7 @@ export function Chat() {
 							createMessage({
 								sender: "someone",
 								content,
+								roomId,
 							}).catch((error) => {
 								console.error(error)
 								alert("Oops, something went wrong. Try again.")
