@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
 import { panel } from "../styles/panel.ts"
+import { AssetsPanel } from "./AssetsPanel.tsx"
 import { CharacterManager } from "./CharacterManager.tsx"
 import { Chat } from "./Chat.tsx"
 import { EditableText } from "./EditableText.tsx"
@@ -51,7 +52,7 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 						{
 							name: "Assets",
 							icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
-							content: <div>assets</div>,
+							content: <AssetsPanel />,
 						},
 						{
 							name: "Settings",

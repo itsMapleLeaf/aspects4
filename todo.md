@@ -7,16 +7,23 @@
   - [ ] stretch: room deletion after a month or something??
 - assets
   - files will be local, uploads only happen when adding to scene
-  - [ ] import button
-  - [ ] import via drag n drop
+  - [x] import button
+  - [x] import via drag n drop
   - [ ] drag asset into scene
-  - [ ] move assets
-  - [ ] resize assets
-  - [ ] rotate assets (???)
-  - [ ] remove assets, delete corresponding image on server
+  - asset context menu:
+    - [ ] add to scene
+    - [ ] delete
+  - [ ] (future) selection via ctrl and shift like system file explorer - context menu will apply to all selected items
+  - [ ] (future) drag and drop to reorder assets
+  - [ ] (future) button to sort assets (disable reordering while sorting)
+  - [ ] (future) search
 - scene viewer
   - [x] drag control
   - [x] zoom control
+  - [ ] move assets
+  - [ ] resize assets
+  - [ ] rotate assets (???)
+  - [ ] remove assets from scene, delete corresponding image on server
   - [ ] viewport control buttons (zoom in, zoom out, reset)
 - sheets
   - [ ] click to roll die
