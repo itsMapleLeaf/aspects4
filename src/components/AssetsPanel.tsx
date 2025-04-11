@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
+import { useDrag } from "../contexts/DragContext.tsx"
 import { useAssets } from "../hooks/useIndexedDB.ts"
 import { panel } from "../styles/panel.ts"
 import { Button } from "./ui/Button.tsx"
@@ -7,6 +8,7 @@ import { Icon } from "./ui/Icon.tsx"
 
 export function AssetsPanel() {
 	const assets = useAssets()
+	const { startAssetDrag, endAssetDrag } = useDrag()
 	const [isImporting, setIsImporting] = useState(false)
 	const [isDragging, setIsDragging] = useState(false)
 
@@ -41,7 +43,11 @@ export function AssetsPanel() {
 		const handleDragOver = (e: DragEvent) => {
 			e.preventDefault()
 			e.stopPropagation()
-			if (!isDragging) setIsDragging(true)
+
+			// Only show drag overlay for file system drags (not for our internal asset drags)
+			if (!isDragging && e.dataTransfer?.types.includes("Files")) {
+				setIsDragging(true)
+			}
 		}
 
 		const handleDragLeave = (e: DragEvent) => {
@@ -64,12 +70,16 @@ export function AssetsPanel() {
 			e.stopPropagation()
 			setIsDragging(false)
 
-			if (!e.dataTransfer?.files.length) return
+			// Only process file drops, not our internal asset drags
+			if (
+				!e.dataTransfer?.files.length ||
+				!e.dataTransfer.types.includes("Files")
+			)
+				return
 
 			try {
 				setIsImporting(true)
 
-				// Process all dropped files
 				const filePromises = Array.from(e.dataTransfer.files)
 					.filter((file) => file.type.startsWith("image/"))
 					.map((file) => assets.add(file))
@@ -82,12 +92,10 @@ export function AssetsPanel() {
 			}
 		}
 
-		// Add event listeners to the window
 		window.addEventListener("dragover", handleDragOver)
 		window.addEventListener("dragleave", handleDragLeave)
 		window.addEventListener("drop", handleDrop)
 
-		// Clean up
 		return () => {
 			window.removeEventListener("dragover", handleDragOver)
 			window.removeEventListener("dragleave", handleDragLeave)
@@ -158,20 +166,43 @@ export function AssetsPanel() {
 						</div>
 					:	<div className="grid grid-cols-2 gap-2">
 							{assets.list.map((asset) => (
-								<div key={asset.id} className="group relative">
+								<div
+									key={asset.id}
+									className="group relative cursor-grab active:cursor-grabbing"
+									draggable
+									onDragStart={async () => {
+										startAssetDrag({
+											id: asset.id,
+											name: asset.name,
+											type: asset.type,
+											url: asset.url || "",
+										})
+									}}
+									onDragEnd={() => {
+										endAssetDrag()
+									}}
+								>
 									<img
 										src={asset.url}
 										alt={asset.name}
 										className="h-24 w-full rounded-md border border-gray-700 object-cover"
 									/>
 									<div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-										<button
-											onClick={() => assets.remove(asset.id)}
-											className="rounded-full bg-red-500 p-1 transition-colors hover:bg-red-600"
-											title="Delete asset"
-										>
-											<Icon icon="mingcute:delete-fill" className="size-4" />
-										</button>
+										<div className="flex gap-2">
+											<button
+												onClick={() => assets.remove(asset.id)}
+												className="rounded-full bg-red-500 p-1 transition-colors hover:bg-red-600"
+												title="Delete asset"
+											>
+												<Icon icon="mingcute:delete-fill" className="size-4" />
+											</button>
+											<button
+												className="rounded-full bg-blue-500 p-1 transition-colors hover:bg-blue-600"
+												title="Drag to add to scene"
+											>
+												<Icon icon="mingcute:move-fill" className="size-4" />
+											</button>
+										</div>
 									</div>
 									<div className="mt-1 truncate text-xs">{asset.name}</div>
 								</div>

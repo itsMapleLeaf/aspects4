@@ -9,9 +9,10 @@
   - files will be local, uploads only happen when adding to scene
   - [x] import button
   - [x] import via drag n drop
-  - [ ] drag asset into scene
-  - asset context menu:
+  - [x] drag asset into scene
+  - (future) asset context menu:
     - [ ] add to scene
+    - [ ] rename
     - [ ] delete
   - [ ] (future) selection via ctrl and shift like system file explorer - context menu will apply to all selected items
   - [ ] (future) drag and drop to reorder assets
