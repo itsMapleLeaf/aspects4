@@ -12,7 +12,8 @@
 		"preview": "vite preview",
 		"test": "vitest --run",
 		"format": "prettier . --write",
-		"fetch-notion-data": "bun run scripts/fetch-notion-data.ts"
+		"fetch-notion-data": "bun run scripts/fetch-notion-data.ts",
+		"predeploy": "convex deploy --cmd 'bun run build' --cmd-url-env-var-name VITE_CONVEX_URL"
 	},
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
