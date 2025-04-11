@@ -1,10 +1,15 @@
-export function handleDrag(onDrag: (event: PointerEvent) => void) {
+export function handleDrag({
+	onDrag,
+	onDragEnd,
+}: {
+	onDrag: (event: PointerEvent) => void
+	onDragEnd?: () => void
+}) {
 	const controller = new AbortController()
 
 	window.addEventListener(
 		"pointermove",
 		(event) => {
-			if (!(event.buttons & 2)) return
 			onDrag(event)
 		},
 		{
@@ -16,6 +21,7 @@ export function handleDrag(onDrag: (event: PointerEvent) => void) {
 		"pointerup",
 		() => {
 			controller.abort()
+			onDragEnd?.()
 		},
 		{ signal: controller.signal },
 	)
@@ -24,6 +30,7 @@ export function handleDrag(onDrag: (event: PointerEvent) => void) {
 		"blur",
 		() => {
 			controller.abort()
+			onDragEnd?.()
 		},
 		{ signal: controller.signal },
 	)

@@ -21,11 +21,11 @@
 - scene viewer
   - [x] drag control
   - [x] zoom control
-  - [ ] move assets
+  - [x] move assets
   - [ ] resize assets
-  - [ ] rotate assets (???)
   - [ ] remove assets from scene, delete corresponding image on server
-  - [ ] viewport control buttons (zoom in, zoom out, reset)
+  - [ ] (future) viewport control buttons (zoom in, zoom out, reset)
+  - [ ] (future) rotate assets
 - sheets
   - [ ] click to roll die
   - [ ] persona + bonuses

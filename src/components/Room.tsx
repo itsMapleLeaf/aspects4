@@ -40,7 +40,7 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 
 	return (
 		<>
-			<SceneViewer />
+			<SceneViewer roomId={roomId} />
 			<div className="fixed top-0 left-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Sidebar
 					tabs={[

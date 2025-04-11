@@ -1,9 +1,13 @@
 import { ArkErrors } from "arktype"
-import { useParams } from "wouter"
+import { isEqual } from "es-toolkit"
+import { useState } from "react"
+import { twMerge } from "tailwind-merge"
+import { useValueRef } from "~/hooks/common.ts"
 import { Id } from "../../convex/_generated/dataModel"
 import { useDrag } from "../contexts/DragContext.tsx"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
-import { useSceneAssets } from "../hooks/useSceneAssets.ts"
+import { useUpdateAsset } from "../hooks/useSceneAssets"
+import { useSceneAssets, type SceneAsset } from "../hooks/useSceneAssets.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
 	defaultViewportTransform,
@@ -13,14 +17,8 @@ import {
 } from "../lib/viewport.ts"
 import mapUrl from "../map.jpg"
 
-export function SceneViewer() {
-	const { roomId } = useParams<{ roomId: string }>()
-	const {
-		assets,
-		addAssetToScene,
-		updateAssetProperties: _updateAssetProperties,
-		removeAssetFromScene: _removeAssetFromScene,
-	} = useSceneAssets(roomId as Id<"rooms">)
+export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
+	const { assets, addAssetToScene } = useSceneAssets(roomId)
 	const { dragState } = useDrag()
 
 	const [viewportTransform, setViewportTransform] =
@@ -42,14 +40,17 @@ export function SceneViewer() {
 		if (event.button !== 2) return
 
 		event.preventDefault()
-		handleDrag((event) => {
-			setViewportTransform((transform) => ({
-				...transform,
-				offset: {
-					x: transform.offset.x + event.movementX,
-					y: transform.offset.y + event.movementY,
-				},
-			}))
+		handleDrag({
+			onDrag: (event) => {
+				if (!(event.buttons & 2)) return
+				setViewportTransform((transform) => ({
+					...transform,
+					offset: {
+						x: transform.offset.x + event.movementX,
+						y: transform.offset.y + event.movementY,
+					},
+				}))
+			},
 		})
 	}
 
@@ -109,25 +110,74 @@ export function SceneViewer() {
 			>
 				<img src={mapUrl} draggable={false} className="max-w-[unset]" />
 				{assets.map((asset) => (
-					<div
+					<AssetImage
 						key={asset._id}
-						className="absolute top-0 left-0 origin-top-left cursor-move"
-						style={{
-							translate: `${asset.position.x}px ${asset.position.y}px`,
-							rotate: `${asset.rotation ?? 0}deg`,
-							width: `${asset.size?.width ?? "auto"}px`,
-							height: `${asset.size?.height ?? "auto"}px`,
-						}}
-					>
-						<img
-							src={asset.url || ""}
-							alt={asset.name || ""}
-							className="max-h-full max-w-full object-contain"
-							draggable={false}
-						/>
-					</div>
+						asset={asset}
+						viewportTransform={viewportTransform}
+					/>
 				))}
 			</div>
+		</div>
+	)
+}
+
+function AssetImage({
+	asset,
+	viewportTransform,
+}: {
+	asset: SceneAsset
+	viewportTransform: ViewportTransform
+}) {
+	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+	const dragOffsetRef = useValueRef(dragOffset)
+	const update = useUpdateAsset()
+	return (
+		<div
+			className={twMerge(
+				"absolute top-0 left-0 origin-top-left cursor-move transition-[translate_rotate] ease-out",
+				isEqual(dragOffset, { x: 0, y: 0 }) ? "duration-300" : "duration-50",
+			)}
+			style={{
+				translate: `${asset.position.x + dragOffset.x}px ${asset.position.y + dragOffset.y}px`,
+				rotate: `${asset.rotation ?? 0}deg`,
+				width: `${asset.size?.width ?? "auto"}px`,
+				height: `${asset.size?.height ?? "auto"}px`,
+			}}
+			onPointerDown={(event) => {
+				if (event.button !== 0) return
+
+				event.preventDefault()
+
+				handleDrag({
+					onDrag: (event) => {
+						setDragOffset((offset) => ({
+							x:
+								offset.x +
+								event.movementX / getViewportScale(viewportTransform.zoom),
+							y:
+								offset.y +
+								event.movementY / getViewportScale(viewportTransform.zoom),
+						}))
+					},
+					onDragEnd: () => {
+						update({
+							assetId: asset._id,
+							position: {
+								x: asset.position.x + dragOffsetRef.current.x,
+								y: asset.position.y + dragOffsetRef.current.y,
+							},
+						})
+						setDragOffset({ x: 0, y: 0 })
+					},
+				})
+			}}
+		>
+			<img
+				src={asset.url || ""}
+				alt={asset.name || ""}
+				className="max-h-full max-w-full object-contain"
+				draggable={false}
+			/>
 		</div>
 	)
 }
