@@ -40,7 +40,7 @@
   - [ ] json export
   - [ ] avatar?
 - chat
-  - [ ] /roll command
-  - [ ] italics and bold (markdown, both forms)
+  - [x] /roll command
+  - [ ] (future) italics and bold (markdown, both forms)
     - simple tree parser/render on client
 - journals (?)
