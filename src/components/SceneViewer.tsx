@@ -1,12 +1,12 @@
 import { ArkErrors } from "arktype"
 import { isEqual } from "es-toolkit"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { useValueRef } from "~/hooks/common.ts"
 import { Id } from "../../convex/_generated/dataModel"
 import { useDrag } from "../contexts/DragContext.tsx"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
-import { useUpdateAsset } from "../hooks/useSceneAssets"
+import { useRemoveAsset, useUpdateAsset } from "../hooks/useSceneAssets"
 import { useSceneAssets, type SceneAsset } from "../hooks/useSceneAssets.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
@@ -21,6 +21,7 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 	const { assets, addAssetToScene } = useSceneAssets(roomId)
 	const { dragState } = useDrag()
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"assets">>()
+	const removeAsset = useRemoveAsset()
 
 	const [viewportTransform, setViewportTransform] =
 		useLocalStorage<ViewportTransform>(
@@ -96,6 +97,24 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 
 	const handleDragLeave = () => {}
 
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (
+				event.key === "Delete" &&
+				selectedAsssetId &&
+				!document.activeElement?.matches("input, textarea")
+			) {
+				removeAsset({ assetId: selectedAsssetId })
+				setSelectedAsssetId(undefined)
+			}
+		}
+
+		window.addEventListener("keydown", handleKeyDown)
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown)
+		}
+	}, [selectedAsssetId, removeAsset])
+
 	return (
 		<div
 			className="relative h-dvh w-dvw overflow-clip select-none"
@@ -145,6 +164,7 @@ function AssetImage({
 	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 	const dragOffsetRef = useValueRef(dragOffset)
 	const update = useUpdateAsset()
+
 	return (
 		<div
 			className={twMerge(

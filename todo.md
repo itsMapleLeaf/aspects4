@@ -23,7 +23,7 @@
   - [x] zoom control
   - [x] move assets
   - [x] asset selection state: click to select, click backdrop to deselect
-  - [ ] press delete key to remove from scene
+  - [x] press delete key to remove selected asset from scene
   - [x] deletion removes corresponding image on server
   - [ ] show resize handles for selected assets
   - [ ] (future) viewport control buttons (zoom in, zoom out, reset)

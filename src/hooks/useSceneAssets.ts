@@ -114,7 +114,6 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 		removeAssetFromScene,
 	}
 }
-
 export function useUpdateAsset() {
 	return useMutation(api.assets.update).withOptimisticUpdate(
 		(localStore, { assetId, ...updates }) => {
@@ -126,6 +125,21 @@ export function useUpdateAsset() {
 					query.value.map((asset: SceneAsset) =>
 						asset._id === assetId ? { ...asset, ...updates } : asset,
 					),
+				)
+			}
+		},
+	)
+}
+
+export function useRemoveAsset() {
+	return useMutation(api.assets.remove).withOptimisticUpdate(
+		(localStore, { assetId }) => {
+			for (const query of localStore.getAllQueries(api.assets.list)) {
+				if (query.value === undefined) return
+				localStore.setQuery(
+					api.assets.list,
+					{ roomId: query.args.roomId },
+					query.value.filter((asset) => asset._id !== assetId),
 				)
 			}
 		},
