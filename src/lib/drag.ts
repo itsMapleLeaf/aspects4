@@ -1,3 +1,5 @@
+const dragStartThreshold = 8
+
 export function handleDrag({
 	onDrag,
 	onDragEnd,
@@ -5,12 +7,27 @@ export function handleDrag({
 	onDrag: (event: PointerEvent) => void
 	onDragEnd?: () => void
 }) {
+	let movedX = 0
+	let movedY = 0
+	let dragging = false
+
 	const controller = new AbortController()
 
 	window.addEventListener(
 		"pointermove",
 		(event) => {
-			onDrag(event)
+			movedX += event.movementX
+			movedY += event.movementY
+
+			if (Math.sqrt(movedX * movedX + movedY * movedY) > dragStartThreshold) {
+				dragging = true
+				// todo: need to add movedX and movedY to the movement information to the consumer, otherwise the start drag position lags behind a bit
+				// but event objects can't be modified, it's a super small thing, and i'm lazy
+			}
+
+			if (dragging) {
+				onDrag(event)
+			}
 		},
 		{
 			signal: controller.signal,
@@ -21,7 +38,7 @@ export function handleDrag({
 		"pointerup",
 		() => {
 			controller.abort()
-			onDragEnd?.()
+			if (dragging) onDragEnd?.()
 		},
 		{ signal: controller.signal },
 	)
@@ -30,7 +47,7 @@ export function handleDrag({
 		"blur",
 		() => {
 			controller.abort()
-			onDragEnd?.()
+			if (dragging) onDragEnd?.()
 		},
 		{ signal: controller.signal },
 	)
@@ -38,7 +55,7 @@ export function handleDrag({
 	window.addEventListener(
 		"contextmenu",
 		(event) => {
-			event.preventDefault()
+			if (dragging) event.preventDefault()
 		},
 		{ once: true },
 	)
