@@ -1,11 +1,12 @@
 import js from "@eslint/js"
+import reactCompiler from "eslint-plugin-react-compiler"
 import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
 export default tseslint.config(
-	{ ignores: ["dist"] },
+	{ ignores: ["dist", "convex/_generated"] },
 	{
 		extends: [js.configs.recommended, ...tseslint.configs.recommended],
 		files: ["**/*.{ts,tsx}"],
@@ -16,6 +17,7 @@ export default tseslint.config(
 		plugins: {
 			"react-hooks": reactHooks,
 			"react-refresh": reactRefresh,
+			"react-compiler": reactCompiler,
 		},
 		rules: {
 			"@typescript-eslint/no-unused-vars": [
@@ -30,6 +32,7 @@ export default tseslint.config(
 				"warn",
 				{ allowConstantExport: true },
 			],
+			"react-compiler/react-compiler": "warn",
 		},
 	},
 )

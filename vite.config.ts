@@ -1,10 +1,18 @@
 import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react-swc"
+import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
 import { defineConfig } from "vitest/config"
 
 export default defineConfig({
-	plugins: [react(), tsconfigPaths(), tailwindcss()],
+	plugins: [
+		react({
+			babel: {
+				plugins: ["babel-plugin-react-compiler"],
+			},
+		}),
+		tsconfigPaths(),
+		tailwindcss(),
+	],
 	server: {
 		headers: {
 			"Access-Control-Allow-Origin": "https://www.owlbear.rodeo",
