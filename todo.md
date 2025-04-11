@@ -30,17 +30,18 @@
   - [ ] (future) viewport control buttons (zoom in, zoom out, reset)
   - [ ] (future) rotate assets
 - sheets
-  - [ ] click to roll die
+  - [x] click to prefill dice roll command
   - [ ] persona + bonuses
   - [ ] lineage + bonuses
   - [ ] bonds + bonuses
-  - [ ] items (???)
-  - [ ] delete button
-  - [ ] drag n drop reorder
-  - [ ] json export
-  - [ ] avatar?
+  - [ ] (future) items (???)
+  - [ ] (future) delete button
+  - [ ] (future) drag n drop reorder
+  - [ ] (future) json export
+  - [ ] (future) avatar?
 - chat
   - [x] /roll command
+  - [ ] (future) custom command macros
   - [ ] (future) italics and bold (markdown, both forms)
     - simple tree parser/render on client
 - journals (?)

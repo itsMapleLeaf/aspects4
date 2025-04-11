@@ -2,6 +2,7 @@ import { clamp, sum } from "es-toolkit"
 import {
 	ComponentProps,
 	ReactNode,
+	RefObject,
 	useId,
 	useState,
 	type ChangeEvent,
@@ -13,6 +14,7 @@ import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
 import skillList from "../data/list-of-skills.json"
+import { ChatInputRef } from "./Chat.tsx"
 import { Icon } from "./ui/Icon.tsx"
 
 const attributeOrder = [
@@ -27,10 +29,12 @@ const aspectOrder = ["Fire", "Water", "Wind", "Light", "Darkness"]
 
 export function CharacterSheet({
 	character,
+	chatInputRef,
 	onNameChange,
 	onDataChange,
 }: {
 	character: Character
+	chatInputRef: RefObject<ChatInputRef | null>
 	onNameChange: (name: Character["name"]) => void
 	onDataChange: (data: Character["data"]) => void
 }) {
@@ -77,6 +81,27 @@ export function CharacterSheet({
 		}
 	}
 
+	const prefillAspectsRoll = (count: number) => {
+		chatInputRef.current?.prefill(`/roll aspects ${count}`)
+	}
+
+	const handleAttributeSkillClick = (skillName: string, attributeName: string) => {
+		const attributeValue = safeParseNumber(character.data[`attribute:${attributeName}`]) ?? 1
+		const skillValue = safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+		const total = attributeValue + skillValue
+		chatInputRef.current?.prefill(`/roll aspects ${total}`)
+	}
+
+	const handleAspectSkillClick = (skillName: string, aspectName: string) => {
+		const aspectValue = safeParseNumber(character.data[`aspect:${aspectName}`]) ?? 0
+		const skillValue = safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+		const total = aspectValue + skillValue
+		
+		if (total > 0) {
+			chatInputRef.current?.prefill(`/roll aspects ${total}`)
+		}
+	}
+
 	return (
 		<div className={"flex flex-col gap-3"}>
 			<div className="flex items-start gap-3">
@@ -113,15 +138,22 @@ export function CharacterSheet({
 									attributeOrder.indexOf(a.attribute) -
 									attributeOrder.indexOf(b.attribute),
 							)
-							.map((item) => (
-								<StatField
-									key={item.attribute}
-									label={item.attribute}
-									min={1}
-									max={5}
-									{...bindNumber(`attribute:${item.attribute}`, 1)}
-								/>
-							))}
+							.map((item) => {
+								const value =
+									safeParseNumber(
+										character.data[`attribute:${item.attribute}`],
+									) ?? 1
+								return (
+									<StatField
+										key={item.attribute}
+										label={item.attribute}
+										min={1}
+										max={5}
+										onLabelClick={() => prefillAspectsRoll(value)}
+										{...bindNumber(`attribute:${item.attribute}`, 1)}
+									/>
+								)
+							})}
 					</div>
 				</Section>
 
@@ -132,15 +164,23 @@ export function CharacterSheet({
 								(a, b) =>
 									aspectOrder.indexOf(a.name) - aspectOrder.indexOf(b.name),
 							)
-							.map((item) => (
-								<StatField
-									key={item.name}
-									label={item.name}
-									min={0}
-									max={5}
-									{...bindNumber(`aspect:${item.name}`, 0)}
-								/>
-							))}
+							.map((item) => {
+								const value =
+									safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
+								return (
+									<StatField
+										key={item.name}
+										label={item.name}
+										min={0}
+										max={5}
+										fadedLabel={value === 0}
+										onLabelClick={
+											value > 0 ? () => prefillAspectsRoll(value) : undefined
+										}
+										{...bindNumber(`aspect:${item.name}`, 0)}
+									/>
+								)
+							})}
 					</div>
 				</Section>
 
@@ -148,30 +188,41 @@ export function CharacterSheet({
 					{skillPointsAssigned}/3 skill points used
 				</div>
 
-				<Section heading="Core Skills">
+				<Section heading="Skills">
 					{skillList
 						.toSorted((a, b) => a.skill.localeCompare(b.skill))
-						.map((skill) => (
-							<StatField
-								key={skill.skill}
-								label={`${skill.skill} (${skill.attribute})`}
-								max={3}
-								{...bindNumber(`skill:${skill.skill}`)}
-							/>
-						))}
+						.map((skill) => {
+							const attributeValue = safeParseNumber(character.data[`attribute:${skill.attribute}`]) ?? 1
+							return (
+								<StatField
+									key={skill.skill}
+									label={`${skill.skill} (${skill.attribute}) (${attributeValue})`}
+									max={3}
+									onLabelClick={() => handleAttributeSkillClick(skill.skill, skill.attribute)}
+									{...bindNumber(`skill:${skill.skill}`)}
+								/>
+							)
+						})}
 				</Section>
 
 				<Section heading="Aspect Skills">
 					{aspectSkillList
 						.toSorted((a, b) => a.modifier.localeCompare(b.modifier))
-						.map((skill) => (
-							<StatField
-								key={skill.modifier}
-								label={`${skill.modifier} (${skill.aspect})`}
-								max={3}
-								{...bindNumber(`skill:${skill.modifier}`)}
-							/>
-						))}
+						.map((skill) => {
+							const aspectValue = safeParseNumber(character.data[`aspect:${skill.aspect}`]) ?? 0
+							const skillValue = safeParseNumber(character.data[`skill:${skill.modifier}`]) ?? 0
+							const total = aspectValue + skillValue
+							return (
+								<StatField
+									key={skill.modifier}
+									label={`${skill.modifier} (${skill.aspect}) (${aspectValue})`}
+									max={3}
+									fadedLabel={total === 0}
+									onLabelClick={total > 0 ? () => handleAspectSkillClick(skill.modifier, skill.aspect) : undefined}
+									{...bindNumber(`skill:${skill.modifier}`)}
+								/>
+							)
+						})}
 				</Section>
 			</div>
 
@@ -216,15 +267,34 @@ function InputField({
 function StatField({
 	className,
 	label,
+	onLabelClick,
+	fadedLabel,
 	...props
-}: ComponentProps<typeof NumberInput> & { label: ReactNode }) {
+}: ComponentProps<typeof NumberInput> & {
+	label: ReactNode
+	onLabelClick?: () => void
+	fadedLabel?: boolean
+}) {
 	const id = useId()
 	return (
 		<div className={twMerge("flex items-center gap-3", className)}>
-			<label htmlFor={id} className="flex-1 font-semibold">
+			<label
+				htmlFor={id}
+				className={twMerge(
+					"flex-1 font-semibold",
+					fadedLabel && "text-gray-400",
+					onLabelClick && "hover:text-primary-300",
+				)}
+				onClick={(event) => {
+					if (onLabelClick) {
+						event.preventDefault()
+						onLabelClick()
+					}
+				}}
+			>
 				{label}
 			</label>
-			<NumberInput className="w-10 text-center" {...props} />
+			<NumberInput id={id} className="w-10 text-center" {...props} />
 		</div>
 	)
 }

@@ -1,8 +1,13 @@
 import { useMutation, useQuery } from "convex/react"
-import { useCallback, useState } from "react"
+import { useCallback, useImperativeHandle, useRef, useState } from "react"
+import { rollDice } from "~/lib/dice.ts"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
+
+export interface ChatInputRef {
+	prefill: (value: string) => void
+}
 
 const shortTimeFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
@@ -24,9 +29,11 @@ type LocalMessage = {
 export function Chat({
 	roomId,
 	playerName,
+	chatInputRef,
 }: {
 	roomId: Id<"rooms">
 	playerName: string
+	chatInputRef: React.RefObject<ChatInputRef | null>
 }) {
 	const remoteMessages = useQuery(api.messages.list, { roomId })
 	const createMessage = useMutation(api.messages.create)
@@ -50,86 +57,6 @@ export function Chat({
 	const allMessages = [...(remoteMessages ?? []), ...localMessages].sort(
 		(a, b) => a._creationTime - b._creationTime,
 	)
-
-	type DiceRollResult =
-		| { success: true; message: string }
-		| { success: false; error: string }
-
-	const rollAspectsOfNature = (diceCount: number): DiceRollResult => {
-		if (diceCount <= 0 || diceCount > 100) {
-			return {
-				success: false,
-				error: "Error: Invalid dice count. Must be between 1 and 100.",
-			}
-		}
-
-		const rolls = []
-		let successCount = 0
-
-		for (let i = 0; i < diceCount; i++) {
-			const roll = Math.floor(Math.random() * 12) + 1
-			rolls.push(roll)
-
-			if (roll >= 9 && roll <= 11) {
-				successCount += 1
-			} else if (roll === 12) {
-				successCount += 2
-			}
-		}
-
-		const rollMessage = `Rolled ${diceCount} dice: ${successCount} successes (${rolls.join(", ")})`
-		return { success: true, message: rollMessage }
-	}
-
-	const rollDice = (args: string[]): DiceRollResult => {
-		const rollArg = args.join(" ")
-
-		// Check for Aspects of Nature format: "aspects X" or "aX"
-		const aspectsPattern = /^aspects\s+(\d+)$/i
-		const aspectsMatch = rollArg.match(aspectsPattern)
-
-		if (aspectsMatch && aspectsMatch[1]) {
-			const diceCount = parseInt(aspectsMatch[1], 10)
-			return rollAspectsOfNature(diceCount)
-		}
-
-		const aspectsShortPattern = /^a(\d+)$/i
-		const aspectsShortMatch = rollArg.match(aspectsShortPattern)
-
-		if (aspectsShortMatch && aspectsShortMatch[1]) {
-			const diceCount = parseInt(aspectsShortMatch[1], 10)
-			return rollAspectsOfNature(diceCount)
-		}
-
-		// Standard dice rolling format: XdY
-		const rollPattern = /^(\d+)d(\d+)$/
-		const rollMatch = rollArg.match(rollPattern)
-
-		if (!rollMatch || !rollMatch[1] || !rollMatch[2]) {
-			return {
-				success: false,
-				error: `Error: Invalid roll format.`,
-			}
-		}
-
-		const diceCount = parseInt(rollMatch[1], 10)
-		const sides = parseInt(rollMatch[2], 10)
-
-		if (diceCount <= 0 || diceCount > 100 || sides <= 0) {
-			return {
-				success: false,
-				error: `Error: Invalid dice parameters.`,
-			}
-		}
-
-		const rolls = []
-		for (let i = 0; i < diceCount; i++) {
-			rolls.push(Math.floor(Math.random() * sides) + 1)
-		}
-
-		const rollMessage = `Rolled ${diceCount}d${sides}: ${rolls.join(", ")}`
-		return { success: true, message: rollMessage }
-	}
 
 	type Command = {
 		usage: string[]
@@ -188,6 +115,17 @@ export function Chat({
 	const commandMap = new Map(Object.entries(commands))
 	commandMap.set("r", commands.roll)
 	commandMap.set("rp", commands.rollpriv)
+
+	const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+	useImperativeHandle(chatInputRef, () => ({
+		prefill: (value: string) => {
+			if (textareaRef.current) {
+				textareaRef.current.value = value
+				textareaRef.current.focus()
+			}
+		}
+	}))
 
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<{ value: string }>,
@@ -286,6 +224,7 @@ export function Chat({
 			</div>
 			<footer className={panel("p-0 focus-within:border-gray-700")}>
 				<textarea
+					ref={textareaRef}
 					placeholder="Say something!"
 					className="block field-sizing-content w-full resize-none px-3 py-2 focus:outline-none"
 					onKeyDown={handleKeyDown}

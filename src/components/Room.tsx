@@ -1,7 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
@@ -16,10 +16,12 @@ import { Button } from "./ui/Button.tsx"
 import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Input } from "./ui/Input.tsx"
+import { ChatInputRef } from "./Chat.tsx"
 
 export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 	const room = useQuery(api.rooms.get, { roomId })
 	const updateRoom = useMutation(api.rooms.update)
+	const chatInputRef = useRef<ChatInputRef | null>(null)
 
 	const [playerName, setPlayerName] = useLocalStorage<string | null>(
 		"Room:playerName",
@@ -56,7 +58,7 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 						{
 							name: "Characters",
 							icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
-							content: <CharacterManager />,
+							content: <CharacterManager chatInputRef={chatInputRef} />,
 						},
 						{
 							name: "Assets",
@@ -79,7 +81,7 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 				/>
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Chat roomId={roomId} playerName={playerName} />
+				<Chat roomId={roomId} playerName={playerName} chatInputRef={chatInputRef} />
 			</div>
 		</DocumentTitle>
 	)

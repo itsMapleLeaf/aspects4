@@ -7,8 +7,10 @@ import { Character } from "../lib/character.ts"
 import { panel } from "../styles/panel.ts"
 import { CharacterSheet } from "./CharacterSheet.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { ChatInputRef } from "./Chat.tsx"
+import { RefObject } from "react"
 
-export function CharacterManager() {
+export function CharacterManager({ chatInputRef }: { chatInputRef: RefObject<ChatInputRef | null> }) {
 	const [characterDict, setCharacterDict] = useLocalStorage<
 		Record<Character["key"], Character>
 	>("CharacterManager:characters", {}, (input) => {
@@ -121,6 +123,7 @@ export function CharacterManager() {
 						<div className="h-full overflow-y-auto p-4 will-change-scroll">
 							<CharacterSheet
 								character={character}
+								chatInputRef={chatInputRef}
 								onNameChange={(name) => {
 									setCharacterName(character, name)
 								}}
