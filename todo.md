@@ -25,7 +25,7 @@
   - [x] asset selection state: click to select, click backdrop to deselect
   - [x] press delete key to remove selected asset from scene
   - [x] deletion removes corresponding image on server
-  - [ ] show resize handles for selected assets
+  - [x] show resize handles for selected assets
   - [x] press "L" to lock an asset and prevent it from moving
   - [ ] (future) viewport control buttons (zoom in, zoom out, reset)
   - [ ] (future) rotate assets

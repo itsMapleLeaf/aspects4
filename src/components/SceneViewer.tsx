@@ -1,12 +1,16 @@
 import { ArkErrors } from "arktype"
 import { isEqual } from "es-toolkit"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { useValueRef } from "~/hooks/common.ts"
 import { Id } from "../../convex/_generated/dataModel"
 import { useDrag } from "../contexts/DragContext.tsx"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
-import { useRemoveAsset, useUpdateAsset, useMoveAssetToFront } from "../hooks/useSceneAssets"
+import {
+	useMoveAssetToFront,
+	useRemoveAsset,
+	useUpdateAsset,
+} from "../hooks/useSceneAssets"
 import { useSceneAssets, type SceneAsset } from "../hooks/useSceneAssets.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
@@ -172,21 +176,35 @@ function AssetImage({
 }) {
 	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 	const dragOffsetRef = useValueRef(dragOffset)
+	const [resizeOffset, setResizeOffset] = useState({ width: 0, height: 0 })
+	const resizeOffsetRef = useValueRef(resizeOffset)
 	const update = useUpdateAsset()
 	const moveToFront = useMoveAssetToFront()
+	
+	const setBodyCursor = useCallback((cursor: string | null) => {
+		if (cursor) {
+			document.body.style.cursor = cursor
+		} else {
+			document.body.style.removeProperty('cursor')
+		}
+	}, [])
+
+	const isIdle =
+		isEqual(dragOffset, { x: 0, y: 0 }) &&
+		isEqual(resizeOffset, { width: 0, height: 0 })
 
 	return (
 		<div
 			className={twMerge(
 				"absolute top-0 left-0 origin-top-left transition-[translate_rotate] ease-out",
-				isEqual(dragOffset, { x: 0, y: 0 }) ? "duration-300" : "duration-50",
+				isIdle ? "duration-300" : "duration-50",
 				asset.locked ? "" : "cursor-move",
 			)}
 			style={{
 				translate: `${asset.position.x + dragOffset.x}px ${asset.position.y + dragOffset.y}px`,
 				rotate: `${asset.rotation ?? 0}deg`,
-				width: `${asset.size?.width ?? "auto"}px`,
-				height: `${asset.size?.height ?? "auto"}px`,
+				width: `${(asset.size?.width ?? 0) + resizeOffset.width}px`,
+				height: `${(asset.size?.height ?? 0) + resizeOffset.height}px`,
 			}}
 			onPointerDown={(event) => {
 				if (event.button !== 0) return
@@ -200,6 +218,7 @@ function AssetImage({
 				handleDrag({
 					onDragStart: () => {
 						moveToFront({ assetId: asset._id })
+						setBodyCursor("move")
 					},
 					onDrag: (event) => {
 						setDragOffset((offset) => ({
@@ -220,19 +239,16 @@ function AssetImage({
 							},
 						})
 						setDragOffset({ x: 0, y: 0 })
+						setBodyCursor(null)
 					},
 				})
 			}}
 		>
-			<div className="relative">
+			<div className="relative size-full">
 				<img
 					src={asset.url || ""}
 					alt={asset.name || ""}
-					style={{
-						width: asset.size?.width ?? 1000,
-						height: asset.size?.height ?? 1000,
-					}}
-					className="object-contain"
+					className="size-full object-cover"
 					draggable={false}
 				/>
 
@@ -256,6 +272,59 @@ function AssetImage({
 									}}
 								/>
 							</div>
+						)}
+
+						{!asset.locked && (
+							<div
+								className="bg-primary-400 absolute cursor-nwse-resize"
+								style={{
+									width: 16 / getViewportScale(viewportTransform.zoom),
+									height: 16 / getViewportScale(viewportTransform.zoom),
+									right: -8 / getViewportScale(viewportTransform.zoom),
+									bottom: -8 / getViewportScale(viewportTransform.zoom),
+								}}
+								onPointerDown={(event) => {
+									if (event.button !== 0) return
+
+									event.stopPropagation()
+									event.preventDefault()
+
+									moveToFront({ assetId: asset._id })
+									setBodyCursor("nwse-resize")
+
+									handleDrag({
+										onDrag: (event) => {
+											setResizeOffset((offset) => ({
+												width:
+													offset.width +
+													event.movementX /
+														getViewportScale(viewportTransform.zoom),
+												height:
+													offset.height +
+													event.movementY /
+														getViewportScale(viewportTransform.zoom),
+											}))
+										},
+										onDragEnd: () => {
+											const newWidth =
+												(asset.size?.width ?? 0) + resizeOffsetRef.current.width
+											const newHeight =
+												(asset.size?.height ?? 0) +
+												resizeOffsetRef.current.height
+
+											update({
+												assetId: asset._id,
+												size: {
+													width: Math.max(10, newWidth),
+													height: Math.max(10, newHeight),
+												},
+											})
+											setResizeOffset({ width: 0, height: 0 })
+											setBodyCursor(null)
+										},
+									})
+								}}
+							/>
 						)}
 					</div>
 				)}
