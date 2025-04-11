@@ -1,7 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 
-// List all assets in a room
 export const list = query({
 	args: {
 		roomId: v.id("rooms"),
@@ -13,14 +12,15 @@ export const list = query({
 			.order("desc")
 			.collect()
 
-		return await Array.fromAsync(assets, async (asset) => ({
+		const assetsWithUrl = await Array.fromAsync(assets, async (asset) => ({
 			...asset,
 			url: await ctx.storage.getUrl(asset.fileId),
 		}))
+
+		return assetsWithUrl.sort((a, b) => a.updatedAt - b.updatedAt)
 	},
 })
 
-// Get a single asset by ID
 export const get = query({
 	args: {
 		assetId: v.id("assets"),
@@ -34,7 +34,6 @@ export const get = query({
 	},
 })
 
-// Generate a URL for uploading a file to Convex storage
 export const generateUploadUrl = mutation({
 	args: {},
 	async handler(ctx) {
@@ -42,7 +41,6 @@ export const generateUploadUrl = mutation({
 	},
 })
 
-// Create a new asset in the scene after file upload
 export const create = mutation({
 	args: {
 		name: v.string(),
@@ -64,13 +62,12 @@ export const create = mutation({
 	async handler(ctx, args) {
 		const assetId = await ctx.db.insert("assets", {
 			...args,
-			createdAt: Date.now(),
+			updatedAt: Date.now(),
 		})
 		return assetId
 	},
 })
 
-// Update an asset's position, size, or rotation
 export const update = mutation({
 	args: {
 		assetId: v.id("assets"),
@@ -89,11 +86,13 @@ export const update = mutation({
 		rotation: v.optional(v.number()),
 	},
 	async handler(ctx, { assetId, ...updates }) {
-		await ctx.db.patch(assetId, updates)
+		await ctx.db.patch(assetId, {
+			...updates,
+			updatedAt: Date.now(),
+		})
 	},
 })
 
-// Delete an asset and its associated file
 export const remove = mutation({
 	args: {
 		assetId: v.id("assets"),
@@ -102,10 +101,8 @@ export const remove = mutation({
 		const asset = await ctx.db.get(assetId)
 		if (!asset) throw new Error("Asset not found")
 
-		// Delete the file from storage
 		await ctx.storage.delete(asset.fileId)
 
-		// Delete the asset record
 		await ctx.db.delete(assetId)
 		return assetId
 	},

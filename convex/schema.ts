@@ -19,11 +19,13 @@ export default defineSchema({
 			x: v.number(),
 			y: v.number(),
 		}),
-		size: v.optional(v.object({
-			width: v.number(),
-			height: v.number(),
-		})),
+		size: v.optional(
+			v.object({
+				width: v.number(),
+				height: v.number(),
+			}),
+		),
 		rotation: v.optional(v.number()),
-		createdAt: v.number(),
+		updatedAt: v.number(),
 	}),
 })
