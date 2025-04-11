@@ -38,7 +38,7 @@ export function Tooltip({
 			>
 				{content}
 			</Ariakit.Tooltip>
-			<p className="sr-only">{content}</p>
+			<div className="sr-only">{content}</div>
 		</>
 	)
 }

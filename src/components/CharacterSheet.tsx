@@ -15,6 +15,7 @@ import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
 import skillList from "../data/list-of-skills.json"
 import { ChatInputRef } from "./Chat.tsx"
+import { Tooltip } from "./ui/Tooltip.tsx"
 import { Icon } from "./ui/Icon.tsx"
 
 const attributeOrder = [
@@ -193,10 +194,23 @@ export function CharacterSheet({
 						.toSorted((a, b) => a.skill.localeCompare(b.skill))
 						.map((skill) => {
 							const attributeValue = safeParseNumber(character.data[`attribute:${skill.attribute}`]) ?? 1
+							
+							// Create tooltip content
+							let tooltip = null
+							if (skill.effect || skill.flavor) {
+								tooltip = (
+									<div className="space-y-2">
+										{skill.effect && <div>{skill.effect}</div>}
+										{skill.flavor && <div className="italic">{skill.flavor}</div>}
+									</div>
+								)
+							}
+							
 							return (
 								<StatField
 									key={skill.skill}
 									label={`${skill.skill} (${skill.attribute}) (${attributeValue})`}
+									tooltip={tooltip}
 									max={3}
 									onLabelClick={() => handleAttributeSkillClick(skill.skill, skill.attribute)}
 									{...bindNumber(`skill:${skill.skill}`)}
@@ -212,10 +226,17 @@ export function CharacterSheet({
 							const aspectValue = safeParseNumber(character.data[`aspect:${skill.aspect}`]) ?? 0
 							const skillValue = safeParseNumber(character.data[`skill:${skill.modifier}`]) ?? 0
 							const total = aspectValue + skillValue
+							
+							// Create tooltip content
+							const tooltip = skill.description ? (
+								<div>{skill.description}</div>
+							) : null
+							
 							return (
 								<StatField
 									key={skill.modifier}
 									label={`${skill.modifier} (${skill.aspect}) (${aspectValue})`}
+									tooltip={tooltip}
 									max={3}
 									fadedLabel={total === 0}
 									onLabelClick={total > 0 ? () => handleAspectSkillClick(skill.modifier, skill.aspect) : undefined}
@@ -269,31 +290,44 @@ function StatField({
 	label,
 	onLabelClick,
 	fadedLabel,
+	tooltip,
 	...props
 }: ComponentProps<typeof NumberInput> & {
 	label: ReactNode
 	onLabelClick?: () => void
 	fadedLabel?: boolean
+	tooltip?: ReactNode
 }) {
 	const id = useId()
+	
+	const labelContent = (
+		<label
+			htmlFor={id}
+			className={twMerge(
+				"flex-1 font-semibold",
+				fadedLabel && "text-gray-400",
+				onLabelClick && "hover:text-primary-300",
+			)}
+			onClick={(event) => {
+				if (onLabelClick) {
+					event.preventDefault()
+					onLabelClick()
+				}
+			}}
+		>
+			{label}
+		</label>
+	)
+	
 	return (
 		<div className={twMerge("flex items-center gap-3", className)}>
-			<label
-				htmlFor={id}
-				className={twMerge(
-					"flex-1 font-semibold",
-					fadedLabel && "text-gray-400",
-					onLabelClick && "hover:text-primary-300",
-				)}
-				onClick={(event) => {
-					if (onLabelClick) {
-						event.preventDefault()
-						onLabelClick()
-					}
-				}}
-			>
-				{label}
-			</label>
+			{tooltip ? (
+				<Tooltip content={tooltip}>
+					{labelContent}
+				</Tooltip>
+			) : (
+				labelContent
+			)}
 			<NumberInput id={id} className="w-10 text-center" {...props} />
 		</div>
 	)

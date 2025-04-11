@@ -34,10 +34,12 @@
   - [ ] persona + bonuses
   - [ ] lineage + bonuses
   - [ ] bonds + bonuses
-  - [ ] (future) items (???)
+  - [ ] milestones
   - [ ] (future) delete button
+  - [ ] (future) sharing
+  - [ ] (future) import/export
+  - [ ] (future) items (???)
   - [ ] (future) drag n drop reorder
-  - [ ] (future) json export
   - [ ] (future) avatar?
 - chat
   - [x] /roll command
