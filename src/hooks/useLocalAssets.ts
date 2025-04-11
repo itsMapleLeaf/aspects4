@@ -40,16 +40,6 @@ export function useLocalAssets() {
 	const [error, setError] = useState<Error | null>(null)
 
 	useEffect(() => {
-		return () => {
-			assets.forEach((asset) => {
-				if (asset.url) {
-					URL.revokeObjectURL(asset.url)
-				}
-			})
-		}
-	}, [assets])
-
-	useEffect(() => {
 		const loadAssets = async () => {
 			try {
 				setLoading(true)

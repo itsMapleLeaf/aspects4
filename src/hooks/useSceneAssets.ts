@@ -18,21 +18,26 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 	const removeAsset = useMutation(api.assets.remove)
 
 	const addAssetToScene = useCallback(
-		async (file: File, position: { x: number; y: number }) => {
+		async (
+			asset: { name: string; url: string; type: string },
+			position: { x: number; y: number },
+		) => {
 			try {
 				setIsUploading(true)
 				setError(null)
 
-				const { width, height } = await createImageBitmap(file)
+				const assetBlob = await fetch(asset.url).then((res) => res.blob())
+
+				const { width, height } = await createImageBitmap(assetBlob)
 
 				const uploadUrl = await generateUploadUrl()
 
 				const result = await fetch(uploadUrl, {
 					method: "POST",
 					headers: {
-						"Content-Type": file.type,
+						"Content-Type": asset.type,
 					},
-					body: file,
+					body: assetBlob,
 				})
 
 				if (!result.ok) {
@@ -43,11 +48,14 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 				const fileId = responseData.storageId as Id<"_storage">
 
 				await createAsset({
-					name: file.name,
-					type: file.type,
+					name: asset.name,
+					type: asset.type,
 					fileId,
 					roomId,
-					position,
+					position: {
+						x: position.x - width / 2,
+						y: position.y - height / 2,
+					},
 					size: { width, height },
 				})
 

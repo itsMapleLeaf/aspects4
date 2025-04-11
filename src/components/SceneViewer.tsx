@@ -66,15 +66,11 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 			const data = dragState.assetData
 			if (!data) return
 
-			const res = await fetch(data.url)
-			const blob = await res.blob()
-			const file = new File([blob], data.name, { type: data.type })
-
 			const scale = getViewportScale(viewportTransform.zoom)
 			const dropX = (event.clientX - viewportTransform.offset.x) / scale
 			const dropY = (event.clientY - viewportTransform.offset.y) / scale
 
-			addAssetToScene(file, { x: dropX, y: dropY })
+			addAssetToScene(data, { x: dropX, y: dropY })
 		} catch (err) {
 			console.error("Error processing dropped asset:", err)
 		}
