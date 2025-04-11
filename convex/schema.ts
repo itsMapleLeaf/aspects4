@@ -26,6 +26,7 @@ export default defineSchema({
 			}),
 		),
 		rotation: v.optional(v.number()),
+		locked: v.optional(v.boolean()),
 		updatedAt: v.number(),
 	}),
 })

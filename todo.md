@@ -26,7 +26,7 @@
   - [x] press delete key to remove selected asset from scene
   - [x] deletion removes corresponding image on server
   - [ ] show resize handles for selected assets
-  - [ ] press "L" to lock an asset and prevent it from moving
+  - [x] press "L" to lock an asset and prevent it from moving
   - [ ] (future) viewport control buttons (zoom in, zoom out, reset)
   - [ ] (future) rotate assets
 - sheets

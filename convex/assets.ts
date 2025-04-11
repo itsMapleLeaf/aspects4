@@ -84,11 +84,11 @@ export const update = mutation({
 			}),
 		),
 		rotation: v.optional(v.number()),
+		locked: v.optional(v.boolean()),
 	},
 	async handler(ctx, { assetId, ...updates }) {
 		await ctx.db.patch(assetId, {
 			...updates,
-			updatedAt: Date.now(),
 		})
 	},
 })
@@ -105,5 +105,19 @@ export const remove = mutation({
 
 		await ctx.db.delete(assetId)
 		return assetId
+	},
+})
+
+export const moveToFront = mutation({
+	args: {
+		assetId: v.id("assets"),
+	},
+	async handler(ctx, { assetId }) {
+		const asset = await ctx.db.get(assetId)
+		if (!asset) throw new Error("Asset not found")
+
+		await ctx.db.patch(assetId, {
+			updatedAt: Date.now(),
+		})
 	},
 })

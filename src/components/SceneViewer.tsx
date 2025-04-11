@@ -6,7 +6,7 @@ import { useValueRef } from "~/hooks/common.ts"
 import { Id } from "../../convex/_generated/dataModel"
 import { useDrag } from "../contexts/DragContext.tsx"
 import { useLocalStorage } from "../hooks/useLocalStorage.ts"
-import { useRemoveAsset, useUpdateAsset } from "../hooks/useSceneAssets"
+import { useRemoveAsset, useUpdateAsset, useMoveAssetToFront } from "../hooks/useSceneAssets"
 import { useSceneAssets, type SceneAsset } from "../hooks/useSceneAssets.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
@@ -15,12 +15,14 @@ import {
 	handleViewportZoom,
 	ViewportTransform,
 } from "../lib/viewport.ts"
+import { Icon } from "./ui/Icon.tsx"
 
 export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 	const { assets, addAssetToScene } = useSceneAssets(roomId)
 	const { dragState } = useDrag()
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"assets">>()
 	const removeAsset = useRemoveAsset()
+	const update = useUpdateAsset()
 
 	const [viewportTransform, setViewportTransform] =
 		useLocalStorage<ViewportTransform>(
@@ -103,6 +105,22 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 				removeAsset({ assetId: selectedAsssetId })
 				setSelectedAsssetId(undefined)
 			}
+
+			if (
+				event.key === "l" &&
+				selectedAsssetId &&
+				!document.activeElement?.matches("input, textarea")
+			) {
+				const selectedAsset = assets.find(
+					(asset) => asset._id === selectedAsssetId,
+				)
+				if (selectedAsset) {
+					update({
+						assetId: selectedAsssetId,
+						locked: !selectedAsset.locked,
+					})
+				}
+			}
 		}
 
 		window.addEventListener("keydown", handleKeyDown)
@@ -155,12 +173,14 @@ function AssetImage({
 	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 	const dragOffsetRef = useValueRef(dragOffset)
 	const update = useUpdateAsset()
+	const moveToFront = useMoveAssetToFront()
 
 	return (
 		<div
 			className={twMerge(
-				"absolute top-0 left-0 origin-top-left cursor-move transition-[translate_rotate] ease-out",
+				"absolute top-0 left-0 origin-top-left transition-[translate_rotate] ease-out",
 				isEqual(dragOffset, { x: 0, y: 0 }) ? "duration-300" : "duration-50",
+				asset.locked ? "" : "cursor-move",
 			)}
 			style={{
 				translate: `${asset.position.x + dragOffset.x}px ${asset.position.y + dragOffset.y}px`,
@@ -175,7 +195,12 @@ function AssetImage({
 
 				event.preventDefault()
 
+				if (asset.locked) return
+
 				handleDrag({
+					onDragStart: () => {
+						moveToFront({ assetId: asset._id })
+					},
 					onDrag: (event) => {
 						setDragOffset((offset) => ({
 							x:
@@ -219,7 +244,20 @@ function AssetImage({
 						style={{
 							outlineWidth: 2 / getViewportScale(viewportTransform.zoom),
 						}}
-					></div>
+					>
+						{asset.locked && (
+							<div className="absolute top-0 left-0 p-1 opacity-50">
+								<Icon
+									icon="mingcute:lock-fill"
+									className="aspect-square"
+									style={{
+										width: 16 / getViewportScale(viewportTransform.zoom),
+										height: 16 / getViewportScale(viewportTransform.zoom),
+									}}
+								/>
+							</div>
+						)}
+					</div>
 				)}
 			</div>
 		</div>
