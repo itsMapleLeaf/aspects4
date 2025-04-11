@@ -23,10 +23,10 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 				setIsUploading(true)
 				setError(null)
 
-				// 1. Get a URL to upload the file
+				const { width, height } = await createImageBitmap(file)
+
 				const uploadUrl = await generateUploadUrl()
 
-				// 2. Upload the file to the URL
 				const result = await fetch(uploadUrl, {
 					method: "POST",
 					headers: {
@@ -39,18 +39,16 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 					throw new Error(`Failed to upload file: ${result.statusText}`)
 				}
 
-				// 3. Get the storage ID from the response
 				const responseData = (await result.json()) as { storageId: string }
 				const fileId = responseData.storageId as Id<"_storage">
 
-				// 4. Create the asset in the database
 				await createAsset({
 					name: file.name,
 					type: file.type,
 					fileId,
 					roomId,
 					position,
-					// Optional size and rotation can be added later
+					size: { width, height },
 				})
 
 				return true

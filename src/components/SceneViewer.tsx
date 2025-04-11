@@ -15,7 +15,6 @@ import {
 	handleViewportZoom,
 	ViewportTransform,
 } from "../lib/viewport.ts"
-import mapUrl from "../map.jpg"
 
 export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 	const { assets, addAssetToScene } = useSceneAssets(roomId)
@@ -65,10 +64,7 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 
 		try {
 			const data = dragState.assetData
-
-			if (!data) {
-				return
-			}
+			if (!data) return
 
 			const res = await fetch(data.url)
 			const blob = await res.blob()
@@ -131,11 +127,6 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 					scale: getViewportScale(viewportTransform.zoom),
 				}}
 			>
-				<img
-					src={mapUrl}
-					draggable={false}
-					className="pointer-events-none max-w-[unset]"
-				/>
 				{assets.map((asset) => (
 					<AssetImage
 						key={asset._id}
@@ -212,7 +203,11 @@ function AssetImage({
 				<img
 					src={asset.url || ""}
 					alt={asset.name || ""}
-					className="max-h-full max-w-full object-contain"
+					style={{
+						width: asset.size?.width ?? 1000,
+						height: asset.size?.height ?? 1000,
+					}}
+					className="object-contain"
 					draggable={false}
 				/>
 

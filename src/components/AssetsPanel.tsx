@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { useDrag } from "../contexts/DragContext.tsx"
-import { useAssets } from "../hooks/useIndexedDB.ts"
+import { useLocalAssets } from "../hooks/useLocalAssets.ts"
 import { panel } from "../styles/panel.ts"
 import { Button } from "./ui/Button.tsx"
 import { Icon } from "./ui/Icon.tsx"
 
 export function AssetsPanel() {
-	const assets = useAssets()
+	const assets = useLocalAssets()
 	const { startAssetDrag, endAssetDrag } = useDrag()
 	const [isImporting, setIsImporting] = useState(false)
 	const [isDragging, setIsDragging] = useState(false)
