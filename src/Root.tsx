@@ -2,10 +2,11 @@ import { ConvexProvider, ConvexReactClient, useMutation } from "convex/react"
 import { Route, Switch, useLocation } from "wouter"
 import { api } from "../convex/_generated/api"
 import { Id } from "../convex/_generated/dataModel"
-import { DragProvider } from "./contexts/DragContext.tsx"
+import { DocumentTitle } from "./components/DocumentTitle.tsx"
 import { Room } from "./components/Room.tsx"
 import { Button } from "./components/ui/Button.tsx"
 import { Input } from "./components/ui/Input.tsx"
+import { DragProvider } from "./contexts/DragContext.tsx"
 import { panel } from "./styles/panel.ts"
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
@@ -14,14 +15,16 @@ export function Root() {
 	return (
 		<ConvexProvider client={convex}>
 			<DragProvider>
-				<Switch>
-					<Route path="/rooms/:roomId">
-						{(params) => <Room roomId={params.roomId as Id<"rooms">} />}
-					</Route>
-					<Route path="/">
-						<Landing />
-					</Route>
-				</Switch>
+				<DocumentTitle title="Aspects VTT">
+					<Switch>
+						<Route path="/rooms/:roomId">
+							{(params) => <Room roomId={params.roomId as Id<"rooms">} />}
+						</Route>
+						<Route path="/">
+							<Landing />
+						</Route>
+					</Switch>
+				</DocumentTitle>
 			</DragProvider>
 		</ConvexProvider>
 	)
