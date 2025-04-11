@@ -38,6 +38,14 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 		)
 	}
 
+	if (room === null) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Room not found
+			</div>
+		)
+	}
+
 	return (
 		<>
 			<SceneViewer roomId={roomId} />
