@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "convex/react"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
@@ -227,9 +227,28 @@ export function Chat({
 		}
 	}
 
+	const messageListRef = useCallback((element: Element | null) => {
+		if (!element?.firstElementChild) return
+
+		console.log(element.firstElementChild)
+
+		const obs = new MutationObserver(() => {
+			element.scrollTo({
+				top: element.scrollHeight,
+				behavior: "smooth",
+			})
+			console.log("the")
+		})
+		obs.observe(element.firstElementChild, { childList: true })
+		return () => obs.disconnect()
+	}, [])
+
 	return (
 		<section aria-label="Chat" className="flex h-full w-80 flex-col gap-2">
-			<div className="-ml-2 flex min-h-0 flex-1 flex-col overflow-y-auto p-2">
+			<div
+				className="-ml-2 flex min-h-0 flex-1 flex-col overflow-y-auto p-2"
+				ref={messageListRef}
+			>
 				<ul className="flex flex-col justify-end gap-2">
 					{allMessages.map((message) => (
 						<li key={message._id} className={panel("flex flex-col")}>
