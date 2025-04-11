@@ -20,6 +20,7 @@ import mapUrl from "../map.jpg"
 export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 	const { assets, addAssetToScene } = useSceneAssets(roomId)
 	const { dragState } = useDrag()
+	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"assets">>()
 
 	const [viewportTransform, setViewportTransform] =
 		useLocalStorage<ViewportTransform>(
@@ -36,22 +37,25 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 		)
 
 	const handlePointerDown = (event: React.PointerEvent) => {
-		// Only handle right-click for panning the scene
-		if (event.button !== 2) return
+		if (event.button === 0 && event.target === event.currentTarget) {
+			setSelectedAsssetId(undefined)
+		}
 
-		event.preventDefault()
-		handleDrag({
-			onDrag: (event) => {
-				if (!(event.buttons & 2)) return
-				setViewportTransform((transform) => ({
-					...transform,
-					offset: {
-						x: transform.offset.x + event.movementX,
-						y: transform.offset.y + event.movementY,
-					},
-				}))
-			},
-		})
+		if (event.button === 2) {
+			event.preventDefault()
+			handleDrag({
+				onDrag: (event) => {
+					if (!(event.buttons & 2)) return
+					setViewportTransform((transform) => ({
+						...transform,
+						offset: {
+							x: transform.offset.x + event.movementX,
+							y: transform.offset.y + event.movementY,
+						},
+					}))
+				},
+			})
+		}
 	}
 
 	const handleDrop = async (event: React.DragEvent) => {
@@ -102,18 +106,24 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 			onDragLeave={handleDragLeave}
 		>
 			<div
-				className="absolute top-0 left-0 origin-top-left transition-[scale,translate] duration-100 ease-out"
+				className="pointer-events-children absolute top-0 left-0 origin-top-left transition-[scale,translate] duration-100 ease-out"
 				style={{
 					translate: `${viewportTransform.offset.x}px ${viewportTransform.offset.y}px`,
 					scale: getViewportScale(viewportTransform.zoom),
 				}}
 			>
-				<img src={mapUrl} draggable={false} className="max-w-[unset]" />
+				<img
+					src={mapUrl}
+					draggable={false}
+					className="pointer-events-none max-w-[unset]"
+				/>
 				{assets.map((asset) => (
 					<AssetImage
 						key={asset._id}
 						asset={asset}
 						viewportTransform={viewportTransform}
+						isSelected={selectedAsssetId === asset._id}
+						onPrimaryPointerDown={() => setSelectedAsssetId(asset._id)}
 					/>
 				))}
 			</div>
@@ -124,9 +134,13 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 function AssetImage({
 	asset,
 	viewportTransform,
+	isSelected,
+	onPrimaryPointerDown,
 }: {
 	asset: SceneAsset
 	viewportTransform: ViewportTransform
+	isSelected: boolean
+	onPrimaryPointerDown: () => void
 }) {
 	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 	const dragOffsetRef = useValueRef(dragOffset)
@@ -145,6 +159,8 @@ function AssetImage({
 			}}
 			onPointerDown={(event) => {
 				if (event.button !== 0) return
+
+				onPrimaryPointerDown()
 
 				event.preventDefault()
 
@@ -172,12 +188,25 @@ function AssetImage({
 				})
 			}}
 		>
-			<img
-				src={asset.url || ""}
-				alt={asset.name || ""}
-				className="max-h-full max-w-full object-contain"
-				draggable={false}
-			/>
+			<div className="relative">
+				<img
+					src={asset.url || ""}
+					alt={asset.name || ""}
+					className="max-h-full max-w-full object-contain"
+					draggable={false}
+				/>
+
+				{isSelected && (
+					<div
+						className={twMerge(
+							"outline-primary-400 bg-primary-800/10 absolute inset-0 outline",
+						)}
+						style={{
+							outlineWidth: 2 / getViewportScale(viewportTransform.zoom),
+						}}
+					></div>
+				)}
+			</div>
 		</div>
 	)
 }

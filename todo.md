@@ -22,8 +22,10 @@
   - [x] drag control
   - [x] zoom control
   - [x] move assets
-  - [ ] resize assets
-  - [ ] remove assets from scene, delete corresponding image on server
+  - [x] asset selection state: click to select, click backdrop to deselect
+  - [ ] press delete key to remove from scene
+  - [x] deletion removes corresponding image on server
+  - [ ] show resize handles for selected assets
   - [ ] (future) viewport control buttons (zoom in, zoom out, reset)
   - [ ] (future) rotate assets
 - sheets
