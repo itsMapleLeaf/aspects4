@@ -18,18 +18,18 @@ export function AssetsPanel() {
 		const files = event.target.files
 		if (!files || files.length === 0) return
 
-		const file = files[0]
-		if (!file) return
-
 		try {
 			setIsImporting(true)
-			await assets.add(file)
-			event.target.value = ""
+			for (const file of files) {
+				await assets.add(file)
+			}
 		} catch (err) {
 			console.error("Failed to import asset:", err)
 		} finally {
 			setIsImporting(false)
 		}
+
+		event.target.value = ""
 	}
 
 	const openFileSelector = () => {
@@ -129,6 +129,7 @@ export function AssetsPanel() {
 					id="asset-file-input"
 					type="file"
 					accept="image/*"
+					multiple
 					onChange={handleFileSelect}
 					className="hidden"
 				/>
