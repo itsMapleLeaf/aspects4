@@ -95,6 +95,10 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "0" && event.ctrlKey) {
+				setViewportTransform({ offset: { x: 0, y: 0 }, zoom: 0 })
+			}
+
 			if (
 				event.key === "Delete" &&
 				selectedAsssetId &&
@@ -109,7 +113,7 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown)
 		}
-	}, [selectedAsssetId, removeAsset])
+	})
 
 	return (
 		<div
