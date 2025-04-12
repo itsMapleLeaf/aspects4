@@ -13,10 +13,11 @@ import { safeParseNumber } from "~/lib/utils.ts"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
+import personaList from "../data/list-of-personas.json"
 import skillList from "../data/list-of-skills.json"
 import { ChatInputRef } from "./Chat.tsx"
-import { Tooltip } from "./ui/Tooltip.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { Tooltip } from "./ui/Tooltip.tsx"
 
 const attributeOrder = [
 	"Strength",
@@ -55,6 +56,33 @@ export function CharacterSheet({
 		darkness: safeParseNumber(character.data[`aspect:Darkness`]) ?? 0,
 	}
 
+	const selectedPersona = character.data["persona"] || ""
+
+	const modifiedAttributeScores = { ...attributeScores }
+	const modifiedAspectScores = { ...aspectScores }
+	let fatigueMod = 0
+
+	switch (selectedPersona) {
+		case "Manipulator":
+			modifiedAttributeScores.presence += 1
+			break
+		case "Commander":
+			fatigueMod = 3
+			break
+		case "Vitalist":
+			modifiedAspectScores.light += 1
+			break
+		case "Protector":
+			modifiedAttributeScores.strength += 1
+			break
+		case "Strategist":
+			modifiedAttributeScores.intellect += 1
+			break
+		case "Fighter":
+			modifiedAspectScores.fire += 1
+			break
+	}
+
 	const attributePointsAssigned = sum(Object.values(attributeScores))
 	const aspectPointsAssigned = sum(Object.values(aspectScores))
 
@@ -64,10 +92,14 @@ export function CharacterSheet({
 			.map((entry) => safeParseNumber(entry[1]) ?? 0),
 	)
 
-	const maxHits = attributeScores.strength + attributeScores.dexterity + 3
+	const maxHits =
+		modifiedAttributeScores.strength + modifiedAttributeScores.dexterity + 3
 
 	const maxFatigue =
-		attributeScores.sense + attributeScores.intellect + attributeScores.presence
+		modifiedAttributeScores.sense +
+		modifiedAttributeScores.intellect +
+		modifiedAttributeScores.presence +
+		fatigueMod
 
 	const bindString = (key: keyof Character["data"]) => ({
 		value: String(character.data[key] || ""),
@@ -86,18 +118,25 @@ export function CharacterSheet({
 		chatInputRef.current?.prefill(`/roll aspects ${count}`)
 	}
 
-	const handleAttributeSkillClick = (skillName: string, attributeName: string) => {
-		const attributeValue = safeParseNumber(character.data[`attribute:${attributeName}`]) ?? 1
-		const skillValue = safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+	const handleAttributeSkillClick = (
+		skillName: string,
+		attributeName: string,
+	) => {
+		const attributeValue =
+			safeParseNumber(character.data[`attribute:${attributeName}`]) ?? 1
+		const skillValue =
+			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
 		const total = attributeValue + skillValue
 		chatInputRef.current?.prefill(`/roll aspects ${total}`)
 	}
 
 	const handleAspectSkillClick = (skillName: string, aspectName: string) => {
-		const aspectValue = safeParseNumber(character.data[`aspect:${aspectName}`]) ?? 0
-		const skillValue = safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+		const aspectValue =
+			safeParseNumber(character.data[`aspect:${aspectName}`]) ?? 0
+		const skillValue =
+			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
 		const total = aspectValue + skillValue
-		
+
 		if (total > 0) {
 			chatInputRef.current?.prefill(`/roll aspects ${total}`)
 		}
@@ -140,17 +179,27 @@ export function CharacterSheet({
 									attributeOrder.indexOf(b.attribute),
 							)
 							.map((item) => {
-								const value =
+								const baseValue =
 									safeParseNumber(
 										character.data[`attribute:${item.attribute}`],
 									) ?? 1
+
+								const modifiedValue =
+									modifiedAttributeScores[
+										item.attribute.toLowerCase() as keyof typeof modifiedAttributeScores
+									]
+								const bonusText =
+									modifiedValue > baseValue ?
+										` (+${modifiedValue - baseValue})`
+									:	""
+
 								return (
 									<StatField
 										key={item.attribute}
-										label={item.attribute}
+										label={`${item.attribute}${bonusText}`}
 										min={1}
 										max={5}
-										onLabelClick={() => prefillAspectsRoll(value)}
+										onLabelClick={() => prefillAspectsRoll(modifiedValue)}
 										{...bindNumber(`attribute:${item.attribute}`, 1)}
 									/>
 								)
@@ -166,17 +215,29 @@ export function CharacterSheet({
 									aspectOrder.indexOf(a.name) - aspectOrder.indexOf(b.name),
 							)
 							.map((item) => {
-								const value =
+								const baseValue =
 									safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
+
+								const modifiedValue =
+									modifiedAspectScores[
+										item.name.toLowerCase() as keyof typeof modifiedAspectScores
+									]
+								const bonusText =
+									modifiedValue > baseValue ?
+										` (+${modifiedValue - baseValue})`
+									:	""
+
 								return (
 									<StatField
 										key={item.name}
-										label={item.name}
+										label={`${item.name}${bonusText}`}
 										min={0}
 										max={5}
-										fadedLabel={value === 0}
+										fadedLabel={modifiedValue === 0}
 										onLabelClick={
-											value > 0 ? () => prefillAspectsRoll(value) : undefined
+											modifiedValue > 0 ?
+												() => prefillAspectsRoll(modifiedValue)
+											:	undefined
 										}
 										{...bindNumber(`aspect:${item.name}`, 0)}
 									/>
@@ -193,26 +254,33 @@ export function CharacterSheet({
 					{skillList
 						.toSorted((a, b) => a.skill.localeCompare(b.skill))
 						.map((skill) => {
-							const attributeValue = safeParseNumber(character.data[`attribute:${skill.attribute}`]) ?? 1
-							
+							const attributeValue =
+								modifiedAttributeScores[
+									skill.attribute.toLowerCase() as keyof typeof modifiedAttributeScores
+								]
+
 							// Create tooltip content
 							let tooltip = null
 							if (skill.effect || skill.flavor) {
 								tooltip = (
 									<div className="space-y-2">
 										{skill.effect && <div>{skill.effect}</div>}
-										{skill.flavor && <div className="italic">{skill.flavor}</div>}
+										{skill.flavor && (
+											<div className="italic">{skill.flavor}</div>
+										)}
 									</div>
 								)
 							}
-							
+
 							return (
 								<StatField
 									key={skill.skill}
 									label={`${skill.skill} (${skill.attribute}) (${attributeValue})`}
 									tooltip={tooltip}
 									max={3}
-									onLabelClick={() => handleAttributeSkillClick(skill.skill, skill.attribute)}
+									onLabelClick={() =>
+										handleAttributeSkillClick(skill.skill, skill.attribute)
+									}
 									{...bindNumber(`skill:${skill.skill}`)}
 								/>
 							)
@@ -223,15 +291,18 @@ export function CharacterSheet({
 					{aspectSkillList
 						.toSorted((a, b) => a.modifier.localeCompare(b.modifier))
 						.map((skill) => {
-							const aspectValue = safeParseNumber(character.data[`aspect:${skill.aspect}`]) ?? 0
-							const skillValue = safeParseNumber(character.data[`skill:${skill.modifier}`]) ?? 0
+							const aspectValue =
+								modifiedAspectScores[
+									skill.aspect.toLowerCase() as keyof typeof modifiedAspectScores
+								]
+							const skillValue =
+								safeParseNumber(character.data[`skill:${skill.modifier}`]) ?? 0
 							const total = aspectValue + skillValue
-							
+
 							// Create tooltip content
-							const tooltip = skill.description ? (
-								<div>{skill.description}</div>
-							) : null
-							
+							const tooltip =
+								skill.description ? <div>{skill.description}</div> : null
+
 							return (
 								<StatField
 									key={skill.modifier}
@@ -239,7 +310,11 @@ export function CharacterSheet({
 									tooltip={tooltip}
 									max={3}
 									fadedLabel={total === 0}
-									onLabelClick={total > 0 ? () => handleAspectSkillClick(skill.modifier, skill.aspect) : undefined}
+									onLabelClick={
+										total > 0 ?
+											() => handleAspectSkillClick(skill.modifier, skill.aspect)
+										:	undefined
+									}
 									{...bindNumber(`skill:${skill.modifier}`)}
 								/>
 							)
@@ -250,7 +325,21 @@ export function CharacterSheet({
 			<div className="grid gap-2">
 				<TextAreaField label="Items" {...bindString("items")} />
 				<TextAreaField label="Bonds" {...bindString("bonds")} />
-				<TextAreaField label="Persona" {...bindString("persona")} />
+				<SelectField
+					label="Persona"
+					options={personaList.map((p) => ({
+						value: p.persona,
+						label: p.persona,
+						// description: `${p.description} - ${p.ability}`,
+						description: (
+							<>
+								<em>{p.description}</em>
+								<p>{p.ability}</p>
+							</>
+						),
+					}))}
+					{...bindString("persona")}
+				/>
 				<TextAreaField label="Lineage" {...bindString("lineage")} />
 				<TextAreaField label="Details" {...bindString("details")} />
 			</div>
@@ -299,7 +388,7 @@ function StatField({
 	tooltip?: ReactNode
 }) {
 	const id = useId()
-	
+
 	const labelContent = (
 		<label
 			htmlFor={id}
@@ -318,16 +407,12 @@ function StatField({
 			{label}
 		</label>
 	)
-	
+
 	return (
 		<div className={twMerge("flex items-center gap-3", className)}>
-			{tooltip ? (
-				<Tooltip content={tooltip}>
-					{labelContent}
-				</Tooltip>
-			) : (
-				labelContent
-			)}
+			{tooltip ?
+				<Tooltip content={tooltip}>{labelContent}</Tooltip>
+			:	labelContent}
 			<NumberInput id={id} className="w-10 text-center" {...props} />
 		</div>
 	)
@@ -342,6 +427,26 @@ function TextAreaField({
 	return (
 		<Field className={className} label={label} htmlFor={id}>
 			<TextArea id={id} {...props} />
+		</Field>
+	)
+}
+
+function SelectField({
+	className,
+	label,
+	options,
+	...props
+}: ComponentProps<"select"> & {
+	label: ReactNode
+	options: Array<{ value: string; label: string; description?: ReactNode }>
+}) {
+	const id = useId()
+	return (
+		<Field className={className} label={label} htmlFor={id}>
+			<Select id={id} options={options} {...props} />
+			<div className="mt-1">
+				{options.find((opt) => opt.value === props.value)?.description}
+			</div>
 		</Field>
 	)
 }
@@ -387,6 +492,35 @@ function TextArea({ className, ...props }: ComponentProps<"textarea">) {
 			)}
 			{...props}
 		/>
+	)
+}
+
+function Select({
+	className,
+	options,
+	value,
+	onChange,
+	...props
+}: ComponentProps<"select"> & {
+	options: Array<{ value: string; label: string }>
+}) {
+	return (
+		<select
+			className={twMerge(
+				"h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none",
+				className,
+			)}
+			value={value}
+			onChange={onChange}
+			{...props}
+		>
+			<option value="">Select a persona...</option>
+			{options.map((option) => (
+				<option key={option.value} value={option.value}>
+					{option.label}
+				</option>
+			))}
+		</select>
 	)
 }
 

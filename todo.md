@@ -31,7 +31,7 @@
   - [ ] (future) rotate assets
 - sheets
   - [x] click to prefill dice roll command
-  - [ ] persona + bonuses
+  - [x] persona + bonuses
   - [ ] lineage + bonuses
   - [ ] bonds + bonuses
   - [ ] milestones
