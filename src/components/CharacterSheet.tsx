@@ -13,10 +13,10 @@ import { safeParseNumber } from "~/lib/utils.ts"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
+import lineageList from "../data/list-of-lineages.json"
 import personaList from "../data/list-of-personas.json"
 import skillList from "../data/list-of-skills.json"
 import { ChatInputRef } from "./Chat.tsx"
-import { Icon } from "./ui/Icon.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
 
 const attributeOrder = [
@@ -41,46 +41,94 @@ export function CharacterSheet({
 	onDataChange: (data: Character["data"]) => void
 }) {
 	const attributeScores = {
-		strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
-		sense: safeParseNumber(character.data[`attribute:Sense`]) ?? 1,
-		dexterity: safeParseNumber(character.data[`attribute:Dexterity`]) ?? 1,
-		intellect: safeParseNumber(character.data[`attribute:Intellect`]) ?? 1,
-		presence: safeParseNumber(character.data[`attribute:Presence`]) ?? 1,
+		Strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
+		Sense: safeParseNumber(character.data[`attribute:Sense`]) ?? 1,
+		Dexterity: safeParseNumber(character.data[`attribute:Dexterity`]) ?? 1,
+		Intellect: safeParseNumber(character.data[`attribute:Intellect`]) ?? 1,
+		Presence: safeParseNumber(character.data[`attribute:Presence`]) ?? 1,
 	}
 
 	const aspectScores = {
-		fire: safeParseNumber(character.data[`aspect:Fire`]) ?? 0,
-		water: safeParseNumber(character.data[`aspect:Water`]) ?? 0,
-		wind: safeParseNumber(character.data[`aspect:Wind`]) ?? 0,
-		light: safeParseNumber(character.data[`aspect:Light`]) ?? 0,
-		darkness: safeParseNumber(character.data[`aspect:Darkness`]) ?? 0,
+		Fire: safeParseNumber(character.data[`aspect:Fire`]) ?? 0,
+		Water: safeParseNumber(character.data[`aspect:Water`]) ?? 0,
+		Wind: safeParseNumber(character.data[`aspect:Wind`]) ?? 0,
+		Light: safeParseNumber(character.data[`aspect:Light`]) ?? 0,
+		Darkness: safeParseNumber(character.data[`aspect:Darkness`]) ?? 0,
 	}
 
 	const selectedPersona = character.data["persona"] || ""
+	const selectedLineage = character.data["lineage"] || ""
 
-	const modifiedAttributeScores = { ...attributeScores }
-	const modifiedAspectScores = { ...aspectScores }
+	const modifiedAttributeScores = new Map<string, number>(
+		Object.entries(attributeScores),
+	)
+	const modifiedAspectScores = new Map<string, number>(
+		Object.entries(aspectScores),
+	)
+
 	let fatigueMod = 0
+	let hitsMod = 0
 
 	switch (selectedPersona) {
-		case "Manipulator":
-			modifiedAttributeScores.presence += 1
+		case "Manipulator": {
+			const current = modifiedAttributeScores.get("Presence") ?? 0
+			modifiedAttributeScores.set("Presence", current + 1)
 			break
+		}
 		case "Commander":
-			fatigueMod = 3
+			fatigueMod += 3
 			break
-		case "Vitalist":
-			modifiedAspectScores.light += 1
+		case "Vitalist": {
+			const current = modifiedAspectScores.get("Light") ?? 0
+			modifiedAspectScores.set("Light", current + 1)
 			break
-		case "Protector":
-			modifiedAttributeScores.strength += 1
+		}
+		case "Protector": {
+			const current = modifiedAttributeScores.get("Strength") ?? 0
+			modifiedAttributeScores.set("Strength", current + 1)
 			break
-		case "Strategist":
-			modifiedAttributeScores.intellect += 1
+		}
+		case "Strategist": {
+			const current = modifiedAttributeScores.get("Intellect") ?? 0
+			modifiedAttributeScores.set("Intellect", current + 1)
 			break
-		case "Fighter":
-			modifiedAspectScores.fire += 1
+		}
+		case "Fighter": {
+			const current = modifiedAspectScores.get("Fire") ?? 0
+			modifiedAspectScores.set("Fire", current + 1)
 			break
+		}
+	}
+
+	switch (selectedLineage) {
+		case "Umbral": {
+			const current = modifiedAspectScores.get("Darkness") ?? 0
+			modifiedAspectScores.set("Darkness", current + 1)
+			break
+		}
+		case "Arthropod": {
+			const current = modifiedAttributeScores.get("Sense") ?? 0
+			modifiedAttributeScores.set("Sense", current + 1)
+			break
+		}
+		case "Avian": {
+			const current = modifiedAspectScores.get("Wind") ?? 0
+			modifiedAspectScores.set("Wind", current + 1)
+			break
+		}
+		case "Aquatic": {
+			const current = modifiedAspectScores.get("Water") ?? 0
+			modifiedAspectScores.set("Water", current + 1)
+			break
+		}
+		case "Scalebearer":
+			hitsMod += 3
+			break
+		case "Furbearer": {
+			const current = modifiedAttributeScores.get("Dexterity") ?? 0
+			modifiedAttributeScores.set("Dexterity", current + 1)
+			break
+		}
 	}
 
 	const attributePointsAssigned = sum(Object.values(attributeScores))
@@ -93,12 +141,15 @@ export function CharacterSheet({
 	)
 
 	const maxHits =
-		modifiedAttributeScores.strength + modifiedAttributeScores.dexterity + 3
+		(modifiedAttributeScores.get("Strength") ?? 0) +
+		(modifiedAttributeScores.get("Dexterity") ?? 0) +
+		3 +
+		hitsMod
 
 	const maxFatigue =
-		modifiedAttributeScores.sense +
-		modifiedAttributeScores.intellect +
-		modifiedAttributeScores.presence +
+		(modifiedAttributeScores.get("Sense") ?? 0) +
+		(modifiedAttributeScores.get("Intellect") ?? 0) +
+		(modifiedAttributeScores.get("Presence") ?? 0) +
 		fatigueMod
 
 	const bindString = (key: keyof Character["data"]) => ({
@@ -122,8 +173,8 @@ export function CharacterSheet({
 		skillName: string,
 		attributeName: string,
 	) => {
-		const attributeValue =
-			safeParseNumber(character.data[`attribute:${attributeName}`]) ?? 1
+		// Use the modified attribute score that includes persona/lineage bonuses
+		const attributeValue = modifiedAttributeScores.get(attributeName) ?? 0
 		const skillValue =
 			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
 		const total = attributeValue + skillValue
@@ -131,8 +182,8 @@ export function CharacterSheet({
 	}
 
 	const handleAspectSkillClick = (skillName: string, aspectName: string) => {
-		const aspectValue =
-			safeParseNumber(character.data[`aspect:${aspectName}`]) ?? 0
+		// Use the modified aspect score that includes persona/lineage bonuses
+		const aspectValue = modifiedAspectScores.get(aspectName) ?? 0
 		const skillValue =
 			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
 		const total = aspectValue + skillValue
@@ -144,28 +195,30 @@ export function CharacterSheet({
 
 	return (
 		<div className={"flex flex-col gap-3"}>
-			<div className="flex items-start gap-3">
-				<div className="flex aspect-square h-32 items-center justify-center rounded-lg bg-gray-950/50">
+			<InputField
+				label="Name"
+				className="flex-1"
+				value={character.name}
+				onChange={(event) => onNameChange(event.target.value)}
+			/>
+
+			<div className="grid auto-cols-fr grid-flow-col gap-3">
+				{/* <div className="flex aspect-square h-32 items-center justify-center rounded-lg bg-gray-950/50">
 					<Icon icon="mingcute:pic-line" className="size-24 text-gray-700" />
-				</div>
+				</div> */}
 
-				<InputField
-					label="Name"
-					className="flex-1"
-					value={character.name}
-					onChange={(event) => onNameChange(event.target.value)}
-				/>
-
-				<Field label={`Hits / ${maxHits}`} htmlFor="hits">
-					<NumberInput id="hits" className="w-21" {...bindNumber("hits")} />
+				<Field
+					label={`Hits / ${maxHits}${hitsMod > 0 ? ` (+${hitsMod})` : ""}`}
+					htmlFor="hits"
+				>
+					<NumberInput id="hits" {...bindNumber("hits")} />
 				</Field>
 
-				<Field label={`Fatigue / ${maxFatigue}`} htmlFor="fatigue">
-					<NumberInput
-						id="fatigue"
-						className="w-21"
-						{...bindNumber("fatigue")}
-					/>
+				<Field
+					label={`Fatigue / ${maxFatigue}${fatigueMod > 0 ? ` (+${fatigueMod})` : ""}`}
+					htmlFor="fatigue"
+				>
+					<NumberInput id="fatigue" {...bindNumber("fatigue")} />
 				</Field>
 			</div>
 
@@ -185,9 +238,7 @@ export function CharacterSheet({
 									) ?? 1
 
 								const modifiedValue =
-									modifiedAttributeScores[
-										item.attribute.toLowerCase() as keyof typeof modifiedAttributeScores
-									]
+									modifiedAttributeScores.get(item.attribute) ?? baseValue
 								const bonusText =
 									modifiedValue > baseValue ?
 										` (+${modifiedValue - baseValue})`
@@ -219,9 +270,7 @@ export function CharacterSheet({
 									safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
 
 								const modifiedValue =
-									modifiedAspectScores[
-										item.name.toLowerCase() as keyof typeof modifiedAspectScores
-									]
+									modifiedAspectScores.get(item.name) ?? baseValue
 								const bonusText =
 									modifiedValue > baseValue ?
 										` (+${modifiedValue - baseValue})`
@@ -255,9 +304,10 @@ export function CharacterSheet({
 						.toSorted((a, b) => a.skill.localeCompare(b.skill))
 						.map((skill) => {
 							const attributeValue =
-								modifiedAttributeScores[
-									skill.attribute.toLowerCase() as keyof typeof modifiedAttributeScores
-								]
+								modifiedAttributeScores.get(skill.attribute) ?? 0
+							const skillValue =
+								safeParseNumber(character.data[`skill:${skill.skill}`]) ?? 0
+							const total = attributeValue + skillValue
 
 							// Create tooltip content
 							let tooltip = null
@@ -275,7 +325,7 @@ export function CharacterSheet({
 							return (
 								<StatField
 									key={skill.skill}
-									label={`${skill.skill} (${skill.attribute}) (${attributeValue})`}
+									label={`${skill.skill} (${skill.attribute} - ${total})`}
 									tooltip={tooltip}
 									max={3}
 									onLabelClick={() =>
@@ -291,10 +341,7 @@ export function CharacterSheet({
 					{aspectSkillList
 						.toSorted((a, b) => a.modifier.localeCompare(b.modifier))
 						.map((skill) => {
-							const aspectValue =
-								modifiedAspectScores[
-									skill.aspect.toLowerCase() as keyof typeof modifiedAspectScores
-								]
+							const aspectValue = modifiedAspectScores.get(skill.aspect) ?? 0
 							const skillValue =
 								safeParseNumber(character.data[`skill:${skill.modifier}`]) ?? 0
 							const total = aspectValue + skillValue
@@ -306,7 +353,7 @@ export function CharacterSheet({
 							return (
 								<StatField
 									key={skill.modifier}
-									label={`${skill.modifier} (${skill.aspect}) (${aspectValue})`}
+									label={`${skill.modifier} (${skill.aspect} - ${total})`}
 									tooltip={tooltip}
 									max={3}
 									fadedLabel={total === 0}
@@ -322,9 +369,10 @@ export function CharacterSheet({
 				</Section>
 			</div>
 
-			<div className="grid gap-2">
+			<div className="grid gap-3">
 				<TextAreaField label="Items" {...bindString("items")} />
 				<TextAreaField label="Bonds" {...bindString("bonds")} />
+
 				<SelectField
 					label="Persona"
 					options={personaList.map((p) => ({
@@ -334,13 +382,28 @@ export function CharacterSheet({
 						description: (
 							<>
 								<em>{p.description}</em>
-								<p>{p.ability}</p>
+								<p>Ability: {p.ability}</p>
 							</>
 						),
 					}))}
 					{...bindString("persona")}
 				/>
-				<TextAreaField label="Lineage" {...bindString("lineage")} />
+
+				<SelectField
+					label="Lineage"
+					options={lineageList.map((l) => ({
+						value: l.lineage,
+						label: l.lineage,
+						description: (
+							<>
+								<em>Examples: {l.memberCreatures}</em>
+								<p>Ability: {l.ability}</p>
+							</>
+						),
+					}))}
+					{...bindString("lineage")}
+				/>
+
 				<TextAreaField label="Details" {...bindString("details")} />
 			</div>
 		</div>
@@ -411,7 +474,9 @@ function StatField({
 	return (
 		<div className={twMerge("flex items-center gap-3", className)}>
 			{tooltip ?
-				<Tooltip content={tooltip}>{labelContent}</Tooltip>
+				<Tooltip content={tooltip} className="flex-1">
+					{labelContent}
+				</Tooltip>
 			:	labelContent}
 			<NumberInput id={id} className="w-10 text-center" {...props} />
 		</div>

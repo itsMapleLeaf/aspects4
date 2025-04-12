@@ -32,7 +32,7 @@
 - sheets
   - [x] click to prefill dice roll command
   - [x] persona + bonuses
-  - [ ] lineage + bonuses
+  - [x] lineage + bonuses
   - [ ] bonds + bonuses
   - [ ] milestones
   - [ ] (future) delete button
