@@ -13,12 +13,6 @@ export default defineConfig({
 		tsconfigPaths(),
 		tailwindcss(),
 	],
-	server: {
-		headers: {
-			"Access-Control-Allow-Origin": "https://www.owlbear.rodeo",
-			"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-		},
-	},
 	test: {
 		environment: "jsdom",
 		globals: true,
