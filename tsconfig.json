@@ -1,7 +1,31 @@
 {
-	"files": [],
-	"references": [
-		{ "path": "./tsconfig.app.json" },
-		{ "path": "./tsconfig.node.json" }
-	]
+	"compilerOptions": {
+		/* resolution */
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"moduleDetection": "force",
+		"paths": {
+			"~/*": ["./src/*"]
+		},
+
+		/* checks */
+		"target": "ESNext",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+		"allowImportingTsExtensions": true,
+		"noUncheckedIndexedAccess": true,
+		"skipLibCheck": true,
+		"isolatedModules": true,
+
+		/* emit */
+		"noEmit": true,
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+		"useDefineForClassFields": true,
+		"jsx": "react-jsx"
+	},
+	"exclude": ["**/node_modules/**", "**/dist/**"]
 }
