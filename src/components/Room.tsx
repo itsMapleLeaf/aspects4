@@ -3,7 +3,6 @@ import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useRef, useState } from "react"
 import { api } from "../../convex/_generated/api"
-import { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { panel } from "../styles/panel.ts"
 import { AssetsPanel } from "./AssetsPanel.tsx"
@@ -17,8 +16,8 @@ import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Input } from "./ui/Input.tsx"
 
-export function Room({ roomId }: { roomId: Id<"rooms"> }) {
-	const room = useQuery(api.rooms.get, { roomId })
+export function Room({ slug }: { slug: string }) {
+	const room = useQuery(api.rooms.getBySlug, { slug })
 	const updateRoom = useMutation(api.rooms.update)
 	const chatInputRef = useRef<ChatInputRef | null>(null)
 
@@ -52,7 +51,9 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 		{
 			name: "Characters",
 			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
-			content: <CharacterManager chatInputRef={chatInputRef} roomId={roomId} />,
+			content: (
+				<CharacterManager chatInputRef={chatInputRef} roomId={room._id} />
+			),
 		},
 		{
 			name: "Assets",
@@ -66,7 +67,7 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 				<RoomSettings
 					roomName={room?.name || ""}
 					playerName={playerName}
-					onUpdateRoom={(name) => updateRoom({ roomId, name })}
+					onUpdateRoom={(name) => updateRoom({ roomId: room._id, name })}
 					onUpdatePlayerName={setPlayerName}
 				/>
 			),
@@ -75,13 +76,13 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
-			<SceneViewer roomId={roomId} />
+			<SceneViewer roomId={room._id} />
 			<div className="fixed top-0 left-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Sidebar tabs={sidebarTabs} />
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Chat
-					roomId={roomId}
+					roomId={room._id}
 					playerName={playerName}
 					chatInputRef={chatInputRef}
 				/>
@@ -143,13 +144,13 @@ function PlayerNameDialog({ onSubmit }: { onSubmit: (name: string) => void }) {
 		<Dialog open>
 			<DialogPanel title="Enter Your Name">
 				<form
+					className="flex flex-col gap-4"
 					action={() => {
 						const name = nameInput.trim()
 						if (name) {
 							onSubmit(name)
 						}
 					}}
-					className="flex flex-col gap-4"
 				>
 					<Input
 						label="Your name"

@@ -4,7 +4,10 @@ import { v } from "convex/values"
 export default defineSchema({
 	rooms: defineTable({
 		name: v.string(),
-	}).index("name", ["name"]),
+		slug: v.string(),
+	})
+		.index("name", ["name"])
+		.index("slug", ["slug"]),
 
 	messages: defineTable({
 		sender: v.string(),

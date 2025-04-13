@@ -1,7 +1,12 @@
-import { ConvexProvider, ConvexReactClient, useMutation } from "convex/react"
+import {
+	ConvexProvider,
+	ConvexReactClient,
+	useMutation,
+	useQuery,
+} from "convex/react"
+import { useActionState, useState } from "react"
 import { Route, Switch, useLocation } from "wouter"
 import { api } from "../convex/_generated/api"
-import { Id } from "../convex/_generated/dataModel"
 import { DocumentTitle } from "./components/DocumentTitle.tsx"
 import { Room } from "./components/Room.tsx"
 import { Button } from "./components/ui/Button.tsx"
@@ -17,8 +22,8 @@ export function Root() {
 			<DragProvider>
 				<DocumentTitle title="Aspects VTT">
 					<Switch>
-						<Route path="/rooms/:roomId">
-							{(params) => <Room roomId={params.roomId as Id<"rooms">} />}
+						<Route path="/rooms/:slug">
+							{(params) => <Room slug={params.slug} />}
 						</Route>
 						<Route path="/">
 							<Landing />
@@ -31,50 +36,80 @@ export function Root() {
 }
 
 function Landing() {
+	const [roomName, setRoomName] = useState("")
+	const [slugInput, setSlugInput] = useState("")
+	const slug = slugify(slugInput || roomName)
+
+	const existingRoom = useQuery(api.rooms.getBySlug, { slug })
 	const createRoom = useMutation(api.rooms.create)
+
 	const [_, navigate] = useLocation()
+
+	const [error, action, pending] = useActionState(async () => {
+		if (!roomName.trim()) {
+			return "Please enter a room name"
+		}
+
+		if (existingRoom) {
+			return "A room with this slug already exists"
+		}
+
+		try {
+			await createRoom({
+				name: roomName,
+				slug,
+			})
+			navigate(`/rooms/${slug}`)
+		} catch (error) {
+			console.error(error)
+			return "Sorry, something went wrong. Try again."
+		}
+	}, "")
 
 	return (
 		<div className="flex min-h-screen items-center justify-center">
-			<form
-				className={panel("flex flex-col gap-4 p-6")}
-				onSubmit={async (event) => {
-					event.preventDefault()
-					const formData = new FormData(event.currentTarget)
-					const roomName = formData.get("roomName") as string
-
-					if (!roomName.trim()) {
-						alert("Please enter a room name")
-						return
-					}
-
-					try {
-						// Create the room and get back the Convex ID
-						const roomId: Id<"rooms"> = await createRoom({ name: roomName })
-						// Navigate to the new room using the string representation of the ID
-						navigate(`/rooms/${roomId.toString()}`)
-					} catch (error) {
-						console.error(error)
-						alert("Failed to create room. Please try again.")
-					}
-				}}
-			>
+			<div className={panel("flex w-96 flex-col gap-4 p-6")}>
 				<h1 className="text-2xl font-light text-white">Create a New Room</h1>
-				<Input
-					name="roomName"
-					label="Room name"
-					placeholder="Enter room name"
-					required
-				/>
-				<Button
-					type="submit"
-					appearance="default"
-					size="default"
-					className="w-full"
-				>
-					Create Room
-				</Button>
-			</form>
+				<form className="contents" action={action}>
+					<Input
+						name="roomName"
+						label="Room name"
+						placeholder="Enter room name"
+						required
+						value={roomName}
+						onChange={(event) => setRoomName(event.target.value)}
+					/>
+
+					<div>
+						<Input
+							name="roomSlug"
+							label="Room slug"
+							placeholder={slugify(roomName)}
+							value={slugInput}
+							onChange={(event) => setSlugInput(slugify(event.target.value))}
+						/>
+						<p className="mt-1 text-sm font-semibold text-gray-300">
+							Used in the URL. Can only contain lowercase letters, numbers, and
+							hyphens (-).
+						</p>
+					</div>
+
+					{error && (
+						<div className="text-sm font-semibold text-red-400">{error}</div>
+					)}
+
+					<Button type="submit" disabled={pending} className="self-start">
+						{pending ? "Creating..." : "Create Room"}
+					</Button>
+				</form>
+			</div>
 		</div>
 	)
+}
+
+function slugify(name: string) {
+	return name
+		.toLowerCase()
+		.replace(/\s+/g, "-")
+		.replace(/[^\w-]+/g, "")
 }

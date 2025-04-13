@@ -22,9 +22,10 @@ export const get = query({
 export const create = mutation({
 	args: {
 		name: v.string(),
+		slug: v.string(),
 	},
-	async handler(ctx, { name }) {
-		const roomId = await ctx.db.insert("rooms", { name })
+	async handler(ctx, { name, slug }) {
+		const roomId = await ctx.db.insert("rooms", { name, slug })
 		return roomId
 	},
 })
@@ -37,5 +38,17 @@ export const update = mutation({
 	async handler(ctx, { roomId, name }) {
 		await ctx.db.patch(roomId, { name })
 		return roomId
+	},
+})
+
+export const getBySlug = query({
+	args: {
+		slug: v.string(),
+	},
+	async handler(ctx, { slug }) {
+		return await ctx.db
+			.query("rooms")
+			.withIndex("slug", (q) => q.eq("slug", slug))
+			.first()
 	},
 })
