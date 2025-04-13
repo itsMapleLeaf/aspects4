@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from "convex/react"
 import { clamp, sum } from "es-toolkit"
 import {
 	ComponentProps,
@@ -5,11 +6,14 @@ import {
 	RefObject,
 	useId,
 	useState,
+	useTransition,
 	type ChangeEvent,
 } from "react"
 import { twMerge } from "tailwind-merge"
 import type { Character, CharacterBond } from "~/lib/character.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
+import { api } from "../../convex/_generated/api"
+import type { Id } from "../../convex/_generated/dataModel"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
@@ -32,10 +36,12 @@ const aspectOrder = ["Fire", "Water", "Wind", "Light", "Darkness"]
 export function CharacterSheet({
 	character,
 	chatInputRef,
+	roomId,
 	onChange,
 }: {
 	character: Character
 	chatInputRef: RefObject<ChatInputRef | null>
+	roomId: Id<"rooms">
 	onChange: (name: Character) => void
 }) {
 	const attributeScores = {
@@ -64,26 +70,11 @@ export function CharacterSheet({
 		Object.entries(aspectScores),
 	)
 
-	// Calculate bond bonus
-	const bondStrengthSum = (character.bonds || []).reduce(
-		(sum, bond) => sum + (bond.strength || 0),
-		0,
+	const bondStrengthSum = sum(
+		character.bonds?.map((bond) => bond.strength) ?? [],
 	)
-	let bondAspectBonus = ""
 
-	if (bondStrengthSum >= 3) {
-		bondAspectBonus = "Light"
-	} else if (bondStrengthSum >= 1) {
-		bondAspectBonus = "Water"
-	} else if (bondStrengthSum === 0) {
-		bondAspectBonus = "Wind"
-	} else if (bondStrengthSum >= -2) {
-		bondAspectBonus = "Fire"
-	} else {
-		bondAspectBonus = "Darkness"
-	}
-
-	// Apply bond aspect bonus
+	const bondAspectBonus = getBondAspectBonus(bondStrengthSum)
 	if (bondAspectBonus) {
 		const current = modifiedAspectScores.get(bondAspectBonus) ?? 0
 		modifiedAspectScores.set(bondAspectBonus, current + 1)
@@ -179,7 +170,7 @@ export function CharacterSheet({
 		onChange({ ...character, ...newCharacter })
 	}
 
-	function handleDataChange(newData: Partial<Character["data"]>) {
+	function handleDataChange(newData: Character["data"]) {
 		handleChange({ data: { ...character.data, ...newData } })
 	}
 
@@ -252,6 +243,8 @@ export function CharacterSheet({
 					<NumberInput id="fatigue" {...bindNumber("fatigue")} />
 				</Field>
 			</div>
+
+			<ShareCheckbox character={character} roomId={roomId} />
 
 			<div className="grid gap-8 sm:grid-cols-2">
 				<Section heading={`Attributes (${attributePointsAssigned}/15)`}>
@@ -402,19 +395,10 @@ export function CharacterSheet({
 
 			<TextAreaField label="Items" {...bindString("items")} />
 
-			<section aria-label="Bonds">
-				<header className="mb-0.5 flex items-center justify-between">
-					<h3 className="text-sm font-semibold">Bonds</h3>
-					<p className="text-sm">
-						Total: {bondStrengthSum} ({bondAspectBonus})
-					</p>
-				</header>
-
-				<BondManager
-					bonds={character.bonds ?? []}
-					onChange={(bonds) => handleChange({ bonds })}
-				/>
-			</section>
+			<BondSection
+				bonds={character.bonds ?? []}
+				onChange={(bonds) => handleChange({ bonds })}
+			/>
 
 			<SelectField
 				label="Persona"
@@ -452,83 +436,172 @@ export function CharacterSheet({
 	)
 }
 
-function BondManager({
+function getBondAspectBonus(bondStrengthSum: number) {
+	const bonuses = [
+		{ min: Number.NEGATIVE_INFINITY, max: -3, aspect: "Darkness" },
+		{ min: -2, max: 0, aspect: "Fire" },
+		{ min: 0, max: 1, aspect: "Wind" },
+		{ min: 1, max: 3, aspect: "Water" },
+		{ min: 3, max: Number.POSITIVE_INFINITY, aspect: "Light" },
+	]
+
+	const bonus = bonuses.find(
+		(b) => bondStrengthSum >= b.min && bondStrengthSum < b.max,
+	)
+
+	return bonus?.aspect
+}
+
+// Shared characters exist in the cloud, are visible to others in the room,
+// and can only be updated by the owner.
+// A character is un-shared if they don't exist in the cloud.
+function ShareCheckbox({
+	character,
+	roomId,
+}: {
+	character: Character
+	roomId: Id<"rooms">
+}) {
+	const existing = useQuery(api.characters.getByKey, { key: character.key })
+	const create = useMutation(api.characters.create)
+	const remove = useMutation(api.characters.remove)
+	const [pending, startTransition] = useTransition()
+	const id = useId()
+
+	function handleChange(event: ChangeEvent<HTMLInputElement>) {
+		// assign checked now so we don't try to access a stale event asynchronously
+		const { checked } = event.target
+
+		startTransition(async () => {
+			try {
+				if (checked && !existing) {
+					await create({ ...character, roomId })
+				}
+				if (!checked && existing) {
+					await remove({ characterId: existing._id })
+				}
+			} catch (error) {
+				console.error("Error updating character:", error)
+			}
+		})
+	}
+
+	return (
+		<div className="flex items-center gap-2">
+			<input
+				id={id}
+				type="checkbox"
+				className="size-5 accent-primary-300"
+				disabled={pending}
+				checked={existing != null}
+				onChange={handleChange}
+			/>
+			<label htmlFor={id} className="font-medium">
+				Share with others
+			</label>
+		</div>
+	)
+}
+
+function BondSection({
 	bonds,
 	onChange,
 }: {
 	bonds: CharacterBond[]
 	onChange: (bonds: CharacterBond[]) => void
 }) {
+	const strengthTotal = sum(bonds.map((bond) => bond.strength))
+	const aspectBonus = getBondAspectBonus(strengthTotal)
 	return (
-		<div className="flex flex-col gap-3">
-			{bonds.map((bond, index) => (
-				<div
-					key={index}
-					className="rounded border border-gray-800 bg-gray-950/25 p-3"
-				>
-					<div className="mb-2 flex items-center justify-between">
-						<InputField
-							label="Name"
-							className="flex-1"
-							autoFocus
-							value={bond.name}
-							onChange={(event) => {
-								onChange(
-									bonds.with(index, { ...bond, name: event.target.value }),
-								)
-							}}
-						/>
+		<section aria-label="Bonds">
+			<header className="mb-0.5 flex items-center justify-between">
+				<h3 className="text-sm font-semibold">Bonds</h3>
+				<p className="text-sm">
+					Total: {strengthTotal} (+1 {aspectBonus})
+				</p>
+			</header>
 
-						<div className="ml-3 flex items-end gap-2">
-							<Field
-								label="Strength"
-								htmlFor={`bond-strength-${index}`}
-								className="w-20"
-							>
-								<NumberInput
-									id={`bond-strength-${index}`}
-									min={-3}
-									max={3}
-									value={bond.strength || 0}
-									onChange={(value) => {
-										onChange(bonds.with(index, { ...bond, strength: value }))
-									}}
-								/>
-							</Field>
-
-							<button
-								type="button"
-								className="ml-2 h-9 rounded border border-gray-800 bg-gray-950/25 px-3 text-sm hover:bg-gray-800/25"
-								onClick={() => {
-									onChange(bonds.filter((_, i) => i !== index))
-								}}
-							>
-								Remove
-							</button>
-						</div>
-					</div>
-
-					<TextAreaField
-						label="Description"
-						value={bond.description}
-						onChange={(e) => {
-							onChange(
-								bonds.with(index, { ...bond, description: e.target.value }),
-							)
+			<div className="flex flex-col gap-3">
+				{bonds.map((bond, index) => (
+					<BondSectionItem
+						key={index}
+						bond={bond}
+						onChange={(bond) => {
+							onChange(bonds.with(index, bond))
+						}}
+						onRemove={() => {
+							onChange(bonds.filter((_, i) => i !== index))
 						}}
 					/>
-				</div>
-			))}
+				))}
 
-			<button
-				type="button"
-				className="w-full rounded border border-gray-800 bg-gray-950/25 px-3 py-2 hover:bg-gray-800/25"
-				onClick={() => {
-					onChange([...bonds, { name: "", description: "", strength: 0 }])
+				<button
+					type="button"
+					className="w-full rounded border border-gray-800 bg-gray-950/25 px-3 py-2 hover:bg-gray-800/25"
+					onClick={() => {
+						onChange([...bonds, { name: "", description: "", strength: 0 }])
+					}}
+				>
+					Add Bond
+				</button>
+			</div>
+		</section>
+	)
+}
+
+function BondSectionItem({
+	bond,
+	onChange,
+	onRemove,
+}: {
+	bond: CharacterBond
+	onChange: (bond: CharacterBond) => void
+	onRemove: () => void
+}) {
+	const strengthId = useId()
+	return (
+		<div className="rounded border border-gray-800 bg-gray-950/25 p-3">
+			<div className="mb-2 flex items-center justify-between">
+				<InputField
+					label="Name"
+					className="flex-1"
+					autoFocus
+					value={bond.name}
+					onChange={(event) => {
+						onChange({ ...bond, name: event.target.value })
+					}}
+				/>
+
+				<div className="ml-3 flex items-end gap-2">
+					<Field label="Strength" htmlFor={strengthId} className="w-20">
+						<NumberInput
+							id={strengthId}
+							min={-3}
+							max={3}
+							value={bond.strength || 0}
+							onChange={(value) => {
+								onChange({ ...bond, strength: value })
+							}}
+						/>
+					</Field>
+
+					<button
+						type="button"
+						className="ml-2 h-9 rounded border border-gray-800 bg-gray-950/25 px-3 text-sm hover:bg-gray-800/25"
+						onClick={() => onRemove()}
+					>
+						Remove
+					</button>
+				</div>
+			</div>
+
+			<TextAreaField
+				label="Description"
+				value={bond.description}
+				onChange={(event) => {
+					onChange({ ...bond, description: event.target.value })
 				}}
-			>
-				Add Bond
-			</button>
+			/>
 		</div>
 	)
 }

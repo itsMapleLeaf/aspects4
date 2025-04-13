@@ -1,7 +1,11 @@
 import * as Ariakit from "@ariakit/react"
 import { type } from "arktype"
-import { RefObject } from "react"
+import { useQuery } from "convex/react"
+import { RefObject, type ComponentProps } from "react"
+import { twMerge } from "tailwind-merge"
 import { useDictionary } from "~/hooks/useDictionary.ts"
+import { api } from "../../convex/_generated/api"
+import type { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorage, useLocalStorageState } from "../hooks/storage.ts"
 import { Character } from "../lib/character.ts"
 import { panel } from "../styles/panel.ts"
@@ -11,8 +15,10 @@ import { Icon } from "./ui/Icon.tsx"
 
 export function CharacterManager({
 	chatInputRef,
+	roomId,
 }: {
 	chatInputRef: RefObject<ChatInputRef | null>
+	roomId: Id<"rooms">
 }) {
 	const characters = useDictionary<Character>({
 		initialItems: {},
@@ -31,6 +37,14 @@ export function CharacterManager({
 			return result
 		},
 	})
+
+	const localCharacters = characters.values.sort((a, b) =>
+		a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+	)
+
+	const sharedCharacters = useQuery(api.characters.list, { roomId })?.filter(
+		(character) => characters.get(character.key) == null,
+	)
 
 	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorageState<
 		string | undefined | null
@@ -63,12 +77,10 @@ export function CharacterManager({
 						</header>
 
 						<ul className="flex flex-col gap-1">
-							{characters.values.map((character, index) => (
+							{localCharacters.map((character, index) => (
 								<li key={character.key} className="-mx-2 flex gap-1">
-									<Ariakit.Tab
+									<SidebarTab
 										id={character.key}
-										type="button"
-										className="flex h-9 min-w-0 flex-1 cursor-default items-center rounded px-2 transition-colors hover:bg-white/5 aria-selected:bg-white/5 aria-selected:text-primary-300"
 										onClick={() => {
 											if (activeCharacterKey === character.key) {
 												setActiveCharacterKey(null)
@@ -78,7 +90,7 @@ export function CharacterManager({
 										}}
 									>
 										<span className="truncate">{character.name}</span>
-									</Ariakit.Tab>
+									</SidebarTab>
 
 									<button
 										type="button"
@@ -89,10 +101,9 @@ export function CharacterManager({
 											if (character.key === activeCharacterKey) {
 												const nextIndex = Math.min(
 													index + 1,
-													characters.values.length - 2, // -1 for the removed character
+													localCharacters.length - 2, // -1 for the removed character
 												)
-												const nextKey =
-													characters.values[nextIndex]?.key ?? null
+												const nextKey = localCharacters[nextIndex]?.key ?? null
 												setActiveCharacterKey(nextKey)
 											}
 										}}
@@ -102,10 +113,27 @@ export function CharacterManager({
 									</button>
 								</li>
 							))}
+
+							{sharedCharacters?.map((character) => (
+								<li key={character.key} className="-mx-2 flex gap-1">
+									<SidebarTab
+										id={character.key}
+										onClick={() => {
+											if (activeCharacterKey === character.key) {
+												setActiveCharacterKey(null)
+											} else {
+												setActiveCharacterKey(character.key)
+											}
+										}}
+									>
+										<span className="truncate">{character.name}</span>
+									</SidebarTab>
+								</li>
+							))}
 						</ul>
 					</Ariakit.TabList>
 
-					{characters.values.map((character) => (
+					{localCharacters.map((character) => (
 						<Ariakit.TabPanel
 							id={character.key}
 							key={character.key}
@@ -115,6 +143,7 @@ export function CharacterManager({
 								<CharacterSheet
 									character={character}
 									chatInputRef={chatInputRef}
+									roomId={roomId}
 									onChange={(newCharacter) =>
 										characters.set(character.key, newCharacter)
 									}
@@ -122,8 +151,43 @@ export function CharacterManager({
 							</div>
 						</Ariakit.TabPanel>
 					))}
+
+					{sharedCharacters?.map((character) => (
+						<Ariakit.TabPanel
+							id={character.key}
+							key={character.key}
+							className={panel("min-h-0 w-148 flex-1 p-0")}
+						>
+							<div className="h-full overflow-y-auto p-4 will-change-scroll">
+								<CharacterSheet
+									character={character}
+									chatInputRef={chatInputRef}
+									roomId={roomId}
+									onChange={() => {}}
+								/>
+							</div>
+						</Ariakit.TabPanel>
+					))}
 				</section>
 			</Ariakit.HeadingLevel>
 		</Ariakit.TabProvider>
+	)
+}
+
+function SidebarTab({
+	children,
+	...props
+}: ComponentProps<typeof Ariakit.Tab>) {
+	return (
+		<Ariakit.Tab
+			type="button"
+			{...props}
+			className={twMerge(
+				"flex h-9 min-w-0 flex-1 cursor-default items-center rounded px-2 transition-colors hover:bg-white/5 aria-selected:bg-white/5 aria-selected:text-primary-300",
+				props.className,
+			)}
+		>
+			<span className="truncate">{children}</span>
+		</Ariakit.Tab>
 	)
 }

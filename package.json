@@ -24,6 +24,7 @@
 		"@tailwindcss/typography": "^0.5.16",
 		"arktype": "^2.1.8",
 		"convex": "^1.23.0",
+		"convex-helpers": "^0.1.79",
 		"es-toolkit": "^1.32.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",

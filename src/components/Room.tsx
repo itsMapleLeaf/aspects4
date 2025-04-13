@@ -48,36 +48,36 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 		)
 	}
 
+	const sidebarTabs = [
+		{
+			name: "Characters",
+			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
+			content: <CharacterManager chatInputRef={chatInputRef} roomId={roomId} />,
+		},
+		{
+			name: "Assets",
+			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
+			content: <AssetsPanel />,
+		},
+		{
+			name: "Settings",
+			icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
+			content: (
+				<RoomSettings
+					roomName={room?.name || ""}
+					playerName={playerName}
+					onUpdateRoom={(name) => updateRoom({ roomId, name })}
+					onUpdatePlayerName={setPlayerName}
+				/>
+			),
+		},
+	]
+
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
 			<SceneViewer roomId={roomId} />
 			<div className="fixed top-0 left-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Sidebar
-					tabs={[
-						{
-							name: "Characters",
-							icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
-							content: <CharacterManager chatInputRef={chatInputRef} />,
-						},
-						{
-							name: "Assets",
-							icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
-							content: <AssetsPanel />,
-						},
-						{
-							name: "Settings",
-							icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
-							content: (
-								<RoomSettings
-									roomName={room?.name || ""}
-									playerName={playerName}
-									onUpdateRoom={(name) => updateRoom({ roomId, name })}
-									onUpdatePlayerName={setPlayerName}
-								/>
-							),
-						},
-					]}
-				/>
+				<Sidebar tabs={sidebarTabs} />
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Chat
@@ -226,7 +226,7 @@ function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
 		<Ariakit.TooltipProvider placement="bottom-start">
 			<Ariakit.Tab
 				id={name}
-				className="aria-selected:text-primary-300 flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5 aria-selected:bg-white/5"
+				className="flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5 aria-selected:bg-white/5 aria-selected:text-primary-300"
 				render={<Ariakit.TooltipAnchor />}
 				onClick={() => {
 					if (selectedTabId === name) {

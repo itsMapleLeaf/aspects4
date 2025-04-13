@@ -1,0 +1,54 @@
+import { partial } from "convex-helpers/validators"
+import { v } from "convex/values"
+import { mutation, query } from "./_generated/server"
+import schema from "./schema.ts"
+
+export const getByKey = query({
+	args: {
+		key: v.string(),
+	},
+	async handler(ctx, { key }) {
+		return await ctx.db
+			.query("characters")
+			.withIndex("key", (q) => q.eq("key", key))
+			.unique()
+	},
+})
+
+export const list = query({
+	args: {
+		roomId: v.id("rooms"),
+	},
+	async handler(ctx, { roomId }) {
+		return await ctx.db
+			.query("characters")
+			.withIndex("roomId", (q) => q.eq("roomId", roomId))
+			.collect()
+	},
+})
+
+export const create = mutation({
+	args: schema.tables.characters.validator.fields,
+	async handler(ctx, args) {
+		return await ctx.db.insert("characters", args)
+	},
+})
+
+export const update = mutation({
+	args: {
+		characterId: v.id("characters"),
+		data: v.object(partial(schema.tables.characters.validator.fields)),
+	},
+	async handler(ctx, { characterId, data }) {
+		return await ctx.db.patch(characterId, data)
+	},
+})
+
+export const remove = mutation({
+	args: {
+		characterId: v.id("characters"),
+	},
+	async handler(ctx, { characterId }) {
+		await ctx.db.delete(characterId)
+	},
+})

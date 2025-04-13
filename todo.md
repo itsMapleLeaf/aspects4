@@ -34,7 +34,7 @@
   - [x] persona + bonuses
   - [x] lineage + bonuses
   - [x] bonds + bonuses
-  - [ ] sharing
+  - [x] sharing
   - [x] delete button
   - [ ] (future) milestones
   - [ ] (future) import/export

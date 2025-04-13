@@ -11,6 +11,6 @@ export type Character = typeof Character.inferOut
 export const Character = type({
 	"key": "string",
 	"name": "string",
-	"data": `Record<string, string | number | undefined>`,
+	"data": `Record<string, string | number>`,
 	"bonds?": CharacterBond.array(),
 })
