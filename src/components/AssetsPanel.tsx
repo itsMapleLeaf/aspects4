@@ -123,7 +123,7 @@ export function AssetsPanel() {
 				)}
 
 			<div className={panel("flex h-full w-64 flex-col gap-4 p-4")}>
-				<h2 className="text-xl font-light">Assets</h2>
+				<h2 className="heading-xl">Assets</h2>
 
 				<input
 					id="asset-file-input"
