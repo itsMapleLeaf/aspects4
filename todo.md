@@ -33,7 +33,7 @@
   - [x] click to prefill dice roll command
   - [x] persona + bonuses
   - [x] lineage + bonuses
-  - [ ] bonds + bonuses
+  - [x] bonds + bonuses
   - [ ] milestones
   - [ ] (future) delete button
   - [ ] (future) sharing

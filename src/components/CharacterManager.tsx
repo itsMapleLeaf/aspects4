@@ -1,92 +1,53 @@
 import * as Ariakit from "@ariakit/react"
-import { ArkErrors } from "arktype"
-import { mapValues } from "es-toolkit"
-import { JsonObject } from "type-fest"
-import { useLocalStorage } from "../hooks/useLocalStorage.ts"
+import { type } from "arktype"
+import { RefObject } from "react"
+import { useDictionary } from "~/hooks/useDictionary.ts"
+import { useLocalStorage, useLocalStorageState } from "../hooks/storage.ts"
 import { Character } from "../lib/character.ts"
 import { panel } from "../styles/panel.ts"
 import { CharacterSheet } from "./CharacterSheet.tsx"
-import { Icon } from "./ui/Icon.tsx"
 import { ChatInputRef } from "./Chat.tsx"
-import { RefObject } from "react"
+import { Icon } from "./ui/Icon.tsx"
 
-export function CharacterManager({ chatInputRef }: { chatInputRef: RefObject<ChatInputRef | null> }) {
-	const [characterDict, setCharacterDict] = useLocalStorage<
-		Record<Character["key"], Character>
-	>("CharacterManager:characters", {}, (input) => {
-		if (typeof input !== "object") return {}
-		if (input == null) return {}
-		if (Array.isArray(input)) return {}
-
-		return mapValues(input as JsonObject, (value) => {
-			const character = Character(value)
-			if (character instanceof ArkErrors) {
-				console.warn(character)
-				return {
-					key: crypto.randomUUID(),
-					name: "New Character",
-					data: {},
-				}
-			}
-			return character
-		})
+export function CharacterManager({
+	chatInputRef,
+}: {
+	chatInputRef: RefObject<ChatInputRef | null>
+}) {
+	const characters = useDictionary<Character>({
+		initialItems: {},
+		fallback: (key) => ({ key, name: "New Character", data: {} }),
 	})
 
-	const characters = Object.values(characterDict)
+	useLocalStorage({
+		state: [characters.items, characters.setAll],
+		key: "CharacterManager:characters",
+		load(input) {
+			const result = type.Record("string", Character)(input)
+			if (result instanceof type.errors) {
+				console.error("Invalid character data", result)
+				return {}
+			}
+			return result
+		},
+	})
 
-	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorage<
+	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorageState<
 		string | undefined | null
 	>("CharacterManager:activeCharacterKey", null, (input) =>
 		input == null ? null : String(input),
 	)
 
 	function addNewCharacter() {
-		setCharacterDict((characters) => {
-			const newCharacter: Character = {
-				key: crypto.randomUUID(),
-				name: "New Character",
-				data: {},
-			}
-			setActiveCharacterKey(newCharacter.key)
-			return { ...characters, [newCharacter.key]: newCharacter }
-		})
-	}
-
-	function setCharacterName(character: Character, name: Character["name"]) {
-		setCharacterDict((characters) => ({
-			...characters,
-			[character.key]: {
-				key: crypto.randomUUID(),
-				data: {},
-				...characters[character.key],
-				name,
-			},
-		}))
-	}
-
-	function updateCharacterData(
-		key: Character["key"],
-		newData: Character["data"],
-	) {
-		setCharacterDict((characters) => ({
-			...characters,
-			[key]: {
-				key: crypto.randomUUID(),
-				name: "",
-				...characters[key],
-				data: {
-					...characters[key]?.data,
-					...newData,
-				},
-			},
-		}))
+		const character = characters.create(crypto.randomUUID())
+		setActiveCharacterKey(character.key)
 	}
 
 	return (
 		<Ariakit.TabProvider selectedId={activeCharacterKey} orientation="vertical">
 			<div className="flex h-full w-full gap-2">
 				<Ariakit.TabList className={panel("flex w-44 flex-col gap-1 p-1")}>
-					{characters.map((character) => (
+					{characters.values.map((character) => (
 						<Ariakit.Tab
 							key={character.key}
 							id={character.key}
@@ -114,7 +75,7 @@ export function CharacterManager({ chatInputRef }: { chatInputRef: RefObject<Cha
 					</button>
 				</Ariakit.TabList>
 
-				{characters.map((character) => (
+				{characters.values.map((character) => (
 					<Ariakit.TabPanel
 						id={character.key}
 						key={character.key}
@@ -124,12 +85,9 @@ export function CharacterManager({ chatInputRef }: { chatInputRef: RefObject<Cha
 							<CharacterSheet
 								character={character}
 								chatInputRef={chatInputRef}
-								onNameChange={(name) => {
-									setCharacterName(character, name)
-								}}
-								onDataChange={(newData) => {
-									updateCharacterData(character.key, newData)
-								}}
+								onChange={(newCharacter) =>
+									characters.set(character.key, newCharacter)
+								}
 							/>
 						</div>
 					</Ariakit.TabPanel>

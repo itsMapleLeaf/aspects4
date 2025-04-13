@@ -7,7 +7,7 @@ import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { Except } from "type-fest"
 import { Icon } from "~/components/ui/Icon.tsx"
-import { useLocalStorage } from "~/hooks/useLocalStorage"
+import { useLocalStorageState } from "~/hooks/storage"
 
 export function ToggleSection({
 	title,
@@ -23,7 +23,7 @@ export function ToggleSection({
 	titlePostfix?: ReactNode
 	defaultOpen?: boolean
 }) {
-	const [open, setOpen] = useLocalStorage(
+	const [open, setOpen] = useLocalStorageState(
 		`ToggleSection:${storageKey ?? title}`,
 		defaultOpen,
 		Boolean,

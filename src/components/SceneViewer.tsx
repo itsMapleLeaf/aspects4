@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge"
 import { useValueRef } from "~/hooks/common.ts"
 import { Id } from "../../convex/_generated/dataModel"
 import { useDrag } from "../contexts/DragContext.tsx"
-import { useLocalStorage } from "../hooks/useLocalStorage.ts"
+import { useLocalStorageState } from "../hooks/storage.ts"
 import {
 	useMoveAssetToFront,
 	useRemoveAsset,
@@ -29,7 +29,7 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 	const update = useUpdateAsset()
 
 	const [viewportTransform, setViewportTransform] =
-		useLocalStorage<ViewportTransform>(
+		useLocalStorageState<ViewportTransform>(
 			"viewportTransform",
 			defaultViewportTransform,
 			(input) => {
@@ -180,12 +180,12 @@ function AssetImage({
 	const resizeOffsetRef = useValueRef(resizeOffset)
 	const update = useUpdateAsset()
 	const moveToFront = useMoveAssetToFront()
-	
+
 	const setBodyCursor = useCallback((cursor: string | null) => {
 		if (cursor) {
 			document.body.style.cursor = cursor
 		} else {
-			document.body.style.removeProperty('cursor')
+			document.body.style.removeProperty("cursor")
 		}
 	}, [])
 

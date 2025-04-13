@@ -8,7 +8,7 @@ import {
 	type ChangeEvent,
 } from "react"
 import { twMerge } from "tailwind-merge"
-import type { Character } from "~/lib/character.ts"
+import type { Character, CharacterBond } from "~/lib/character.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
@@ -32,13 +32,11 @@ const aspectOrder = ["Fire", "Water", "Wind", "Light", "Darkness"]
 export function CharacterSheet({
 	character,
 	chatInputRef,
-	onNameChange,
-	onDataChange,
+	onChange,
 }: {
 	character: Character
 	chatInputRef: RefObject<ChatInputRef | null>
-	onNameChange: (name: Character["name"]) => void
-	onDataChange: (data: Character["data"]) => void
+	onChange: (name: Character) => void
 }) {
 	const attributeScores = {
 		Strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
@@ -65,6 +63,31 @@ export function CharacterSheet({
 	const modifiedAspectScores = new Map<string, number>(
 		Object.entries(aspectScores),
 	)
+
+	// Calculate bond bonus
+	const bondStrengthSum = (character.bonds || []).reduce(
+		(sum, bond) => sum + (bond.strength || 0),
+		0,
+	)
+	let bondAspectBonus = ""
+
+	if (bondStrengthSum >= 3) {
+		bondAspectBonus = "Light"
+	} else if (bondStrengthSum >= 1) {
+		bondAspectBonus = "Water"
+	} else if (bondStrengthSum === 0) {
+		bondAspectBonus = "Wind"
+	} else if (bondStrengthSum >= -2) {
+		bondAspectBonus = "Fire"
+	} else {
+		bondAspectBonus = "Darkness"
+	}
+
+	// Apply bond aspect bonus
+	if (bondAspectBonus) {
+		const current = modifiedAspectScores.get(bondAspectBonus) ?? 0
+		modifiedAspectScores.set(bondAspectBonus, current + 1)
+	}
 
 	let fatigueMod = 0
 	let hitsMod = 0
@@ -152,16 +175,24 @@ export function CharacterSheet({
 		(modifiedAttributeScores.get("Presence") ?? 0) +
 		fatigueMod
 
+	function handleChange(newCharacter: Partial<Character>) {
+		onChange({ ...character, ...newCharacter })
+	}
+
+	function handleDataChange(newData: Partial<Character["data"]>) {
+		handleChange({ data: { ...character.data, ...newData } })
+	}
+
 	const bindString = (key: keyof Character["data"]) => ({
 		value: String(character.data[key] || ""),
 		onChange: (event: ChangeEvent<{ value: string }>) =>
-			onDataChange({ [key]: event.target.value }),
+			handleDataChange({ [key]: event.target.value }),
 	})
 
 	const bindNumber = (key: keyof Character["data"], fallback = 0) => {
 		return {
 			value: safeParseNumber(character.data[key]) ?? fallback,
-			onChange: (value: number) => onDataChange({ [key]: value }),
+			onChange: (value: number) => handleDataChange({ [key]: value }),
 		}
 	}
 
@@ -199,7 +230,7 @@ export function CharacterSheet({
 				label="Name"
 				className="flex-1"
 				value={character.name}
-				onChange={(event) => onNameChange(event.target.value)}
+				onChange={(event) => handleChange({ name: event.target.value })}
 			/>
 
 			<div className="grid auto-cols-fr grid-flow-col gap-3">
@@ -369,43 +400,135 @@ export function CharacterSheet({
 				</Section>
 			</div>
 
-			<div className="grid gap-3">
-				<TextAreaField label="Items" {...bindString("items")} />
-				<TextAreaField label="Bonds" {...bindString("bonds")} />
+			<TextAreaField label="Items" {...bindString("items")} />
 
-				<SelectField
-					label="Persona"
-					options={personaList.map((p) => ({
-						value: p.persona,
-						label: p.persona,
-						// description: `${p.description} - ${p.ability}`,
-						description: (
-							<>
-								<em>{p.description}</em>
-								<p>Ability: {p.ability}</p>
-							</>
-						),
-					}))}
-					{...bindString("persona")}
+			<section aria-label="Bonds">
+				<header className="mb-0.5 flex items-center justify-between">
+					<h3 className="text-sm font-semibold">Bonds</h3>
+					<p className="text-sm">
+						Total: {bondStrengthSum} ({bondAspectBonus})
+					</p>
+				</header>
+
+				<BondManager
+					bonds={character.bonds ?? []}
+					onChange={(bonds) => handleChange({ bonds })}
 				/>
+			</section>
 
-				<SelectField
-					label="Lineage"
-					options={lineageList.map((l) => ({
-						value: l.lineage,
-						label: l.lineage,
-						description: (
-							<>
-								<em>Examples: {l.memberCreatures}</em>
-								<p>Ability: {l.ability}</p>
-							</>
-						),
-					}))}
-					{...bindString("lineage")}
-				/>
+			<SelectField
+				label="Persona"
+				options={personaList.map((p) => ({
+					value: p.persona,
+					label: p.persona,
+					// description: `${p.description} - ${p.ability}`,
+					description: (
+						<>
+							<em>{p.description}</em>
+							<p>Ability: {p.ability}</p>
+						</>
+					),
+				}))}
+				{...bindString("persona")}
+			/>
 
-				<TextAreaField label="Details" {...bindString("details")} />
-			</div>
+			<SelectField
+				label="Lineage"
+				options={lineageList.map((l) => ({
+					value: l.lineage,
+					label: l.lineage,
+					description: (
+						<>
+							<em>Examples: {l.memberCreatures}</em>
+							<p>Ability: {l.ability}</p>
+						</>
+					),
+				}))}
+				{...bindString("lineage")}
+			/>
+
+			<TextAreaField label="Details" {...bindString("details")} />
+		</div>
+	)
+}
+
+function BondManager({
+	bonds,
+	onChange,
+}: {
+	bonds: CharacterBond[]
+	onChange: (bonds: CharacterBond[]) => void
+}) {
+	return (
+		<div className="flex flex-col gap-3">
+			{bonds.map((bond, index) => (
+				<div
+					key={index}
+					className="rounded border border-gray-800 bg-gray-950/25 p-3"
+				>
+					<div className="mb-2 flex items-center justify-between">
+						<InputField
+							label="Name"
+							className="flex-1"
+							autoFocus
+							value={bond.name}
+							onChange={(event) => {
+								onChange(
+									bonds.with(index, { ...bond, name: event.target.value }),
+								)
+							}}
+						/>
+
+						<div className="ml-3 flex items-end gap-2">
+							<Field
+								label="Strength"
+								htmlFor={`bond-strength-${index}`}
+								className="w-20"
+							>
+								<NumberInput
+									id={`bond-strength-${index}`}
+									min={-3}
+									max={3}
+									value={bond.strength || 0}
+									onChange={(value) => {
+										onChange(bonds.with(index, { ...bond, strength: value }))
+									}}
+								/>
+							</Field>
+
+							<button
+								type="button"
+								className="ml-2 h-9 rounded border border-gray-800 bg-gray-950/25 px-3 text-sm hover:bg-gray-800/25"
+								onClick={() => {
+									onChange(bonds.filter((_, i) => i !== index))
+								}}
+							>
+								Remove
+							</button>
+						</div>
+					</div>
+
+					<TextAreaField
+						label="Description"
+						value={bond.description}
+						onChange={(e) => {
+							onChange(
+								bonds.with(index, { ...bond, description: e.target.value }),
+							)
+						}}
+					/>
+				</div>
+			))}
+
+			<button
+				type="button"
+				className="w-full rounded border border-gray-800 bg-gray-950/25 px-3 py-2 hover:bg-gray-800/25"
+				onClick={() => {
+					onChange([...bonds, { name: "", description: "", strength: 0 }])
+				}}
+			>
+				Add Bond
+			</button>
 		</div>
 	)
 }
@@ -524,7 +647,7 @@ function Field({
 }: ComponentProps<"label"> & { label: ReactNode }) {
 	return (
 		<div className={className}>
-			<label {...props} className="block text-sm font-semibold">
+			<label {...props} className="mb-0.5 block text-sm font-semibold">
 				{label}
 			</label>
 			{children}

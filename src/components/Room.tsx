@@ -4,11 +4,11 @@ import type { ReactNode } from "react"
 import { useRef, useState } from "react"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
-import { useLocalStorage } from "../hooks/useLocalStorage.ts"
+import { useLocalStorageState } from "../hooks/storage.ts"
 import { panel } from "../styles/panel.ts"
 import { AssetsPanel } from "./AssetsPanel.tsx"
 import { CharacterManager } from "./CharacterManager.tsx"
-import { Chat } from "./Chat.tsx"
+import { Chat, ChatInputRef } from "./Chat.tsx"
 import { DocumentTitle } from "./DocumentTitle.tsx"
 import { EditableText } from "./EditableText.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
@@ -16,14 +16,13 @@ import { Button } from "./ui/Button.tsx"
 import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Input } from "./ui/Input.tsx"
-import { ChatInputRef } from "./Chat.tsx"
 
 export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 	const room = useQuery(api.rooms.get, { roomId })
 	const updateRoom = useMutation(api.rooms.update)
 	const chatInputRef = useRef<ChatInputRef | null>(null)
 
-	const [playerName, setPlayerName] = useLocalStorage<string | null>(
+	const [playerName, setPlayerName] = useLocalStorageState<string | null>(
 		"Room:playerName",
 		null,
 		(input) => (input == null ? null : String(input)),
@@ -81,7 +80,11 @@ export function Room({ roomId }: { roomId: Id<"rooms"> }) {
 				/>
 			</div>
 			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Chat roomId={roomId} playerName={playerName} chatInputRef={chatInputRef} />
+				<Chat
+					roomId={roomId}
+					playerName={playerName}
+					chatInputRef={chatInputRef}
+				/>
 			</div>
 		</DocumentTitle>
 	)
@@ -181,7 +184,7 @@ interface SidebarProps {
 }
 
 function Sidebar({ tabs }: SidebarProps) {
-	const [selectedTabId, setSelectedTabId] = useLocalStorage<
+	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
 		string | undefined | null
 	>("Sidebar:selectedTabId", null, (input) =>
 		input == null ? null : String(input),
