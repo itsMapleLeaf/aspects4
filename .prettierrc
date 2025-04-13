@@ -3,5 +3,6 @@
 	"useTabs": true,
 	"quoteProps": "consistent",
 	"experimentalTernaries": true,
-	"plugins": ["prettier-plugin-jsdoc", "prettier-plugin-tailwindcss"]
+	"plugins": ["prettier-plugin-jsdoc", "prettier-plugin-tailwindcss"],
+	"tailwindStylesheet": "./src/styles/index.css"
 }
