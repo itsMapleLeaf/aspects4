@@ -35,8 +35,8 @@
   - [x] lineage + bonuses
   - [x] bonds + bonuses
   - [ ] milestones
-  - [ ] (future) delete button
-  - [ ] (future) sharing
+  - [ ] sharing
+  - [ ] delete button
   - [ ] (future) import/export
   - [ ] (future) items (???)
   - [ ] (future) drag n drop reorder
