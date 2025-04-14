@@ -77,10 +77,10 @@ export function Room({ slug }: { slug: string }) {
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
 			<SceneViewer roomId={room._id} />
-			<div className="fixed top-0 left-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
+			<div className="fixed top-0 left-0 grid h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Sidebar tabs={sidebarTabs} />
 			</div>
-			<div className="fixed right-0 bottom-0 grid max-h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
+			<div className="fixed right-0 bottom-0 grid h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Chat
 					roomId={room._id}
 					playerName={playerName}
