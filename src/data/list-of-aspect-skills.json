@@ -1,62 +1,62 @@
 [
-	{
-		"aspect": "Wind",
-		"description": "Move a nearby target far away, or vice versa.",
-		"tags": "",
-		"modifier": "Gust"
-	},
-	{
-		"aspect": "Light",
-		"description": "Roll Light. Grant targets +1 die on their rolls per success on your roll.",
-		"tags": "Reaction",
-		"modifier": "Inspire"
-	},
-	{
-		"aspect": "Darkness",
-		"description": "Take 1 additional fatigue, then prevent the effect of an aspect art.",
-		"tags": "Reaction",
-		"modifier": "Cancel"
-	},
-	{
-		"aspect": "Wind",
-		"description": "Repeat the effect of an aspect art twice.",
-		"tags": "Reaction",
-		"modifier": "Surge"
-	},
-	{
-		"aspect": "Water",
-		"description": "Roll Water, then give targets 1 protection token per success. Targets may use 1 protection token to prevent 1 hit.",
-		"tags": "",
-		"modifier": "Castle"
-	},
-	{
-		"aspect": "Light",
-		"description": "Roll Light, then heal 2 hits per success on targets.",
-		"tags": "",
-		"modifier": "Heal"
-	},
-	{
-		"aspect": "Darkness",
-		"description": "Roll Darkness. Targets have -1 die per success on their rolls.",
-		"tags": "Reaction",
-		"modifier": "Weaken"
-	},
-	{
-		"aspect": "Water",
-		"description": "Roll Water, then prevent up to 1 hit per success on targets.",
-		"tags": "Reaction",
-		"modifier": "Shield"
-	},
-	{
-		"aspect": "Wind",
-		"description": "Roll Wind, then add 1 additional target per success to a chosen character’s action.",
-		"tags": "Reaction",
-		"modifier": "Multicast"
-	},
-	{
-		"aspect": "Fire",
-		"description": "Roll Fire, then deal 2 hits per success to targets.",
-		"tags": "",
-		"modifier": "Burn"
-	}
+  {
+    "aspect": "Wind",
+    "description": "Move a nearby target far away, or vice versa.",
+    "tags": "",
+    "modifier": "Gust"
+  },
+  {
+    "aspect": "Light",
+    "description": "Roll Light. Grant targets +1 die on their rolls per success on your roll.",
+    "tags": "Reaction",
+    "modifier": "Inspire"
+  },
+  {
+    "aspect": "Darkness",
+    "description": "Take 1 additional fatigue, then prevent the effect of an aspect art.",
+    "tags": "Reaction",
+    "modifier": "Cancel"
+  },
+  {
+    "aspect": "Wind",
+    "description": "Repeat the effect of an aspect art twice.",
+    "tags": "Reaction",
+    "modifier": "Surge"
+  },
+  {
+    "aspect": "Water",
+    "description": "Roll Water, then give targets 1 protection token per success. Targets may use 1 protection token to prevent 1 hit.",
+    "tags": "",
+    "modifier": "Castle"
+  },
+  {
+    "aspect": "Light",
+    "description": "Roll Light, then heal 2 hits per success on targets.",
+    "tags": "",
+    "modifier": "Heal"
+  },
+  {
+    "aspect": "Darkness",
+    "description": "Roll Darkness. Targets have -1 die per success on their rolls.",
+    "tags": "Reaction",
+    "modifier": "Weaken"
+  },
+  {
+    "aspect": "Water",
+    "description": "Roll Water, then prevent up to 1 hit per success on targets.",
+    "tags": "Reaction",
+    "modifier": "Shield"
+  },
+  {
+    "aspect": "Wind",
+    "description": "Roll Wind, then add 1 additional target per success to a chosen character’s action.",
+    "tags": "Reaction",
+    "modifier": "Multicast"
+  },
+  {
+    "aspect": "Fire",
+    "description": "Roll Fire, then deal 2 hits per success to targets.",
+    "tags": "",
+    "modifier": "Burn"
+  }
 ]

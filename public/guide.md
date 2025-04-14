@@ -339,7 +339,9 @@ Characters have a score from 1 to 5 for each aspect representing their level of 
 
 Players can perform aspect art actions by freely describing how they want to use one or more aspects to achieve a particular effect, and the narrator will determine how this plays out. For example, a character might use water aspect art to extinguish a fire by drawing water from a nearby lake.
 
-Alternatively, you may choose from one of many **aspect skills** listed below. You can think of aspect skills as presets for execution and resolution of aspect art.
+## Aspect Skills
+
+Instead of making a freeform aspect art action, you may choose from one of many **aspect skills** listed below. You can think of aspect skills as presets for execution and resolution of aspect art.
 
 Some aspect skills can _only_ be used as reactions, to be performed during or immediately following a character's action—including your own—to affect its outcome.
 
@@ -348,7 +350,6 @@ Because aspect skills are a specific type of [skill](https://www.notion.so/1b1b0
 | Modifier  | Aspect   | Description                                                                                                                                                                      | Tags     |
 | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | Gust      | Wind     | Move a nearby target far away, or vice versa.                                                                                                                                    |          |
-| ???       | Fire     | ???                                                                                                                                                                              |          |
 | Inspire   | Light    | Roll [Light](https://www.notion.so/1b1b0b885c0e808c85f5e09905d8a87e). Grant targets +1 die on their rolls per success on your roll.                                              | Reaction |
 | Cancel    | Darkness | Take 1 additional fatigue, then prevent the effect of an aspect art.                                                                                                             | Reaction |
 | Surge     | Wind     | Repeat the effect of an aspect art twice.                                                                                                                                        | Reaction |
@@ -387,7 +388,7 @@ Aspects each have their own **aura**. Eisenkind find themselves more attuned wit
 
 Optionally, to reduce bookkeeping, at the narrator's jurisdiction, you may choose to update the determined aspect at the _end_ of a session, rather than at the time of change.
 
-# 🚧 Items
+# Items
 
 You may possess a number of **items** which are used in various ways for various benefits.
 
@@ -764,7 +765,6 @@ Below are the available [aspect art modifiers](https://www.notion.so/1b1b0b885c0
 | Aspect   | Description                                                                                                                                                                      | Tags     | Modifier  |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
 | Wind     | Move a nearby target far away, or vice versa.                                                                                                                                    |          | Gust      |
-| Fire     | ???                                                                                                                                                                              |          | ???       |
 | Light    | Roll [Light](https://www.notion.so/1b1b0b885c0e808c85f5e09905d8a87e). Grant targets +1 die on their rolls per success on your roll.                                              | Reaction | Inspire   |
 | Darkness | Take 1 additional fatigue, then prevent the effect of an aspect art.                                                                                                             | Reaction | Cancel    |
 | Wind     | Repeat the effect of an aspect art twice.                                                                                                                                        | Reaction | Surge     |
@@ -947,9 +947,9 @@ Additionally, narrators may determine the impact of an NPC action narratively an
 
 - Gain 2 skill points
 
-- Gain 1 max hit (up to 3 times)
+- Gain 2 max hit (up to 3 times)
 
-- Gain 1 max fatigue (up to 3 times)
+- Gain 2 max fatigue (up to 3 times)
 
 When choosing an upgrade, add a new “Milestones” section on your character sheet if you don’t have one. Then add a note for the milestone that was achieved and the corresponding upgrade.
 
@@ -961,7 +961,7 @@ When choosing an upgrade, add a new “Milestones” section on your character s
 # Milestones
 
 - +2 skill points - Found the required artifact to locate the Evilest Villain
-- +1 max hit - Thwarted the Evilest Villan's plans
+- +2 max hits - Thwarted the Evilest Villan's plans
 ```
 
 </aside>
@@ -983,6 +983,12 @@ While Eisenkind do not use family names in the traditional sense, relatives ofte
 Eisenkind names typically consist of two or more elements combined to create melodic, distinctive names. Below are common name elements that can be combined to create authentic Eisenkind names. Players can roll a d12 on each list to randomly generate name components.
 
 Remember: these are only examples. Feel free to alter letters, leave off parts, or come up with your own elements to make something that sounds right.
+
+<aside>
+
+🚧 I ended up being really dissatisfied with the name generation below. I’m likely just going to go with a long list of example names instead
+
+</aside>
 
 **Prefixes (d12):**
 
