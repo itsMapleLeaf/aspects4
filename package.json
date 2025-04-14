@@ -7,7 +7,7 @@
 		"dev": "convex dev --until-success && run-p --print-label 'dev:*'",
 		"dev:vite": "vite",
 		"dev:convex": "convex dev --tail-logs",
-		"build": "bun run fetch-notion-data && vite build",
+		"build": "vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"test": "vitest --run",
