@@ -654,7 +654,7 @@ function StatField({
 			className={twMerge(
 				"flex-1 font-semibold",
 				fadedLabel && "text-gray-400",
-				onLabelClick && "hover:text-primary-300",
+				onLabelClick && "transition-colors hover:text-primary-300",
 			)}
 			onClick={(event) => {
 				if (onLabelClick) {
