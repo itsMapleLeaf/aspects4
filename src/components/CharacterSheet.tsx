@@ -166,8 +166,15 @@ export function CharacterSheet({
 		(modifiedAttributeScores.get("Presence") ?? 0) +
 		fatigueMod
 
-	function handleChange(newCharacter: Partial<Character>) {
-		onChange({ ...character, ...newCharacter })
+	const shared = useQuery(api.characters.get, { key: character.key, roomId })
+	const updateShared = useMutation(api.characters.update)
+
+	function handleChange(patch: Partial<Character>) {
+		const newCharacter = { ...character, ...patch }
+		onChange(newCharacter)
+		if (shared) {
+			updateShared({ characterId: shared._id, data: newCharacter })
+		}
 	}
 
 	function handleDataChange(newData: Character["data"]) {
