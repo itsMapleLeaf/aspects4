@@ -462,7 +462,7 @@ function ShareCheckbox({
 	character: Character
 	roomId: Id<"rooms">
 }) {
-	const existing = useQuery(api.characters.getByKey, { key: character.key })
+	const existing = useQuery(api.characters.get, { key: character.key, roomId })
 	const create = useMutation(api.characters.create)
 	const remove = useMutation(api.characters.remove)
 	const [pending, startTransition] = useTransition()

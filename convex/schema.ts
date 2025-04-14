@@ -31,7 +31,7 @@ export default defineSchema({
 		),
 	})
 		.index("roomId", ["roomId", "name"])
-		.index("key", ["key", "name"])
+		.index("key", ["key", "roomId", "name"])
 		.index("name", ["name"]),
 
 	assets: defineTable({

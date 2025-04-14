@@ -3,14 +3,15 @@ import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import schema from "./schema.ts"
 
-export const getByKey = query({
+export const get = query({
 	args: {
 		key: v.string(),
+		roomId: v.id("rooms"),
 	},
-	async handler(ctx, { key }) {
+	async handler(ctx, { key, roomId }) {
 		return await ctx.db
 			.query("characters")
-			.withIndex("key", (q) => q.eq("key", key))
+			.withIndex("key", (q) => q.eq("key", key).eq("roomId", roomId))
 			.unique()
 	},
 })
