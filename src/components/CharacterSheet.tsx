@@ -80,8 +80,8 @@ export function CharacterSheet({
 		modifiedAspectScores.set(bondAspectBonus, current + 1)
 	}
 
-	let fatigueMod = 0
-	let hitsMod = 0
+	let hitsMod = safeParseNumber(character.data.hitsMax) ?? 0
+	let fatigueMod = safeParseNumber(character.data.fatigueMax) ?? 0
 
 	switch (selectedPersona) {
 		case "Manipulator": {
@@ -235,12 +235,18 @@ export function CharacterSheet({
 				>
 					<NumberInput id="hits" {...bindNumber("hits")} />
 				</Field>
+				<Field label="Hits Bonus" htmlFor="hitsBonus">
+					<NumberInput id="hitsBonus" {...bindNumber("hitsMax")} />
+				</Field>
 
 				<Field
 					label={`Fatigue / ${maxFatigue}${fatigueMod > 0 ? ` (+${fatigueMod})` : ""}`}
 					htmlFor="fatigue"
 				>
 					<NumberInput id="fatigue" {...bindNumber("fatigue")} />
+				</Field>
+				<Field label="Fatigue Bonus" htmlFor="fatigueBonus">
+					<NumberInput id="fatigueBonus" {...bindNumber("fatigueMax")} />
 				</Field>
 			</div>
 
