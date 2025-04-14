@@ -36,6 +36,7 @@
   - [x] bonds + bonuses
   - [x] sharing
   - [x] delete button
+  - [ ] stat score validation
   - [ ] (future) milestones
   - [ ] (future) import/export
   - [ ] (future) items (???)
