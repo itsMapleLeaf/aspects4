@@ -4,7 +4,8 @@
   - [x] tie messages to rooms
   - [x] ask for user name
   - [x] generic settings/actions panel to change name or rename room
-  - [ ] stretch: room deletion after a month or something??
+  - [ ] set full-screen background from assets
+  - [ ] (future) room deletion after a month or something??
 - assets
   - files will be local, uploads only happen when adding to scene
   - [x] import button
@@ -37,9 +38,17 @@
   - [x] sharing
   - [x] delete button
   - [ ] stat score validation
+  - [ ] update bond aspect ranges
+  - [ ] rest action
+  - [ ] split up character sheet sections into tabs
+    - profile: name, resources, stats, items, lore
+    - skills: skills and aspect skills
+    - bonds
+  - [ ] items with optional configurable buffs (move them to their own tab)
+  - [ ] item presets?
+  - [ ] mark reactions (tiny text under the action? maybe put the attribute/aspect there too? yeah)
   - [ ] (future) milestones
   - [ ] (future) import/export
-  - [ ] (future) items (???)
   - [ ] (future) drag n drop reorder
   - [ ] (future) avatar?
 - chat
