@@ -38,7 +38,7 @@
   - [x] sharing
   - [x] delete button
   - [x] stat score validation
-  - [ ] update bond aspect ranges
+  - [x] update bond aspect ranges
   - [ ] rest action
   - [x] split up character sheet sections into tabs
   - [ ] items with optional configurable buffs (move them to their own tab)

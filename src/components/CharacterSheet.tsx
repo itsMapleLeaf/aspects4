@@ -543,11 +543,11 @@ export function CharacterSheet({
 
 function getBondAspectBonus(bondStrengthSum: number) {
 	const bonuses = [
-		{ min: Number.NEGATIVE_INFINITY, max: -3, aspect: "Darkness" },
-		{ min: -2, max: 0, aspect: "Fire" },
-		{ min: 0, max: 1, aspect: "Wind" },
-		{ min: 1, max: 3, aspect: "Water" },
-		{ min: 3, max: Number.POSITIVE_INFINITY, aspect: "Light" },
+		{ min: Number.NEGATIVE_INFINITY, max: -5, aspect: "Darkness" },
+		{ min: -4, max: -2, aspect: "Fire" },
+		{ min: -1, max: 1, aspect: "Wind" },
+		{ min: 2, max: 4, aspect: "Water" },
+		{ min: 5, max: Number.POSITIVE_INFINITY, aspect: "Light" },
 	]
 
 	const bonus = bonuses.find(
