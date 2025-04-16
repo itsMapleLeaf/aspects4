@@ -40,10 +40,7 @@
   - [x] stat score validation
   - [ ] update bond aspect ranges
   - [ ] rest action
-  - [ ] split up character sheet sections into tabs
-    - profile: name, resources, stats, items, lore
-    - skills: skills and aspect skills
-    - bonds
+  - [x] split up character sheet sections into tabs
   - [ ] items with optional configurable buffs (move them to their own tab)
   - [ ] item presets?
   - [ ] mark reactions (tiny text under the action? maybe put the attribute/aspect there too? yeah)

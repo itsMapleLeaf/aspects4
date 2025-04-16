@@ -133,14 +133,15 @@ export function CharacterManager({
 						</ul>
 					</Ariakit.TabList>
 
-					{localCharacters.map((character) => (
-						<Ariakit.TabPanel
-							id={character.key}
-							key={character.key}
-							className={panel("min-h-0 w-148 flex-1 p-0")}
-						>
-							<div className="h-full overflow-y-auto p-4 will-change-scroll">
+					<div className={panel("h-full w-148 flex-1 p-0")}>
+						{localCharacters.map((character) => (
+							<Ariakit.TabPanel
+								id={character.key}
+								key={character.key}
+								className="contents"
+							>
 								<CharacterSheet
+									className="p-4"
 									character={character}
 									chatInputRef={chatInputRef}
 									roomId={roomId}
@@ -148,26 +149,25 @@ export function CharacterManager({
 										characters.set(character.key, newCharacter)
 									}
 								/>
-							</div>
-						</Ariakit.TabPanel>
-					))}
+							</Ariakit.TabPanel>
+						))}
 
-					{sharedCharacters?.map((character) => (
-						<Ariakit.TabPanel
-							id={character.key}
-							key={character.key}
-							className={panel("min-h-0 w-148 flex-1 p-0")}
-						>
-							<div className="h-full overflow-y-auto p-4 will-change-scroll">
+						{sharedCharacters?.map((character) => (
+							<Ariakit.TabPanel
+								id={character.key}
+								key={character.key}
+								className="contents"
+							>
 								<CharacterSheet
+									className="p-4"
 									character={character}
 									chatInputRef={chatInputRef}
 									roomId={roomId}
 									onChange={() => {}}
 								/>
-							</div>
-						</Ariakit.TabPanel>
-					))}
+							</Ariakit.TabPanel>
+						))}
+					</div>
 				</section>
 			</Ariakit.HeadingLevel>
 		</Ariakit.TabProvider>

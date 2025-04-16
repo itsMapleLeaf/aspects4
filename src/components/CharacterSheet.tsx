@@ -1,4 +1,4 @@
-import { Heading, HeadingLevel } from "@ariakit/react"
+import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { clamp, sum } from "es-toolkit"
 import {
@@ -39,11 +39,13 @@ export function CharacterSheet({
 	chatInputRef,
 	roomId,
 	onChange,
+	className,
 }: {
 	character: Character
 	chatInputRef: RefObject<ChatInputRef | null>
 	roomId: Id<"rooms">
 	onChange: (name: Character) => void
+	className?: string
 }) {
 	const attributeScores = {
 		Strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
@@ -253,233 +255,288 @@ export function CharacterSheet({
 		aspectErrors.push("At least one aspect must have 1 or fewer points.")
 	}
 
-	return (
-		<div className={"flex flex-col gap-3"}>
-			<InputField
-				label="Name"
-				className="flex-1"
-				value={character.name}
-				onChange={(event) => handleChange({ name: event.target.value })}
-			/>
+	const tabs = [
+		{
+			name: "Profile",
+			content: (
+				<div className="flex flex-col gap-6">
+					<TextAreaField label="Items" {...bindString("items")} />
 
-			<div className="grid auto-cols-fr grid-flow-col gap-3">
-				{/* <div className="flex aspect-square h-32 items-center justify-center rounded-lg bg-gray-950/50">
+					<SelectField
+						label="Persona"
+						options={personaList.map((p) => ({
+							value: p.persona,
+							label: p.persona,
+							// description: `${p.description} - ${p.ability}`,
+							description: (
+								<>
+									<em>{p.description}</em>
+									<p>Ability: {p.ability}</p>
+								</>
+							),
+						}))}
+						{...bindString("persona")}
+					/>
+
+					<SelectField
+						label="Lineage"
+						options={lineageList.map((l) => ({
+							value: l.lineage,
+							label: l.lineage,
+							description: (
+								<>
+									<em>Examples: {l.memberCreatures}</em>
+									<p>Ability: {l.ability}</p>
+								</>
+							),
+						}))}
+						{...bindString("lineage")}
+					/>
+
+					<TextAreaField label="Details" {...bindString("details")} />
+				</div>
+			),
+		},
+		{
+			name: "Scores",
+			content: (
+				<div className="grid gap-6 sm:grid-cols-2">
+					<Section heading={`Attributes (${attributePointsAssigned}/15)`}>
+						<div className={"flex flex-col gap-2"}>
+							{attributeList
+								.toSorted(
+									(a, b) =>
+										attributeOrder.indexOf(a.attribute) -
+										attributeOrder.indexOf(b.attribute),
+								)
+								.map((item) => {
+									const baseValue =
+										safeParseNumber(
+											character.data[`attribute:${item.attribute}`],
+										) ?? 1
+
+									const modifiedValue =
+										modifiedAttributeScores.get(item.attribute) ?? baseValue
+									const bonusText =
+										modifiedValue > baseValue ?
+											` (+${modifiedValue - baseValue})`
+										:	""
+
+									return (
+										<StatField
+											key={item.attribute}
+											label={`${item.attribute}${bonusText}`}
+											min={1}
+											max={5}
+											onLabelClick={() => prefillAspectsRoll(modifiedValue)}
+											{...bindNumber(`attribute:${item.attribute}`, 1)}
+										/>
+									)
+								})}
+						</div>
+
+						{attributeErrors.length > 0 && (
+							<ErrorList errors={attributeErrors} />
+						)}
+					</Section>
+
+					<Section heading={`Aspects (${aspectPointsAssigned}/10)`}>
+						<div className={"flex flex-col gap-2"}>
+							{aspectList
+								.toSorted(
+									(a, b) =>
+										aspectOrder.indexOf(a.name) - aspectOrder.indexOf(b.name),
+								)
+								.map((item) => {
+									const baseValue =
+										safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
+
+									const modifiedValue =
+										modifiedAspectScores.get(item.name) ?? baseValue
+									const bonusText =
+										modifiedValue > baseValue ?
+											` (+${modifiedValue - baseValue})`
+										:	""
+
+									return (
+										<StatField
+											key={item.name}
+											label={`${item.name}${bonusText}`}
+											min={0}
+											max={5}
+											fadedLabel={modifiedValue === 0}
+											onLabelClick={
+												modifiedValue > 0 ?
+													() => prefillAspectsRoll(modifiedValue)
+												:	undefined
+											}
+											{...bindNumber(`aspect:${item.name}`, 0)}
+										/>
+									)
+								})}
+						</div>
+
+						{aspectErrors.length > 0 && <ErrorList errors={aspectErrors} />}
+					</Section>
+				</div>
+			),
+		},
+		{
+			name: "Skills",
+			content: (
+				<div className="grid gap-6 sm:grid-cols-2">
+					<div className="col-span-full">
+						{skillPointsAssigned}/3 skill points used
+					</div>
+
+					<Section heading="Skills">
+						{skillList
+							.toSorted((a, b) => a.skill.localeCompare(b.skill))
+							.map((skill) => {
+								const attributeValue =
+									modifiedAttributeScores.get(skill.attribute) ?? 0
+								const skillValue =
+									safeParseNumber(character.data[`skill:${skill.skill}`]) ?? 0
+								const total = attributeValue + skillValue
+
+								// Create tooltip content
+								let tooltip = null
+								if (skill.effect || skill.flavor) {
+									tooltip = (
+										<div className="space-y-2">
+											{skill.effect && <div>{skill.effect}</div>}
+											{skill.flavor && (
+												<div className="italic">{skill.flavor}</div>
+											)}
+										</div>
+									)
+								}
+
+								return (
+									<StatField
+										key={skill.skill}
+										label={`${skill.skill} (${skill.attribute} - ${total})`}
+										tooltip={tooltip}
+										max={3}
+										onLabelClick={() =>
+											handleAttributeSkillClick(skill.skill, skill.attribute)
+										}
+										{...bindNumber(`skill:${skill.skill}`)}
+									/>
+								)
+							})}
+					</Section>
+
+					<Section heading="Aspect Skills">
+						{aspectSkillList
+							.toSorted((a, b) => a.modifier.localeCompare(b.modifier))
+							.map((skill) => {
+								const aspectValue = modifiedAspectScores.get(skill.aspect) ?? 0
+								const skillValue =
+									safeParseNumber(character.data[`skill:${skill.modifier}`]) ??
+									0
+								const total = aspectValue + skillValue
+
+								// Create tooltip content
+								const tooltip =
+									skill.description ? <div>{skill.description}</div> : null
+
+								return (
+									<StatField
+										key={skill.modifier}
+										label={`${skill.modifier} (${skill.aspect} - ${total})`}
+										tooltip={tooltip}
+										max={3}
+										fadedLabel={total === 0}
+										onLabelClick={
+											total > 0 ?
+												() =>
+													handleAspectSkillClick(skill.modifier, skill.aspect)
+											:	undefined
+										}
+										{...bindNumber(`skill:${skill.modifier}`)}
+									/>
+								)
+							})}
+					</Section>
+				</div>
+			),
+		},
+		{
+			name: "Bonds",
+			content: (
+				<BondSection
+					bonds={character.bonds ?? []}
+					onChange={(bonds) => handleChange({ bonds })}
+				/>
+			),
+		},
+	]
+
+	return (
+		<div
+			className={twMerge(
+				"flex h-full min-h-0 flex-col overflow-y-auto [scrollbar-gutter:stable]",
+				className,
+			)}
+		>
+			<Ariakit.TabProvider>
+				<div className={"sticky top-0 flex flex-col bg-gray-900"}>
+					<div className="grid gap-3">
+						<InputField
+							label="Name"
+							value={character.name}
+							onChange={(event) => handleChange({ name: event.target.value })}
+						/>
+
+						<div className="grid auto-cols-fr grid-flow-col gap-3">
+							{/* <div className="flex aspect-square h-32 items-center justify-center rounded-lg bg-gray-950/50">
 					<Icon icon="mingcute:pic-line" className="size-24 text-gray-700" />
 				</div> */}
 
-				<Field
-					label={`Hits / ${maxHits}${hitsMod > 0 ? ` (+${hitsMod})` : ""}`}
-					htmlFor="hits"
-				>
-					<NumberInput id="hits" {...bindNumber("hits")} />
-				</Field>
-				<Field label="Hits Bonus" htmlFor="hitsBonus">
-					<NumberInput id="hitsBonus" {...bindNumber("hitsMax")} />
-				</Field>
+							<Field
+								label={`Hits / ${maxHits}${hitsMod > 0 ? ` (+${hitsMod})` : ""}`}
+								htmlFor="hits"
+							>
+								<NumberInput id="hits" {...bindNumber("hits")} />
+							</Field>
+							<Field label="Hits Bonus" htmlFor="hitsBonus">
+								<NumberInput id="hitsBonus" {...bindNumber("hitsMax")} />
+							</Field>
 
-				<Field
-					label={`Fatigue / ${maxFatigue}${fatigueMod > 0 ? ` (+${fatigueMod})` : ""}`}
-					htmlFor="fatigue"
-				>
-					<NumberInput id="fatigue" {...bindNumber("fatigue")} />
-				</Field>
-				<Field label="Fatigue Bonus" htmlFor="fatigueBonus">
-					<NumberInput id="fatigueBonus" {...bindNumber("fatigueMax")} />
-				</Field>
-			</div>
+							<Field
+								label={`Fatigue / ${maxFatigue}${fatigueMod > 0 ? ` (+${fatigueMod})` : ""}`}
+								htmlFor="fatigue"
+							>
+								<NumberInput id="fatigue" {...bindNumber("fatigue")} />
+							</Field>
+							<Field label="Fatigue Bonus" htmlFor="fatigueBonus">
+								<NumberInput id="fatigueBonus" {...bindNumber("fatigueMax")} />
+							</Field>
+						</div>
 
-			<ShareCheckbox character={character} roomId={roomId} />
-
-			<div className="grid gap-8 sm:grid-cols-2">
-				<Section heading={`Attributes (${attributePointsAssigned}/15)`}>
-					<div className={"flex flex-col gap-2"}>
-						{attributeList
-							.toSorted(
-								(a, b) =>
-									attributeOrder.indexOf(a.attribute) -
-									attributeOrder.indexOf(b.attribute),
-							)
-							.map((item) => {
-								const baseValue =
-									safeParseNumber(
-										character.data[`attribute:${item.attribute}`],
-									) ?? 1
-
-								const modifiedValue =
-									modifiedAttributeScores.get(item.attribute) ?? baseValue
-								const bonusText =
-									modifiedValue > baseValue ?
-										` (+${modifiedValue - baseValue})`
-									:	""
-
-								return (
-									<StatField
-										key={item.attribute}
-										label={`${item.attribute}${bonusText}`}
-										min={1}
-										max={5}
-										onLabelClick={() => prefillAspectsRoll(modifiedValue)}
-										{...bindNumber(`attribute:${item.attribute}`, 1)}
-									/>
-								)
-							})}
+						<ShareCheckbox character={character} roomId={roomId} />
 					</div>
 
-					{attributeErrors.length > 0 && <ErrorList errors={attributeErrors} />}
-				</Section>
-
-				<Section heading={`Aspects (${aspectPointsAssigned}/10)`}>
-					<div className={"flex flex-col gap-2"}>
-						{aspectList
-							.toSorted(
-								(a, b) =>
-									aspectOrder.indexOf(a.name) - aspectOrder.indexOf(b.name),
-							)
-							.map((item) => {
-								const baseValue =
-									safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
-
-								const modifiedValue =
-									modifiedAspectScores.get(item.name) ?? baseValue
-								const bonusText =
-									modifiedValue > baseValue ?
-										` (+${modifiedValue - baseValue})`
-									:	""
-
-								return (
-									<StatField
-										key={item.name}
-										label={`${item.name}${bonusText}`}
-										min={0}
-										max={5}
-										fadedLabel={modifiedValue === 0}
-										onLabelClick={
-											modifiedValue > 0 ?
-												() => prefillAspectsRoll(modifiedValue)
-											:	undefined
-										}
-										{...bindNumber(`aspect:${item.name}`, 0)}
-									/>
-								)
-							})}
-					</div>
-
-					{aspectErrors.length > 0 && <ErrorList errors={aspectErrors} />}
-				</Section>
-
-				<div className="col-span-full">
-					{skillPointsAssigned}/3 skill points used
+					<Ariakit.TabList className="my-4 grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
+						{tabs.map((tab) => (
+							<Ariakit.Tab
+								key={tab.name}
+								id={tab.name}
+								className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+							>
+								{tab.name}
+							</Ariakit.Tab>
+						))}
+					</Ariakit.TabList>
 				</div>
 
-				<Section heading="Skills">
-					{skillList
-						.toSorted((a, b) => a.skill.localeCompare(b.skill))
-						.map((skill) => {
-							const attributeValue =
-								modifiedAttributeScores.get(skill.attribute) ?? 0
-							const skillValue =
-								safeParseNumber(character.data[`skill:${skill.skill}`]) ?? 0
-							const total = attributeValue + skillValue
-
-							// Create tooltip content
-							let tooltip = null
-							if (skill.effect || skill.flavor) {
-								tooltip = (
-									<div className="space-y-2">
-										{skill.effect && <div>{skill.effect}</div>}
-										{skill.flavor && (
-											<div className="italic">{skill.flavor}</div>
-										)}
-									</div>
-								)
-							}
-
-							return (
-								<StatField
-									key={skill.skill}
-									label={`${skill.skill} (${skill.attribute} - ${total})`}
-									tooltip={tooltip}
-									max={3}
-									onLabelClick={() =>
-										handleAttributeSkillClick(skill.skill, skill.attribute)
-									}
-									{...bindNumber(`skill:${skill.skill}`)}
-								/>
-							)
-						})}
-				</Section>
-
-				<Section heading="Aspect Skills">
-					{aspectSkillList
-						.toSorted((a, b) => a.modifier.localeCompare(b.modifier))
-						.map((skill) => {
-							const aspectValue = modifiedAspectScores.get(skill.aspect) ?? 0
-							const skillValue =
-								safeParseNumber(character.data[`skill:${skill.modifier}`]) ?? 0
-							const total = aspectValue + skillValue
-
-							// Create tooltip content
-							const tooltip =
-								skill.description ? <div>{skill.description}</div> : null
-
-							return (
-								<StatField
-									key={skill.modifier}
-									label={`${skill.modifier} (${skill.aspect} - ${total})`}
-									tooltip={tooltip}
-									max={3}
-									fadedLabel={total === 0}
-									onLabelClick={
-										total > 0 ?
-											() => handleAspectSkillClick(skill.modifier, skill.aspect)
-										:	undefined
-									}
-									{...bindNumber(`skill:${skill.modifier}`)}
-								/>
-							)
-						})}
-				</Section>
-			</div>
-
-			<TextAreaField label="Items" {...bindString("items")} />
-
-			<BondSection
-				bonds={character.bonds ?? []}
-				onChange={(bonds) => handleChange({ bonds })}
-			/>
-
-			<SelectField
-				label="Persona"
-				options={personaList.map((p) => ({
-					value: p.persona,
-					label: p.persona,
-					// description: `${p.description} - ${p.ability}`,
-					description: (
-						<>
-							<em>{p.description}</em>
-							<p>Ability: {p.ability}</p>
-						</>
-					),
-				}))}
-				{...bindString("persona")}
-			/>
-
-			<SelectField
-				label="Lineage"
-				options={lineageList.map((l) => ({
-					value: l.lineage,
-					label: l.lineage,
-					description: (
-						<>
-							<em>Examples: {l.memberCreatures}</em>
-							<p>Ability: {l.ability}</p>
-						</>
-					),
-				}))}
-				{...bindString("lineage")}
-			/>
-
-			<TextAreaField label="Details" {...bindString("details")} />
+				{tabs.map((tab) => (
+					<Ariakit.TabPanel key={tab.name} id={tab.name}>
+						{tab.content}
+					</Ariakit.TabPanel>
+				))}
+			</Ariakit.TabProvider>
 		</div>
 	)
 }
@@ -661,12 +718,14 @@ function Section({
 	...props
 }: ComponentProps<"section"> & { heading: ReactNode }) {
 	return (
-		<HeadingLevel>
+		<Ariakit.HeadingLevel>
 			<section {...props} className={twMerge("flex flex-col gap-3", className)}>
-				<Heading className="text-xl font-light">{heading}</Heading>
+				<Ariakit.Heading className="text-xl font-light">
+					{heading}
+				</Ariakit.Heading>
 				{children}
 			</section>
-		</HeadingLevel>
+		</Ariakit.HeadingLevel>
 	)
 }
 
@@ -755,7 +814,7 @@ function SelectField({
 	return (
 		<Field className={className} label={label} htmlFor={id}>
 			<Select id={id} options={options} {...props} />
-			<div className="mt-1">
+			<div className="mt-1 text-sm font-medium">
 				{options.find((opt) => opt.value === props.value)?.description}
 			</div>
 		</Field>
@@ -847,14 +906,14 @@ function ErrorList(props: {
 	if (errors.size === 0) return null
 
 	return (
-		<HeadingLevel>
-			<Heading className="sr-only">Errors</Heading>
+		<Ariakit.HeadingLevel>
+			<Ariakit.Heading className="sr-only">Errors</Ariakit.Heading>
 			<ul className="mt-2 text-red-400">
 				{[...errors].map((error, index) => (
 					<li key={index}>{error}</li>
 				))}
 			</ul>
-		</HeadingLevel>
+		</Ariakit.HeadingLevel>
 	)
 }
 
