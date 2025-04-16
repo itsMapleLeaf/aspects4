@@ -124,7 +124,7 @@ export function Chat({
 				textareaRef.current.value = value
 				textareaRef.current.focus()
 			}
-		}
+		},
 	}))
 
 	const handleKeyDown = async (
@@ -165,7 +165,7 @@ export function Chat({
 		}
 	}
 
-	const messageListRef = useCallback((element: Element | null) => {
+	const bottomScrollRef = useCallback((element: Element | null) => {
 		if (!element?.firstElementChild) return
 
 		console.log(element.firstElementChild)
@@ -182,47 +182,51 @@ export function Chat({
 	}, [])
 
 	return (
-		<section aria-label="Chat" className="flex h-full w-80 flex-col gap-2">
-			<div
-				className="-ml-2 flex min-h-0 flex-1 flex-col overflow-y-auto p-2"
-				ref={messageListRef}
+		<section
+			aria-label="Chat"
+			className="flex h-full w-80 flex-col gap-2 overflow-y-auto [scrollbar-gutter:stable]"
+			ref={bottomScrollRef}
+		>
+			<ul className="flex flex-1 flex-col justify-end gap-2">
+				{allMessages.map((message) => (
+					<li key={message._id} className={panel("flex flex-col")}>
+						{"isLocal" in message ? null : (
+							<p className="text-sm text-gray-300">
+								{message.sender} &bull;{" "}
+								<time
+									dateTime={new Date(message._creationTime).toISOString()}
+									title={fullDateFormat.format(message._creationTime)}
+								>
+									{shortTimeFormat.format(message._creationTime)}
+								</time>
+							</p>
+						)}
+						{message.content.split(/(\r?\n)+/).map((line) => (
+							<p key={line} className="mt-0.5">
+								{line}
+							</p>
+						))}
+						{"isLocal" in message && (
+							<div className="flex translate-y-0.5 items-center gap-1 text-gray-400">
+								<p className="text-xs">Only you can see this</p>
+								<span aria-hidden>&bull;</span>
+								<button
+									className="text-xs text-primary-400 hover:text-primary-300 hover:underline"
+									onClick={() => removeLocalMessage(message._id)}
+								>
+									Remove
+								</button>
+							</div>
+						)}
+					</li>
+				))}
+			</ul>
+
+			<footer
+				className={panel(
+					"sticky bottom-0 p-0 shadow-[0_0_8px_black] focus-within:border-gray-700",
+				)}
 			>
-				<ul className="flex flex-col justify-end gap-2">
-					{allMessages.map((message) => (
-						<li key={message._id} className={panel("flex flex-col")}>
-							{"isLocal" in message ? null : (
-								<p className="text-sm text-gray-300">
-									{message.sender} &bull;{" "}
-									<time
-										dateTime={new Date(message._creationTime).toISOString()}
-										title={fullDateFormat.format(message._creationTime)}
-									>
-										{shortTimeFormat.format(message._creationTime)}
-									</time>
-								</p>
-							)}
-							{message.content.split(/(\r?\n)+/).map((line) => (
-								<p key={line} className="mt-0.5">
-									{line}
-								</p>
-							))}
-							{"isLocal" in message && (
-								<div className="flex translate-y-0.5 items-center gap-1 text-gray-400">
-									<p className="text-xs">Only you can see this</p>
-									<span aria-hidden>&bull;</span>
-									<button
-										className="text-primary-400 hover:text-primary-300 text-xs hover:underline"
-										onClick={() => removeLocalMessage(message._id)}
-									>
-										Remove
-									</button>
-								</div>
-							)}
-						</li>
-					))}
-				</ul>
-			</div>
-			<footer className={panel("p-0 focus-within:border-gray-700")}>
 				<textarea
 					ref={textareaRef}
 					placeholder="Say something!"
