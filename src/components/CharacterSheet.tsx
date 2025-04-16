@@ -225,7 +225,6 @@ export function CharacterSheet({
 		}
 	}
 
-	// Validation for attributes
 	const attributeErrors: string[] = []
 	if (attributePointsAssigned < 15) {
 		attributeErrors.push("You must assign exactly 15 attribute points.")
@@ -240,7 +239,6 @@ export function CharacterSheet({
 		attributeErrors.push("At least one attribute must have 2 or fewer points.")
 	}
 
-	// Validation for aspects
 	const aspectErrors: string[] = []
 	if (aspectPointsAssigned < 10) {
 		aspectErrors.push("You must assign exactly 10 aspect points.")
@@ -260,14 +258,31 @@ export function CharacterSheet({
 			name: "Profile",
 			content: (
 				<div className="flex flex-col gap-6">
-					<TextAreaField label="Items" {...bindString("items")} />
+					<div>
+						<TextAreaField label="Items" {...bindString("items")} />
+						<p className="text-sm">
+							Carrying capacity:{" "}
+							{(() => {
+								const strengthScore =
+									modifiedAttributeScores.get("Strength") ?? 0
+								const endurePoints =
+									safeParseNumber(character.data["skill:Endure"]) ?? 0
+								const total = strengthScore + endurePoints + 4
+								return (
+									<>
+										<strong className="font-medium">{total}</strong>{" "}
+										<aside className="inline text-gray-300 italic">{`(Strength ${strengthScore} + Endure ${endurePoints} + 4)`}</aside>
+									</>
+								)
+							})()}
+						</p>
+					</div>
 
 					<SelectField
 						label="Persona"
 						options={personaList.map((p) => ({
 							value: p.persona,
 							label: p.persona,
-							// description: `${p.description} - ${p.ability}`,
 							description: (
 								<>
 									<em>{p.description}</em>
