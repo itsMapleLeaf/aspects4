@@ -11,28 +11,23 @@ import {
 	type ChangeEvent,
 } from "react"
 import { twMerge } from "tailwind-merge"
-import type { Character, CharacterBond } from "~/lib/character.ts"
+import {
+	createCharacterModel,
+	getAspects,
+	getAttributes,
+	getBondAspectBonus,
+	type Character,
+	type CharacterBond,
+} from "~/lib/character.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
-import aspectList from "../data/list-of-aspects.json"
-import attributeList from "../data/list-of-attributes.json"
 import lineageList from "../data/list-of-lineages.json"
 import personaList from "../data/list-of-personas.json"
 import skillList from "../data/list-of-skills.json"
 import { ChatInputRef } from "./Chat.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
-
-const attributeOrder = [
-	"Strength",
-	"Sense",
-	"Dexterity",
-	"Intellect",
-	"Presence",
-]
-
-const aspectOrder = ["Fire", "Water", "Wind", "Light", "Darkness"]
 
 export function CharacterSheet({
 	character,
@@ -47,127 +42,7 @@ export function CharacterSheet({
 	onChange: (name: Character) => void
 	className?: string
 }) {
-	const attributeScores = {
-		Strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
-		Sense: safeParseNumber(character.data[`attribute:Sense`]) ?? 1,
-		Dexterity: safeParseNumber(character.data[`attribute:Dexterity`]) ?? 1,
-		Intellect: safeParseNumber(character.data[`attribute:Intellect`]) ?? 1,
-		Presence: safeParseNumber(character.data[`attribute:Presence`]) ?? 1,
-	}
-
-	const aspectScores = {
-		Fire: safeParseNumber(character.data[`aspect:Fire`]) ?? 0,
-		Water: safeParseNumber(character.data[`aspect:Water`]) ?? 0,
-		Wind: safeParseNumber(character.data[`aspect:Wind`]) ?? 0,
-		Light: safeParseNumber(character.data[`aspect:Light`]) ?? 0,
-		Darkness: safeParseNumber(character.data[`aspect:Darkness`]) ?? 0,
-	}
-
-	const selectedPersona = character.data["persona"] || ""
-	const selectedLineage = character.data["lineage"] || ""
-
-	const modifiedAttributeScores = new Map<string, number>(
-		Object.entries(attributeScores),
-	)
-	const modifiedAspectScores = new Map<string, number>(
-		Object.entries(aspectScores),
-	)
-
-	const bondStrengthSum = sum(
-		character.bonds?.map((bond) => bond.strength) ?? [],
-	)
-
-	const bondAspectBonus = getBondAspectBonus(bondStrengthSum)
-	if (bondAspectBonus) {
-		const current = modifiedAspectScores.get(bondAspectBonus) ?? 0
-		modifiedAspectScores.set(bondAspectBonus, current + 1)
-	}
-
-	let hitsMod = safeParseNumber(character.data.hitsMax) ?? 0
-	let fatigueMod = safeParseNumber(character.data.fatigueMax) ?? 0
-
-	switch (selectedPersona) {
-		case "Manipulator": {
-			const current = modifiedAttributeScores.get("Presence") ?? 0
-			modifiedAttributeScores.set("Presence", current + 1)
-			break
-		}
-		case "Commander":
-			fatigueMod += 3
-			break
-		case "Vitalist": {
-			const current = modifiedAspectScores.get("Light") ?? 0
-			modifiedAspectScores.set("Light", current + 1)
-			break
-		}
-		case "Protector": {
-			const current = modifiedAttributeScores.get("Strength") ?? 0
-			modifiedAttributeScores.set("Strength", current + 1)
-			break
-		}
-		case "Strategist": {
-			const current = modifiedAttributeScores.get("Intellect") ?? 0
-			modifiedAttributeScores.set("Intellect", current + 1)
-			break
-		}
-		case "Fighter": {
-			const current = modifiedAspectScores.get("Fire") ?? 0
-			modifiedAspectScores.set("Fire", current + 1)
-			break
-		}
-	}
-
-	switch (selectedLineage) {
-		case "Umbral": {
-			const current = modifiedAspectScores.get("Darkness") ?? 0
-			modifiedAspectScores.set("Darkness", current + 1)
-			break
-		}
-		case "Arthropod": {
-			const current = modifiedAttributeScores.get("Sense") ?? 0
-			modifiedAttributeScores.set("Sense", current + 1)
-			break
-		}
-		case "Avian": {
-			const current = modifiedAspectScores.get("Wind") ?? 0
-			modifiedAspectScores.set("Wind", current + 1)
-			break
-		}
-		case "Aquatic": {
-			const current = modifiedAspectScores.get("Water") ?? 0
-			modifiedAspectScores.set("Water", current + 1)
-			break
-		}
-		case "Scalebearer":
-			hitsMod += 3
-			break
-		case "Furbearer": {
-			const current = modifiedAttributeScores.get("Dexterity") ?? 0
-			modifiedAttributeScores.set("Dexterity", current + 1)
-			break
-		}
-	}
-
-	const attributePointsAssigned = sum(Object.values(attributeScores))
-	const aspectPointsAssigned = sum(Object.values(aspectScores))
-
-	const skillPointsAssigned = sum(
-		Object.entries(character.data)
-			.filter((entry) => entry[0].startsWith("skill"))
-			.map((entry) => safeParseNumber(entry[1]) ?? 0),
-	)
-
-	const maxHits =
-		(modifiedAttributeScores.get("Strength") ?? 0) +
-		(modifiedAttributeScores.get("Dexterity") ?? 0) +
-		3 +
-		hitsMod
-
-	const maxFatigue =
-		(modifiedAttributeScores.get("Sense") ?? 0) +
-		(modifiedAttributeScores.get("Intellect") ?? 0) +
-		(modifiedAttributeScores.get("Presence") ?? 0) +
-		fatigueMod
+	const model = createCharacterModel(character)
 
 	const shared = useQuery(api.characters.get, { key: character.key, roomId })
 	const updateShared = useMutation(api.characters.update)
@@ -190,32 +65,24 @@ export function CharacterSheet({
 			handleDataChange({ [key]: event.target.value }),
 	})
 
-	const bindNumber = (key: keyof Character["data"], fallback = 0) => {
-		return {
-			value: safeParseNumber(character.data[key]) ?? fallback,
-			onChange: (value: number) => handleDataChange({ [key]: value }),
-		}
-	}
+	const bindNumber = (key: keyof Character["data"], fallback = 0) => ({
+		value: safeParseNumber(character.data[key]) ?? fallback,
+		onChange: (value: number) => handleDataChange({ [key]: value }),
+	})
 
 	const prefillAspectsRoll = (count: number) => {
 		chatInputRef.current?.prefill(`/roll aspects ${count}`)
 	}
 
-	const handleAttributeSkillClick = (
-		skillName: string,
-		attributeName: string,
-	) => {
-		// Use the modified attribute score that includes persona/lineage bonuses
-		const attributeValue = modifiedAttributeScores.get(attributeName) ?? 0
-		const skillValue =
-			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
-		const total = attributeValue + skillValue
-		chatInputRef.current?.prefill(`/roll aspects ${total}`)
+	const handleAttributeSkillClick = (skillName: string) => {
+		chatInputRef.current?.prefill(
+			`/roll aspects ${model.getSkillScore(skillName)}`,
+		)
 	}
 
 	const handleAspectSkillClick = (skillName: string, aspectName: string) => {
 		// Use the modified aspect score that includes persona/lineage bonuses
-		const aspectValue = modifiedAspectScores.get(aspectName) ?? 0
+		const aspectValue = model.getAspectScore(aspectName) ?? 0
 		const skillValue =
 			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
 		const total = aspectValue + skillValue
@@ -226,12 +93,12 @@ export function CharacterSheet({
 	}
 
 	const attributeErrors: string[] = []
-	if (attributePointsAssigned < 15) {
+	if (model.attributePointsAssigned < 15) {
 		attributeErrors.push("You must assign exactly 15 attribute points.")
-	} else if (attributePointsAssigned > 15) {
+	} else if (model.attributePointsAssigned > 15) {
 		attributeErrors.push("You have assigned more than 15 attribute points.")
 	}
-	const attributeValues = Object.values(attributeScores)
+	const attributeValues = Object.values(model.attributeScores)
 	if (!attributeValues.includes(5)) {
 		attributeErrors.push("At least one attribute must have 5 points.")
 	}
@@ -240,12 +107,12 @@ export function CharacterSheet({
 	}
 
 	const aspectErrors: string[] = []
-	if (aspectPointsAssigned < 10) {
+	if (model.aspectPointsAssigned < 10) {
 		aspectErrors.push("You must assign exactly 10 aspect points.")
-	} else if (aspectPointsAssigned > 10) {
+	} else if (model.aspectPointsAssigned > 10) {
 		aspectErrors.push("You have assigned more than 10 aspect points.")
 	}
-	const aspectValues = Object.values(aspectScores)
+	const aspectValues = Object.values(model.aspectScores)
 	if (!aspectValues.some((v) => v >= 4)) {
 		aspectErrors.push("At least one aspect must have 4 or more points.")
 	}
@@ -263,10 +130,8 @@ export function CharacterSheet({
 						<p className="text-sm">
 							Carrying capacity:{" "}
 							{(() => {
-								const strengthScore =
-									modifiedAttributeScores.get("Strength") ?? 0
-								const endurePoints =
-									safeParseNumber(character.data["skill:Endure"]) ?? 0
+								const strengthScore = model.getAttributeScore("Strength")
+								const endurePoints = model.getSkillPoints("Endure")
 								const total = strengthScore + endurePoints + 4
 								return (
 									<>
@@ -316,38 +181,32 @@ export function CharacterSheet({
 			name: "Scores",
 			content: (
 				<div className="grid gap-6 sm:grid-cols-2">
-					<Section heading={`Attributes (${attributePointsAssigned}/15)`}>
+					<Section heading={`Attributes (${model.attributePointsAssigned}/15)`}>
 						<div className={"flex flex-col gap-2"}>
-							{attributeList
-								.toSorted(
-									(a, b) =>
-										attributeOrder.indexOf(a.attribute) -
-										attributeOrder.indexOf(b.attribute),
+							{getAttributes().map((item) => {
+								const baseValue =
+									safeParseNumber(
+										character.data[`attribute:${item.attribute}`],
+									) ?? 1
+
+								const modifiedValue =
+									model.modifiedAttributeScores.get(item.attribute) ?? baseValue
+								const bonusText =
+									modifiedValue > baseValue ?
+										` (+${modifiedValue - baseValue})`
+									:	""
+
+								return (
+									<StatField
+										key={item.attribute}
+										label={`${item.attribute}${bonusText}`}
+										min={1}
+										max={5}
+										onLabelClick={() => prefillAspectsRoll(modifiedValue)}
+										{...bindNumber(`attribute:${item.attribute}`, 1)}
+									/>
 								)
-								.map((item) => {
-									const baseValue =
-										safeParseNumber(
-											character.data[`attribute:${item.attribute}`],
-										) ?? 1
-
-									const modifiedValue =
-										modifiedAttributeScores.get(item.attribute) ?? baseValue
-									const bonusText =
-										modifiedValue > baseValue ?
-											` (+${modifiedValue - baseValue})`
-										:	""
-
-									return (
-										<StatField
-											key={item.attribute}
-											label={`${item.attribute}${bonusText}`}
-											min={1}
-											max={5}
-											onLabelClick={() => prefillAspectsRoll(modifiedValue)}
-											{...bindNumber(`attribute:${item.attribute}`, 1)}
-										/>
-									)
-								})}
+							})}
 						</div>
 
 						{attributeErrors.length > 0 && (
@@ -355,40 +214,35 @@ export function CharacterSheet({
 						)}
 					</Section>
 
-					<Section heading={`Aspects (${aspectPointsAssigned}/10)`}>
+					<Section heading={`Aspects (${model.aspectPointsAssigned}/10)`}>
 						<div className={"flex flex-col gap-2"}>
-							{aspectList
-								.toSorted(
-									(a, b) =>
-										aspectOrder.indexOf(a.name) - aspectOrder.indexOf(b.name),
+							{getAspects().map((item) => {
+								const baseValue =
+									safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
+
+								const modifiedValue =
+									model.modifiedAspectScores.get(item.name) ?? baseValue
+								const bonusText =
+									modifiedValue > baseValue ?
+										` (+${modifiedValue - baseValue})`
+									:	""
+
+								return (
+									<StatField
+										key={item.name}
+										label={`${item.name}${bonusText}`}
+										min={0}
+										max={5}
+										fadedLabel={modifiedValue === 0}
+										onLabelClick={
+											modifiedValue > 0 ?
+												() => prefillAspectsRoll(modifiedValue)
+											:	undefined
+										}
+										{...bindNumber(`aspect:${item.name}`, 0)}
+									/>
 								)
-								.map((item) => {
-									const baseValue =
-										safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
-
-									const modifiedValue =
-										modifiedAspectScores.get(item.name) ?? baseValue
-									const bonusText =
-										modifiedValue > baseValue ?
-											` (+${modifiedValue - baseValue})`
-										:	""
-
-									return (
-										<StatField
-											key={item.name}
-											label={`${item.name}${bonusText}`}
-											min={0}
-											max={5}
-											fadedLabel={modifiedValue === 0}
-											onLabelClick={
-												modifiedValue > 0 ?
-													() => prefillAspectsRoll(modifiedValue)
-												:	undefined
-											}
-											{...bindNumber(`aspect:${item.name}`, 0)}
-										/>
-									)
-								})}
+							})}
 						</div>
 
 						{aspectErrors.length > 0 && <ErrorList errors={aspectErrors} />}
@@ -401,7 +255,7 @@ export function CharacterSheet({
 			content: (
 				<div className="grid gap-6 sm:grid-cols-2">
 					<div className="col-span-full">
-						{skillPointsAssigned}/3 skill points used
+						{model.skillPointsAssigned}/3 skill points used
 					</div>
 
 					<Section heading="Skills">
@@ -409,7 +263,7 @@ export function CharacterSheet({
 							.toSorted((a, b) => a.skill.localeCompare(b.skill))
 							.map((skill) => {
 								const attributeValue =
-									modifiedAttributeScores.get(skill.attribute) ?? 0
+									model.modifiedAttributeScores.get(skill.attribute) ?? 0
 								const skillValue =
 									safeParseNumber(character.data[`skill:${skill.skill}`]) ?? 0
 								const total = attributeValue + skillValue
@@ -433,9 +287,7 @@ export function CharacterSheet({
 										label={`${skill.skill} (${skill.attribute} - ${total})`}
 										tooltip={tooltip}
 										max={3}
-										onLabelClick={() =>
-											handleAttributeSkillClick(skill.skill, skill.attribute)
-										}
+										onLabelClick={() => handleAttributeSkillClick(skill.skill)}
 										{...bindNumber(`skill:${skill.skill}`)}
 									/>
 								)
@@ -446,7 +298,8 @@ export function CharacterSheet({
 						{aspectSkillList
 							.toSorted((a, b) => a.modifier.localeCompare(b.modifier))
 							.map((skill) => {
-								const aspectValue = modifiedAspectScores.get(skill.aspect) ?? 0
+								const aspectValue =
+									model.modifiedAspectScores.get(skill.aspect) ?? 0
 								const skillValue =
 									safeParseNumber(character.data[`skill:${skill.modifier}`]) ??
 									0
@@ -510,7 +363,7 @@ export function CharacterSheet({
 				</div> */}
 
 							<Field
-								label={`Hits / ${maxHits}${hitsMod > 0 ? ` (+${hitsMod})` : ""}`}
+								label={`Hits / ${model.hitsMax}${model.hitsBonus > 0 ? ` (+${model.hitsBonus})` : ""}`}
 								htmlFor="hits"
 							>
 								<NumberInput id="hits" {...bindNumber("hits")} />
@@ -520,7 +373,7 @@ export function CharacterSheet({
 							</Field>
 
 							<Field
-								label={`Fatigue / ${maxFatigue}${fatigueMod > 0 ? ` (+${fatigueMod})` : ""}`}
+								label={`Fatigue / ${model.fatigueMax}${model.fatigueBonus > 0 ? ` (+${model.fatigueBonus})` : ""}`}
 								htmlFor="fatigue"
 							>
 								<NumberInput id="fatigue" {...bindNumber("fatigue")} />
@@ -554,22 +407,6 @@ export function CharacterSheet({
 			</Ariakit.TabProvider>
 		</div>
 	)
-}
-
-function getBondAspectBonus(bondStrengthSum: number) {
-	const bonuses = [
-		{ min: Number.NEGATIVE_INFINITY, max: -5, aspect: "Darkness" },
-		{ min: -4, max: -2, aspect: "Fire" },
-		{ min: -1, max: 1, aspect: "Wind" },
-		{ min: 2, max: 4, aspect: "Water" },
-		{ min: 5, max: Number.POSITIVE_INFINITY, aspect: "Light" },
-	]
-
-	const bonus = bonuses.find(
-		(b) => bondStrengthSum >= b.min && bondStrengthSum < b.max,
-	)
-
-	return bonus?.aspect
 }
 
 // Shared characters exist in the cloud, are visible to others in the room,
