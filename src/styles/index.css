@@ -50,7 +50,7 @@
 
 @layer base {
 	:root {
-		@apply selection:bg-primary-950 overflow-x-clip bg-gray-950;
+		@apply overflow-x-clip bg-gray-950 selection:bg-primary-950;
 		scrollbar-color: var(--color-gray-700) var(--color-gray-950);
 		/* scrollbar-gutter: stable; */
 		color-scheme: dark;
@@ -58,6 +58,10 @@
 
 	.footnotes {
 		@apply border-t border-gray-700 text-sm text-gray-300;
+	}
+
+	strong {
+		@apply font-medium;
 	}
 }
 
