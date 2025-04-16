@@ -1,3 +1,4 @@
+import { Heading, HeadingLevel } from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { clamp, sum } from "es-toolkit"
 import {
@@ -222,6 +223,36 @@ export function CharacterSheet({
 		}
 	}
 
+	// Validation for attributes
+	const attributeErrors: string[] = []
+	if (attributePointsAssigned < 15) {
+		attributeErrors.push("You must assign exactly 15 attribute points.")
+	} else if (attributePointsAssigned > 15) {
+		attributeErrors.push("You have assigned more than 15 attribute points.")
+	}
+	const attributeValues = Object.values(attributeScores)
+	if (!attributeValues.includes(5)) {
+		attributeErrors.push("At least one attribute must have 5 points.")
+	}
+	if (!attributeValues.some((v) => v <= 2)) {
+		attributeErrors.push("At least one attribute must have 2 or fewer points.")
+	}
+
+	// Validation for aspects
+	const aspectErrors: string[] = []
+	if (aspectPointsAssigned < 10) {
+		aspectErrors.push("You must assign exactly 10 aspect points.")
+	} else if (aspectPointsAssigned > 10) {
+		aspectErrors.push("You have assigned more than 10 aspect points.")
+	}
+	const aspectValues = Object.values(aspectScores)
+	if (!aspectValues.some((v) => v >= 4)) {
+		aspectErrors.push("At least one aspect must have 4 or more points.")
+	}
+	if (!aspectValues.some((v) => v <= 1)) {
+		aspectErrors.push("At least one aspect must have 1 or fewer points.")
+	}
+
 	return (
 		<div className={"flex flex-col gap-3"}>
 			<InputField
@@ -293,6 +324,8 @@ export function CharacterSheet({
 								)
 							})}
 					</div>
+
+					{attributeErrors.length > 0 && <ErrorList errors={attributeErrors} />}
 				</Section>
 
 				<Section heading={`Aspects (${aspectPointsAssigned}/10)`}>
@@ -330,6 +363,8 @@ export function CharacterSheet({
 								)
 							})}
 					</div>
+
+					{aspectErrors.length > 0 && <ErrorList errors={aspectErrors} />}
 				</Section>
 
 				<div className="col-span-full">
@@ -626,10 +661,12 @@ function Section({
 	...props
 }: ComponentProps<"section"> & { heading: ReactNode }) {
 	return (
-		<section {...props} className={twMerge("flex flex-col gap-3", className)}>
-			<h2 className="text-xl font-light">{heading}</h2>
-			{children}
-		</section>
+		<HeadingLevel>
+			<section {...props} className={twMerge("flex flex-col gap-3", className)}>
+				<Heading className="text-xl font-light">{heading}</Heading>
+				{children}
+			</section>
+		</HeadingLevel>
 	)
 }
 
@@ -795,6 +832,29 @@ function Select({
 				</option>
 			))}
 		</select>
+	)
+}
+
+function ErrorList(props: {
+	errors: string | Iterable<string> | undefined | null
+}) {
+	const errors = new Set(
+		props.errors == null ? []
+		: typeof props.errors === "string" ? [props.errors]
+		: [...props.errors],
+	)
+
+	if (errors.size === 0) return null
+
+	return (
+		<HeadingLevel>
+			<Heading className="sr-only">Errors</Heading>
+			<ul className="mt-2 text-red-400">
+				{[...errors].map((error, index) => (
+					<li key={index}>{error}</li>
+				))}
+			</ul>
+		</HeadingLevel>
 	)
 }
 

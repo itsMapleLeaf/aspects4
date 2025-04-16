@@ -37,7 +37,7 @@
   - [x] bonds + bonuses
   - [x] sharing
   - [x] delete button
-  - [ ] stat score validation
+  - [x] stat score validation
   - [ ] update bond aspect ranges
   - [ ] rest action
   - [ ] split up character sheet sections into tabs
