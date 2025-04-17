@@ -30,6 +30,14 @@ export default defineSchema({
 				}),
 			),
 		),
+		items: v.optional(
+			v.array(
+				v.object({
+					name: v.string(),
+					description: v.string(),
+				}),
+			),
+		),
 	})
 		.index("roomId", ["roomId", "name"])
 		.index("key", ["key", "roomId", "name"])
