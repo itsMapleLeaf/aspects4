@@ -26,6 +26,7 @@ import aspectSkillList from "../data/list-of-aspect-skills.json"
 import lineageList from "../data/list-of-lineages.json"
 import personaList from "../data/list-of-personas.json"
 import skillList from "../data/list-of-skills.json"
+import { CharacterRestButton } from "./CharacterRestButton.tsx"
 import { ChatInputRef } from "./Chat.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
 
@@ -351,11 +352,25 @@ export function CharacterSheet({
 			<Ariakit.TabProvider>
 				<div className={"sticky top-0 flex flex-col bg-gray-900"}>
 					<div className="grid gap-3">
-						<InputField
-							label="Name"
-							value={character.name}
-							onChange={(event) => handleChange({ name: event.target.value })}
-						/>
+						<div className="flex items-end gap-2">
+							<InputField
+								label="Name"
+								className="flex-1"
+								value={character.name}
+								onChange={(event) => handleChange({ name: event.target.value })}
+							/>
+							<CharacterRestButton
+								onSubmit={(hourCount) => {
+									let fatigue = safeParseNumber(character.data.fatigue) ?? 0
+									if (hourCount >= 8) {
+										fatigue = 0
+									} else {
+										fatigue -= hourCount
+									}
+									handleDataChange({ fatigue })
+								}}
+							/>
+						</div>
 
 						<div className="grid auto-cols-fr grid-flow-col gap-3">
 							{/* <div className="flex aspect-square h-32 items-center justify-center rounded-lg bg-gray-950/50">

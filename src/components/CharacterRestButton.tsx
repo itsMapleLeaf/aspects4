@@ -1,0 +1,63 @@
+import * as Ariakit from "@ariakit/react"
+import { useState } from "react"
+import type { Except } from "type-fest"
+import { Button } from "~/components/ui/Button.tsx"
+import { Icon } from "~/components/ui/Icon.tsx"
+import { panel } from "~/styles/panel.ts"
+import { InputField } from "./ui/InputField.tsx"
+
+interface CharacterRestButtonProps
+	extends Except<React.ComponentProps<typeof Button>, "onSubmit"> {
+	onSubmit: (hourCount: number) => void
+}
+
+export function CharacterRestButton({
+	onSubmit,
+	...props
+}: CharacterRestButtonProps) {
+	const [open, setOpen] = useState(false)
+	const [hourCount, setHourCount] = useState(1)
+
+	return (
+		<Ariakit.PopoverProvider open={open} setOpen={setOpen}>
+			<Button
+				icon={<Icon icon="mingcute:sleep-fill" />}
+				render={<Ariakit.PopoverDisclosure />}
+				{...props}
+			>
+				Rest
+			</Button>
+			<Ariakit.Popover
+				backdrop={
+					<div className="fixed inset-0 bg-black/25 opacity-0 transition data-enter:opacity-100" />
+				}
+				className={panel(
+					"grid translate-y-2 gap-3 opacity-0 transition data-enter:translate-y-0 data-enter:opacity-100",
+				)}
+				gutter={8}
+			>
+				<form
+					className="contents"
+					action={async () => {
+						onSubmit(hourCount)
+						setOpen(false)
+					}}
+				>
+					<InputField
+						label="Hours"
+						type="number"
+						min={1}
+						value={hourCount}
+						onChange={(event) => setHourCount(event.target.valueAsNumber)}
+					/>
+					<Button type="submit" icon={<Icon icon="mingcute:sleep-fill" />}>
+						Rest for {hourCount} {hourCount === 1 ? "hour" : "hours"}
+					</Button>
+					<p className="text-sm font-medium text-gray-200">
+						You will heal {hourCount >= 8 ? "all of your" : hourCount} fatigue.
+					</p>
+				</form>
+			</Ariakit.Popover>
+		</Ariakit.PopoverProvider>
+	)
+}
