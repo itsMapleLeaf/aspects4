@@ -87,12 +87,6 @@ export function createCharacterModel(character: Character) {
 		character.bonds?.map((bond) => bond.strength) ?? [],
 	)
 
-	const bondAspectBonus = getBondAspectBonus(bondStrengthSum)
-	if (bondAspectBonus) {
-		const current = modifiedAspectScores.get(bondAspectBonus) ?? 0
-		modifiedAspectScores.set(bondAspectBonus, current + 1)
-	}
-
 	const attributePointsAssigned = sum(Object.values(attributeScores))
 	const aspectPointsAssigned = sum(Object.values(aspectScores))
 
@@ -234,20 +228,4 @@ export function createCharacterModel(character: Character) {
 	}
 
 	return model
-}
-
-export function getBondAspectBonus(bondStrengthSum: number) {
-	const bonuses = [
-		{ min: Number.NEGATIVE_INFINITY, max: -5, aspect: "Darkness" },
-		{ min: -4, max: -2, aspect: "Fire" },
-		{ min: -1, max: 1, aspect: "Wind" },
-		{ min: 2, max: 4, aspect: "Water" },
-		{ min: 5, max: Number.POSITIVE_INFINITY, aspect: "Light" },
-	]
-
-	const bonus = bonuses.find(
-		(b) => bondStrengthSum >= b.min && bondStrengthSum < b.max,
-	)
-
-	return bonus?.aspect
 }
