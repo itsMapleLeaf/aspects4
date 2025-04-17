@@ -25,6 +25,7 @@ import aspectSkillList from "../data/list-of-aspect-skills.json"
 import lineageList from "../data/list-of-lineages.json"
 import personaList from "../data/list-of-personas.json"
 import skillList from "../data/list-of-skills.json"
+import { CharacterInventory } from "./CharacterInventory.tsx"
 import { CharacterRestButton } from "./CharacterRestButton.tsx"
 import { ChatInputRef } from "./Chat.tsx"
 import { Button } from "./ui/Button.tsx"
@@ -127,23 +128,7 @@ export function CharacterSheet({
 			name: "Profile",
 			content: (
 				<div className="flex flex-col gap-6">
-					<div>
-						<TextAreaField label="Items" {...bindString("items")} />
-						<p className="text-sm">
-							Carrying capacity:{" "}
-							{(() => {
-								const strengthScore = model.getAttributeScore("Strength")
-								const endurePoints = model.getSkillPoints("Endure")
-								const total = strengthScore + endurePoints + 4
-								return (
-									<>
-										<strong className="font-medium">{total}</strong>{" "}
-										<aside className="inline text-gray-300 italic">{`(Strength ${strengthScore} + Endure ${endurePoints} + 4)`}</aside>
-									</>
-								)
-							})()}
-						</p>
-					</div>
+					<TextAreaField label="Items" {...bindString("items")} />
 
 					<SelectField
 						label="Persona"
@@ -343,6 +328,31 @@ export function CharacterSheet({
 				/>
 			),
 		},
+		{
+			name: "Inventory",
+			content: (
+				<>
+					<p className="mb-3">
+						Carrying capacity:{" "}
+						{(() => {
+							const strengthScore = model.getAttributeScore("Strength")
+							const endurePoints = model.getSkillPoints("Endure")
+							const total = strengthScore + endurePoints + 4
+							return (
+								<>
+									<strong className="font-medium">{total}</strong>{" "}
+									<aside className="inline text-gray-300 italic">{`(Strength ${strengthScore} + Endure ${endurePoints} + 4)`}</aside>
+								</>
+							)
+						})()}
+					</p>
+					<CharacterInventory
+						items={character.items ?? []}
+						onChange={(items) => handleChange({ items })}
+					/>
+				</>
+			),
+		},
 	]
 
 	return (
@@ -513,39 +523,31 @@ function BondSection({
 	onChange: (bonds: CharacterBond[]) => void
 }) {
 	return (
-		<section aria-label="Bonds">
-			<Ariakit.HeadingLevel>
-				<Ariakit.Heading className="text-sm font-semibold">
-					Bonds
-				</Ariakit.Heading>
-
-				<ul className="flex flex-col gap-3">
-					{bonds.map((bond, index) => (
-						<li key={index}>
-							<BondSectionItem
-								bond={bond}
-								onChange={(bond) => {
-									onChange(bonds.with(index, bond))
-								}}
-								onRemove={() => {
-									onChange(bonds.filter((_, i) => i !== index))
-								}}
-							/>
-						</li>
-					))}
-
-					<Button
-						className="self-start"
-						icon={<Icon icon="mingcute:heart-fill" />}
-						onClick={() => {
-							onChange([...bonds, { name: "", description: "", strength: 0 }])
+		<ul className="flex flex-col gap-3">
+			{bonds.map((bond, index) => (
+				<li key={index}>
+					<BondSectionItem
+						bond={bond}
+						onChange={(bond) => {
+							onChange(bonds.with(index, bond))
 						}}
-					>
-						Add Bond
-					</Button>
-				</ul>
-			</Ariakit.HeadingLevel>
-		</section>
+						onRemove={() => {
+							onChange(bonds.filter((_, i) => i !== index))
+						}}
+					/>
+				</li>
+			))}
+
+			<Button
+				className="self-start"
+				icon={<Icon icon="mingcute:heart-fill" />}
+				onClick={() => {
+					onChange([...bonds, { name: "", description: "", strength: 0 }])
+				}}
+			>
+				Add Bond
+			</Button>
+		</ul>
 	)
 }
 
@@ -655,7 +657,7 @@ function Section({
 	)
 }
 
-function InputField({
+export function InputField({
 	className,
 	label,
 	...props
@@ -714,7 +716,7 @@ function StatField({
 	)
 }
 
-function TextAreaField({
+export function TextAreaField({
 	className,
 	label,
 	...props

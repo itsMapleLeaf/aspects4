@@ -44,12 +44,19 @@ const CharacterBond = type({
 	"aura?": "string | null | undefined",
 })
 
+export type CharacterItem = typeof CharacterItem.inferOut
+const CharacterItem = type({
+	name: "string",
+	description: "string",
+})
+
 export type Character = typeof Character.inferOut
 export const Character = type({
 	"key": "string",
 	"name": "string",
 	"data": `Record<string, string | number>`,
 	"bonds?": CharacterBond.array(),
+	"items?": CharacterItem.array(),
 })
 
 const skillAttributes = new Map(
