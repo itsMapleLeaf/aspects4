@@ -44,7 +44,7 @@ export function Button({
 	...props
 }: ButtonProps) {
 	const combinedClasses = `
-		flex items-center transition border font-medium shadow-sm focus:outline-none ring-2 ring-transparent
+		flex items-center transition border font-medium shadow-sm focus:outline-none ring-2 ring-transparent leading-none
 		${appearanceClasses[appearance]}
 		${sizeClasses[size].button}
 		${shapeClasses[shape]}
