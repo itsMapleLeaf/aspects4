@@ -6,7 +6,7 @@ import { Icon } from "~/components/ui/Icon.tsx"
 
 const appearanceClasses = {
 	default: twMerge(
-		"bg-primary-950/75 backdrop-blur-md border-primary-500 hover:bg-primary-500/30 focus:ring-primary-500/50",
+		"bg-gray-950/50 backdrop-blur-md border-gray-800 hover:bg-gray-950 focus:ring-primary-500/50",
 	),
 	ghost: twMerge(
 		"border-transparent opacity-75 hover:bg-gray-500/30 hover:opacity-100 focus:ring-gray-500/50",
@@ -14,13 +14,13 @@ const appearanceClasses = {
 } as const
 
 const sizeClasses = {
-	sm: { button: "px-2 py-1 text-sm gap-2", icon: "*:size-3 -mx-0.5" },
-	default: { button: "px-3 py-2 text-base gap-2.5", icon: "*:size-4 -mx-1" },
-	lg: { button: "px-5 py-2 text-lg gap-3.5", icon: "*:size-5 -mx-1.5" },
+	sm: { button: "px-2 h-7 text-sm gap-2", icon: "*:size-3 -mx-0.5" },
+	default: { button: "px-3 h-9 text-base gap-2", icon: "*:size-4 -mx-0.5" },
+	lg: { button: "px-5 h-11 text-lg gap-3.5", icon: "*:size-5 -mx-1.5" },
 } as const
 
 const shapeClasses = {
-	default: "rounded-md",
+	default: "rounded",
 	circle: "rounded-full aspect-square",
 }
 
@@ -44,7 +44,7 @@ export function Button({
 	...props
 }: ButtonProps) {
 	const combinedClasses = `
-		flex items-center transition border font-medium shadow-sm focus:outline-none focus:ring-2
+		flex items-center transition border font-medium shadow-sm focus:outline-none ring-2 ring-transparent
 		${appearanceClasses[appearance]}
 		${sizeClasses[size].button}
 		${shapeClasses[shape]}
