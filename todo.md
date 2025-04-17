@@ -39,11 +39,12 @@
   - [x] delete button
   - [x] stat score validation
   - [x] update bond aspect ranges
-  - [ ] rest action
+  - [x] rest action
   - [x] split up character sheet sections into tabs
+  - [ ] mark reactions (tiny text under the action? maybe put the attribute/aspect there too? yeah)
   - [ ] items with optional configurable buffs (move them to their own tab)
   - [ ] item presets?
-  - [ ] mark reactions (tiny text under the action? maybe put the attribute/aspect there too? yeah)
+  - [ ] (future) wealth
   - [ ] (future) milestones
   - [ ] (future) import/export
   - [ ] (future) drag n drop reorder
