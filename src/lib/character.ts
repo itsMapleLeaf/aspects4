@@ -6,21 +6,6 @@ import attributeList from "../data/list-of-attributes.json"
 import skillList from "../data/list-of-skills.json"
 import { safeParseNumber } from "./utils.ts"
 
-export type CharacterBond = typeof CharacterBond.inferOut
-const CharacterBond = type({
-	name: "string",
-	description: "string",
-	strength: "number",
-})
-
-export type Character = typeof Character.inferOut
-export const Character = type({
-	"key": "string",
-	"name": "string",
-	"data": `Record<string, string | number>`,
-	"bonds?": CharacterBond.array(),
-})
-
 type AttributeName = (typeof attributeNames)[number]
 const attributeNames = [
 	"Strength",
@@ -50,6 +35,22 @@ const aspects = aspectNames.flatMap((name) => {
 export function getAspects() {
 	return aspects
 }
+
+export type CharacterBond = typeof CharacterBond.inferOut
+const CharacterBond = type({
+	"name": "string",
+	"description": "string",
+	"strength": "number",
+	"aura?": "string | null | undefined",
+})
+
+export type Character = typeof Character.inferOut
+export const Character = type({
+	"key": "string",
+	"name": "string",
+	"data": `Record<string, string | number>`,
+	"bonds?": CharacterBond.array(),
+})
 
 const skillAttributes = new Map(
 	skillList.map((skill) => [skill.skill, skill.attribute]),

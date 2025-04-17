@@ -26,6 +26,7 @@ export default defineSchema({
 					name: v.string(),
 					description: v.string(),
 					strength: v.number(),
+					aura: v.optional(v.union(v.string(), v.null())),
 				}),
 			),
 		),

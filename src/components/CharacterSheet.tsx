@@ -1,6 +1,6 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
-import { clamp, sum } from "es-toolkit"
+import { clamp } from "es-toolkit"
 import {
 	ComponentProps,
 	ReactNode,
@@ -15,7 +15,6 @@ import {
 	createCharacterModel,
 	getAspects,
 	getAttributes,
-	getBondAspectBonus,
 	type Character,
 	type CharacterBond,
 } from "~/lib/character.ts"
@@ -28,6 +27,8 @@ import personaList from "../data/list-of-personas.json"
 import skillList from "../data/list-of-skills.json"
 import { CharacterRestButton } from "./CharacterRestButton.tsx"
 import { ChatInputRef } from "./Chat.tsx"
+import { Button } from "./ui/Button.tsx"
+import { Icon } from "./ui/Icon.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
 
 export function CharacterSheet({
@@ -146,6 +147,7 @@ export function CharacterSheet({
 
 					<SelectField
 						label="Persona"
+						placeholder="Choose a persona..."
 						options={personaList.map((p) => ({
 							value: p.persona,
 							label: p.persona,
@@ -161,6 +163,7 @@ export function CharacterSheet({
 
 					<SelectField
 						label="Lineage"
+						placeholder="Choose a lineage..."
 						options={lineageList.map((l) => ({
 							value: l.lineage,
 							label: l.lineage,
@@ -359,6 +362,19 @@ export function CharacterSheet({
 								value={character.name}
 								onChange={(event) => handleChange({ name: event.target.value })}
 							/>
+
+							<Field
+								label="Bond Activations"
+								htmlFor="bondActivations"
+								className="w-32"
+							>
+								<NumberInput
+									id="bondActivations"
+									min={0}
+									{...bindNumber("bondActivations", 3)}
+								/>
+							</Field>
+
 							<CharacterRestButton
 								onSubmit={(hourCount) => {
 									let fatigue = safeParseNumber(character.data.fatigue) ?? 0
@@ -367,16 +383,17 @@ export function CharacterSheet({
 									} else {
 										fatigue -= hourCount
 									}
-									handleDataChange({ fatigue })
+									handleDataChange({ fatigue, bondActivations: 3 })
 								}}
 							/>
 						</div>
 
 						<div className="grid auto-cols-fr grid-flow-col gap-3">
 							{/* <div className="flex aspect-square h-32 items-center justify-center rounded-lg bg-gray-950/50">
-					<Icon icon="mingcute:pic-line" className="size-24 text-gray-700" />
-				</div> */}
+								<Icon icon="mingcute:pic-line" className="size-24 text-gray-700" />
+							</div> */}
 
+							{/* IDEA: style this as a dot bar type thing */}
 							<Field
 								label={`Hits / ${model.hitsMax}${model.hitsBonus > 0 ? ` (+${model.hitsBonus})` : ""}`}
 								htmlFor="hits"
@@ -438,7 +455,6 @@ function ShareCheckbox({
 	const create = useMutation(api.characters.create)
 	const remove = useMutation(api.characters.remove)
 	const [pending, startTransition] = useTransition()
-	const id = useId()
 
 	function handleChange(event: ChangeEvent<HTMLInputElement>) {
 		// assign checked now so we don't try to access a stale event asynchronously
@@ -459,17 +475,31 @@ function ShareCheckbox({
 	}
 
 	return (
-		<div className="flex items-center gap-2">
+		<Checkbox
+			label="Share with others"
+			disabled={pending}
+			checked={existing != null}
+			onChange={handleChange}
+		/>
+	)
+}
+
+function Checkbox({
+	label,
+	className,
+	...props
+}: { label: ReactNode } & ComponentProps<"input">) {
+	const id = useId()
+	return (
+		<div className={twMerge("flex items-center gap-2", className)}>
 			<input
 				id={id}
+				{...props}
 				type="checkbox"
 				className="size-5 accent-primary-300"
-				disabled={pending}
-				checked={existing != null}
-				onChange={handleChange}
 			/>
-			<label htmlFor={id} className="font-medium">
-				Share with others
+			<label htmlFor={props.id || id} className="font-medium">
+				{label}
 			</label>
 		</div>
 	)
@@ -482,41 +512,39 @@ function BondSection({
 	bonds: CharacterBond[]
 	onChange: (bonds: CharacterBond[]) => void
 }) {
-	const strengthTotal = sum(bonds.map((bond) => bond.strength))
-	const aspectBonus = getBondAspectBonus(strengthTotal)
 	return (
 		<section aria-label="Bonds">
-			<header className="mb-0.5 flex items-center justify-between">
-				<h3 className="text-sm font-semibold">Bonds</h3>
-				<p className="text-sm">
-					Total: {strengthTotal} (+1 {aspectBonus})
-				</p>
-			</header>
+			<Ariakit.HeadingLevel>
+				<Ariakit.Heading className="text-sm font-semibold">
+					Bonds
+				</Ariakit.Heading>
 
-			<div className="flex flex-col gap-3">
-				{bonds.map((bond, index) => (
-					<BondSectionItem
-						key={index}
-						bond={bond}
-						onChange={(bond) => {
-							onChange(bonds.with(index, bond))
-						}}
-						onRemove={() => {
-							onChange(bonds.filter((_, i) => i !== index))
-						}}
-					/>
-				))}
+				<ul className="flex flex-col gap-3">
+					{bonds.map((bond, index) => (
+						<li key={index}>
+							<BondSectionItem
+								bond={bond}
+								onChange={(bond) => {
+									onChange(bonds.with(index, bond))
+								}}
+								onRemove={() => {
+									onChange(bonds.filter((_, i) => i !== index))
+								}}
+							/>
+						</li>
+					))}
 
-				<button
-					type="button"
-					className="w-full rounded border border-gray-800 bg-gray-950/25 px-3 py-2 hover:bg-gray-800/25"
-					onClick={() => {
-						onChange([...bonds, { name: "", description: "", strength: 0 }])
-					}}
-				>
-					Add Bond
-				</button>
-			</div>
+					<Button
+						className="self-start"
+						icon={<Icon icon="mingcute:heart-fill" />}
+						onClick={() => {
+							onChange([...bonds, { name: "", description: "", strength: 0 }])
+						}}
+					>
+						Add Bond
+					</Button>
+				</ul>
+			</Ariakit.HeadingLevel>
 		</section>
 	)
 }
@@ -532,8 +560,8 @@ function BondSectionItem({
 }) {
 	const strengthId = useId()
 	return (
-		<div className="rounded border border-gray-800 bg-gray-950/25 p-3">
-			<div className="mb-2 flex items-center justify-between">
+		<div className="grid gap-4 rounded border border-gray-800 bg-gray-950/25 p-3">
+			<div className="flex items-end justify-between gap-2">
 				<InputField
 					label="Name"
 					className="flex-1"
@@ -544,28 +572,59 @@ function BondSectionItem({
 					}}
 				/>
 
-				<div className="ml-3 flex items-end gap-2">
-					<Field label="Strength" htmlFor={strengthId} className="w-20">
-						<NumberInput
-							id={strengthId}
-							min={-3}
-							max={3}
-							value={bond.strength || 0}
-							onChange={(value) => {
-								onChange({ ...bond, strength: value })
-							}}
-						/>
-					</Field>
+				<Field label="Strength" htmlFor={strengthId} className="w-20">
+					<NumberInput
+						id={strengthId}
+						min={1}
+						max={5}
+						value={clamp(bond.strength, 1, 5)}
+						onChange={(value) => {
+							onChange({ ...bond, strength: value })
+						}}
+					/>
+				</Field>
 
-					<button
-						type="button"
-						className="ml-2 h-9 rounded border border-gray-800 bg-gray-950/25 px-3 text-sm hover:bg-gray-800/25"
-						onClick={() => onRemove()}
-					>
-						Remove
-					</button>
-				</div>
+				<Button
+					onClick={() => onRemove()}
+					icon={<Icon icon="mingcute:close-fill" />}
+				>
+					Remove
+				</Button>
 			</div>
+
+			<SelectField
+				label="Aura"
+				placeholder="Choose an aura..."
+				value={bond.aura || ""}
+				onChange={(event) => onChange({ ...bond, aura: event.target.value })}
+				options={[
+					{
+						label: "Fire",
+						value: "Fire",
+						description: `indicates an adversarial, heated, conflict-heavy relationship.`,
+					},
+					{
+						label: "Water",
+						value: "Water",
+						description: `comes from notions of comfort, peace, and protection.`,
+					},
+					{
+						label: "Wind",
+						value: "Wind",
+						description: `exhibits in turbulent relationships full of excitement and change.`,
+					},
+					{
+						label: "Light",
+						value: "Light",
+						description: `represents diplomatic relationships built on fairness and respect.`,
+					},
+					{
+						label: "Darkness",
+						value: "Darkness",
+						description: `manifests from tension, mistrust, and uncertainty.`,
+					},
+				]}
+			/>
 
 			<TextAreaField
 				label="Description"
@@ -673,15 +732,14 @@ function SelectField({
 	label,
 	options,
 	...props
-}: ComponentProps<"select"> & {
+}: ComponentProps<typeof Select> & {
 	label: ReactNode
-	options: Array<{ value: string; label: string; description?: ReactNode }>
 }) {
 	const id = useId()
 	return (
 		<Field className={className} label={label} htmlFor={id}>
 			<Select id={id} options={options} {...props} />
-			<div className="mt-1 text-sm font-medium">
+			<div className="mt-1 text-sm font-medium empty:hidden">
 				{options.find((opt) => opt.value === props.value)?.description}
 			</div>
 		</Field>
@@ -705,12 +763,10 @@ function Field({
 }
 
 function Input({ className, ...props }: ComponentProps<"input">) {
-	const id = useId()
 	return (
 		<input
-			id={id}
 			className={twMerge(
-				"h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none",
+				"h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 transition hover:border-gray-700 focus:border-primary-800 focus:bg-gray-950/25 focus:outline-none",
 				className,
 			)}
 			{...props}
@@ -735,11 +791,13 @@ function TextArea({ className, ...props }: ComponentProps<"textarea">) {
 function Select({
 	className,
 	options,
+	placeholder,
 	value,
 	onChange,
 	...props
 }: ComponentProps<"select"> & {
-	options: Array<{ value: string; label: string }>
+	placeholder: string
+	options: Array<{ value: string; label: string; description?: ReactNode }>
 }) {
 	return (
 		<select
@@ -747,11 +805,11 @@ function Select({
 				"h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none",
 				className,
 			)}
-			value={value}
+			value={value || ""}
 			onChange={onChange}
 			{...props}
 		>
-			<option value="">Select a persona...</option>
+			<option value="">{placeholder}</option>
 			{options.map((option) => (
 				<option key={option.value} value={option.value}>
 					{option.label}
@@ -800,15 +858,50 @@ function NumberInput({
 	onChange: (value: number) => void
 }) {
 	const [editing, setEditing] = useState(false)
+
+	const wheelHandlerRef = (element: HTMLElement | null) => {
+		const controller = new AbortController()
+
+		element?.addEventListener(
+			"wheel",
+			(event) => {
+				const tweak = (delta: number) => {
+					event.preventDefault()
+
+					const currentValue =
+						event.target instanceof HTMLInputElement ?
+							(safeParseNumber(event.target.value) ?? 0)
+						:	value
+
+					const newValue = clamp(currentValue + delta, min, max)
+
+					if (event.target instanceof HTMLInputElement) {
+						event.target.value = String(newValue)
+					}
+
+					onChange(newValue)
+					setEditing(true)
+				}
+
+				if (event.deltaY < 0) tweak(1)
+				if (event.deltaY > 0) tweak(-1)
+			},
+			{ signal: controller.signal, passive: false },
+		)
+
+		return () => controller.abort()
+	}
+
 	return (
 		<div className={twMerge("text-center", className)}>
 			{editing ?
-				<input
+				<Input
 					id={id}
+					className="text-center"
 					inputMode="numeric"
-					className="h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 text-center focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none"
 					defaultValue={value}
 					autoFocus
+					ref={wheelHandlerRef}
 					onFocus={(event) => {
 						event.currentTarget.select()
 					}}
@@ -824,15 +917,23 @@ function NumberInput({
 						}
 						if (event.key === "ArrowUp") {
 							event.preventDefault()
-							event.currentTarget.value = String(
-								clamp((Number(event.currentTarget.value) || 0) + 1, min, max),
+							const newValue = clamp(
+								(Number(event.currentTarget.value) || 0) + 1,
+								min,
+								max,
 							)
+							event.currentTarget.value = String(newValue)
+							onChange(newValue)
 						}
 						if (event.key === "ArrowDown") {
 							event.preventDefault()
-							event.currentTarget.value = String(
-								clamp((Number(event.currentTarget.value) || 0) - 1, min, max),
+							const newValue = clamp(
+								(Number(event.currentTarget.value) || 0) - 1,
+								min,
+								max,
 							)
+							event.currentTarget.value = String(newValue)
+							onChange(newValue)
 						}
 					}}
 				/>
@@ -840,6 +941,7 @@ function NumberInput({
 					id={id}
 					type="button"
 					className="h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none"
+					ref={wheelHandlerRef}
 					onClick={() => setEditing(true)}
 					onFocus={() => setEditing(true)}
 				>
