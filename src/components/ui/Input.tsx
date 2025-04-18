@@ -1,4 +1,5 @@
 import { type ComponentPropsWithoutRef, type ReactNode } from "react"
+import { twMerge } from "tailwind-merge"
 import { IconTooltip } from "~/components/ui/IconTooltip.tsx"
 
 type InputProps = {
@@ -17,12 +18,15 @@ export function Input({
 	readOnly = false,
 	...props
 }: InputProps) {
-	const baseInputClasses =
-		"flex-1 px-3 py-2 min-w-0 border bg-gray-900 rounded-md focus:outline-none transition focus:ring-2 focus:ring-primary-500"
-	const stateClasses =
-		readOnly ? "border-gray-700"
+	const baseInputClasses = twMerge(
+		"panel-dark flex-1 px-3 h-10 min-w-0 border hover:bg-gray-950 rounded focus:outline-none transition ring-2 ring-transparent focus:ring-primary-500",
+	)
+
+	const stateClasses = twMerge(
+		readOnly ? ""
 		: error ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-		: "border-gray-700"
+		: "",
+	)
 
 	return (
 		<div className={`min-w-0 ${className}`}>

@@ -1,30 +1,48 @@
-import { ConvexAuthProvider } from "@convex-dev/auth/react"
-import { ConvexReactClient, useMutation, useQuery } from "convex/react"
+import { ConvexAuthProvider, useAuthActions } from "@convex-dev/auth/react"
+import { Authenticated, AuthLoading, ConvexReactClient, Unauthenticated, useMutation, useQuery } from "convex/react"
 import { useActionState, useState } from "react"
 import { Route, Switch, useLocation } from "wouter"
 import { api } from "../convex/_generated/api"
+import { AuthScreen } from "./components/AuthScreen.tsx"
 import { DocumentTitle } from "./components/DocumentTitle.tsx"
 import { Room } from "./components/Room.tsx"
 import { Button } from "./components/ui/Button.tsx"
 import { Input } from "./components/ui/Input.tsx"
+import { LoadingScreen } from "./components/ui/LoadingScreen.tsx"
 import { DragProvider } from "./contexts/DragContext.tsx"
 import { panel } from "./styles/panel.ts"
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
+
+function AuthenticatedRoutes() {
+	return (
+		<>
+			<AuthLoading>
+				<LoadingScreen className="min-h-screen" />
+			</AuthLoading>
+			<Authenticated>
+				<Switch>
+					<Route path="/rooms/:slug">
+						{(params) => <Room slug={params.slug} />}
+					</Route>
+					<Route path="/">
+						<Landing />
+					</Route>
+				</Switch>
+			</Authenticated>
+			<Unauthenticated>
+				<AuthScreen />
+			</Unauthenticated>
+		</>
+	)
+}
 
 export function Root() {
 	return (
 		<ConvexAuthProvider client={convex}>
 			<DragProvider>
 				<DocumentTitle title="Aspects VTT">
-					<Switch>
-						<Route path="/rooms/:slug">
-							{(params) => <Room slug={params.slug} />}
-						</Route>
-						<Route path="/">
-							<Landing />
-						</Route>
-					</Switch>
+					<AuthenticatedRoutes />
 				</DocumentTitle>
 			</DragProvider>
 		</ConvexAuthProvider>
@@ -63,7 +81,7 @@ function Landing() {
 	}, "")
 
 	return (
-		<div className="flex min-h-screen items-center justify-center">
+		<div className="flex min-h-screen flex-col items-center justify-center gap-4">
 			<div className={panel("flex w-96 flex-col gap-4 p-6")}>
 				<h1 className="text-2xl font-light text-white">Create a New Room</h1>
 				<form className="contents" action={action}>
@@ -99,6 +117,7 @@ function Landing() {
 					</Button>
 				</form>
 			</div>
+			<SignOutButton />
 		</div>
 	)
 }
@@ -108,4 +127,23 @@ function slugify(name: string) {
 		.toLowerCase()
 		.replace(/\s+/g, "-")
 		.replace(/[^\w-]+/g, "")
+}
+
+function SignOutButton() {
+	const { signOut } = useAuthActions()
+	const [_, startSignOut, isPending] = useActionState(async () => {
+		await signOut()
+		return null
+	}, null)
+
+	return (
+		<button
+			type="button"
+			onClick={startSignOut}
+			className="text-primary-400 text-sm hover:underline"
+			disabled={isPending}
+		>
+			{isPending ? "Signing out..." : "Sign out"}
+		</button>
+	)
 }

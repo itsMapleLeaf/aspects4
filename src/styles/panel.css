@@ -1,3 +1,7 @@
 @utility panel {
-	@apply rounded-lg border border-primary-900 bg-primary-dark;
+	@apply rounded-lg border border-gray-800 bg-gray-900;
+}
+
+@utility panel-dark {
+	@apply rounded-lg border border-gray-800 bg-gray-950/50;
 }
