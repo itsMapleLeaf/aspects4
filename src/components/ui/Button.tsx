@@ -6,7 +6,7 @@ import { Icon } from "~/components/ui/Icon.tsx"
 
 const appearanceClasses = {
 	default: twMerge(
-		"bg-gray-950/50 backdrop-blur-md border-gray-800 hover:bg-gray-950 focus:ring-primary-500/50",
+		"bg-gray-950/50 border-gray-800 hover:bg-gray-950 focus:ring-primary-500/50",
 	),
 	ghost: twMerge(
 		"border-transparent opacity-75 hover:bg-gray-500/30 hover:opacity-100 focus:ring-gray-500/50",
