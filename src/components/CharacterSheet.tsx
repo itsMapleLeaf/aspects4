@@ -125,8 +125,6 @@ export function CharacterSheet({
 			name: "Profile",
 			content: (
 				<div className="flex flex-col gap-6">
-					<TextAreaField label="Items" {...bindString("items")} />
-
 					<SelectField
 						label="Persona"
 						placeholder="Choose a persona..."
