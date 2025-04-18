@@ -327,7 +327,7 @@ export function CharacterSheet({
 			name: "Inventory",
 			content: (
 				<>
-					<p className="mb-3">
+					<div className="mb-3">
 						Carrying capacity:{" "}
 						{(() => {
 							const strengthScore = model.getAttributeScore("Strength")
@@ -340,7 +340,7 @@ export function CharacterSheet({
 								</>
 							)
 						})()}
-					</p>
+					</div>
 					<CharacterInventory
 						items={character.items ?? []}
 						onChange={(items) => handleChange({ items })}
