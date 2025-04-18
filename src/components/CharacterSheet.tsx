@@ -38,27 +38,20 @@ export function CharacterSheet({
 	roomId,
 	onChange,
 	className,
+	hasShareCheckbox,
 }: {
 	character: Character
 	chatInputRef: RefObject<ChatInputRef | null>
 	roomId: Id<"rooms">
 	onChange: (name: Character) => void
 	className?: string
+	hasShareCheckbox: boolean
 }) {
 	const model = createCharacterModel(character)
-
-	const sharedDoc = useSharedCharacter(character, roomId)
-	const updateShared = useMutation(api.characters.update)
 
 	function handleChange(patch: Partial<Character>) {
 		const newCharacter = { ...character, ...patch }
 		onChange(newCharacter)
-		if (sharedDoc) {
-			updateShared({
-				characterId: sharedDoc._id,
-				data: { clientData: newCharacter },
-			})
-		}
 	}
 
 	function handleDataChange(newData: Character["data"]) {
@@ -428,7 +421,9 @@ export function CharacterSheet({
 							</Field>
 						</div>
 
-						<ShareCheckbox character={character} roomId={roomId} />
+						{hasShareCheckbox && (
+							<ShareCheckbox character={character} roomId={roomId} />
+						)}
 					</div>
 
 					<Ariakit.TabList className="my-4 grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">

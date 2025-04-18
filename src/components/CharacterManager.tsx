@@ -1,6 +1,6 @@
 import * as Ariakit from "@ariakit/react"
 import { type } from "arktype"
-import { useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { RefObject, type ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
 import { useDictionary } from "~/hooks/useDictionary.ts"
@@ -42,22 +42,23 @@ export function CharacterManager({
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
 	)
 
-	const sharedCharacters = useQuery(api.characters.list, { roomId })?.flatMap(
-		(doc) => {
-			const parsed = Character(doc.clientData)
-			if (parsed instanceof type.errors) {
-				console.warn("Failed to parse character", parsed, doc)
-				return []
-			}
+	const sharedCharacterDocs = useQuery(api.characters.list, { roomId })
+	const updateShared = useMutation(api.characters.update)
 
-			// ignore characters that also exist locally
-			if (characters.get(parsed.key) != null) {
-				return []
-			}
+	const sharedCharacters = sharedCharacterDocs?.flatMap((doc) => {
+		const parsed = Character(doc.clientData)
+		if (parsed instanceof type.errors) {
+			console.warn("Failed to parse character", parsed, doc)
+			return []
+		}
 
-			return [parsed]
-		},
-	)
+		// ignore characters that also exist locally
+		if (characters.get(parsed.key) != null) {
+			return []
+		}
+
+		return [parsed]
+	})
 
 	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorageState<
 		string | undefined | null
@@ -158,9 +159,19 @@ export function CharacterManager({
 									character={character}
 									chatInputRef={chatInputRef}
 									roomId={roomId}
-									onChange={(newCharacter) =>
+									hasShareCheckbox
+									onChange={(newCharacter) => {
 										characters.set(character.key, newCharacter)
-									}
+										const sharedDoc = sharedCharacterDocs?.find(
+											(doc) => doc.key === character.key,
+										)
+										if (sharedDoc) {
+											updateShared({
+												characterId: sharedDoc._id,
+												data: { clientData: newCharacter },
+											})
+										}
+									}}
 								/>
 							</Ariakit.TabPanel>
 						))}
@@ -176,6 +187,7 @@ export function CharacterManager({
 									character={character}
 									chatInputRef={chatInputRef}
 									roomId={roomId}
+									hasShareCheckbox={false}
 									onChange={() => {}}
 								/>
 							</Ariakit.TabPanel>
