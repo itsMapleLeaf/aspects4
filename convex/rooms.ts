@@ -1,4 +1,6 @@
+import { getAuthUserId } from "@convex-dev/auth/server"
 import { v } from "convex/values"
+import { pick } from "es-toolkit"
 import type { Doc } from "./_generated/dataModel"
 import { mutation, query, type QueryCtx } from "./_generated/server"
 
@@ -39,7 +41,16 @@ export const create = mutation({
 		slug: v.string(),
 	},
 	async handler(ctx, { name, slug }) {
-		const roomId = await ctx.db.insert("rooms", { name, slug })
+		const userId = await getAuthUserId(ctx)
+		if (!userId) {
+			throw new Error("Not signed in")
+		}
+
+		const roomId = await ctx.db.insert("rooms", {
+			name,
+			slug,
+			ownerId: userId,
+		})
 		return roomId
 	},
 })
@@ -68,10 +79,86 @@ export const update = mutation({
 	},
 })
 
+export const joinRoom = mutation({
+	args: {
+		roomId: v.id("rooms"),
+	},
+	async handler(ctx, { roomId }) {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) {
+			throw new Error("Not signed in")
+		}
+
+		const room = await ctx.db.get(roomId)
+		if (!room) {
+			throw new Error("Room not found")
+		}
+
+		// If user is already the owner, no need to add to members
+		if (room.ownerId === userId) {
+			return roomId
+		}
+
+		// Add user to memberUserIds if not already a member
+		const memberUserIds = room.memberUserIds || []
+		if (!memberUserIds.includes(userId)) {
+			await ctx.db.patch(roomId, {
+				memberUserIds: [...memberUserIds, userId],
+			})
+		}
+
+		return roomId
+	},
+})
+
+export const leaveRoom = mutation({
+	args: {
+		roomId: v.id("rooms"),
+	},
+	async handler(ctx, { roomId }) {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) {
+			throw new Error("Not signed in")
+		}
+
+		const room = await ctx.db.get(roomId)
+		if (!room) {
+			throw new Error("Room not found")
+		}
+
+		// Owners cannot leave their own room
+		if (room.ownerId === userId) {
+			throw new Error("Room owners cannot leave their own room")
+		}
+
+		// Remove user from memberUserIds if they are a member
+		const memberUserIds = room.memberUserIds || []
+		if (memberUserIds.includes(userId)) {
+			await ctx.db.patch(roomId, {
+				memberUserIds: memberUserIds.filter(id => id !== userId),
+			})
+		}
+
+		return roomId
+	},
+})
+
+export type ClientRoom = Awaited<ReturnType<typeof toClientRoom>>
+
 async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
-	const { backgroundId, ...clientRoom } = room
+	const backgroundUrl =
+		room.backgroundId && (await ctx.storage.getUrl(room.backgroundId))
+
+	const userId = await getAuthUserId(ctx)
+
+	let members = room.memberUserIds ?? []
+	if (room.ownerId) {
+		members.push(room.ownerId)
+	}
+
 	return {
-		...clientRoom,
-		backgroundUrl: backgroundId && (await ctx.storage.getUrl(backgroundId)),
+		...pick(room, ["_id", "_creationTime", "name", "slug"]),
+		backgroundUrl,
+		isMember: userId != null && members.includes(userId),
 	}
 }

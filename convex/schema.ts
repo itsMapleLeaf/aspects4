@@ -1,13 +1,16 @@
-import { defineSchema, defineTable } from "convex/server"
-import { v, type Validator } from "convex/values"
 import { authTables } from "@convex-dev/auth/server"
+import { defineSchema, defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export default defineSchema({
 	...authTables,
+
 	rooms: defineTable({
 		name: v.string(),
 		slug: v.string(),
 		backgroundId: v.optional(v.union(v.id("_storage"), v.null())),
+		ownerId: v.optional(v.id("users")),
+		memberUserIds: v.optional(v.array(v.id("users"))),
 	})
 		.index("name", ["name"])
 		.index("slug", ["slug"]),
@@ -21,7 +24,7 @@ export default defineSchema({
 	characters: defineTable({
 		roomId: v.id("rooms"),
 		key: v.string(),
-		clientData: v.optional(v.any() as Validator<unknown, "required">),
+		clientData: v.optional(v.any()),
 	})
 		.index("roomId", ["roomId", "clientData.name"])
 		.index("key", ["key", "roomId", "clientData.name"]),

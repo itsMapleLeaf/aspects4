@@ -1,9 +1,11 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
-import { useRef, useState } from "react"
+import { useActionState, useRef, useState } from "react"
+import { useLocation } from "wouter"
 import { api } from "../../convex/_generated/api"
 import { Id, type Doc } from "../../convex/_generated/dataModel"
+import type { ClientRoom } from "../../convex/rooms.ts"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { panel } from "../styles/panel.ts"
@@ -48,6 +50,10 @@ export function Room({ slug }: { slug: string }) {
 				Room not found
 			</div>
 		)
+	}
+
+	if (!room.isMember) {
+		return <RoomInvitation room={room} />
 	}
 
 	const sidebarTabs = [
@@ -107,6 +113,18 @@ function RoomSettings({
 	playerName,
 	onUpdatePlayerName,
 }: RoomSettingsProps) {
+	const leaveRoom = useMutation(api.rooms.leaveRoom)
+	const [, navigate] = useLocation()
+
+	const [, leaveAction, isLeaving] = useActionState(async () => {
+		try {
+			await leaveRoom({ roomId: room._id })
+			navigate("/")
+		} catch (error) {
+			console.error("Error leaving room:", error)
+			return "Failed to leave room"
+		}
+	}, null)
 	return (
 		<Ariakit.HeadingLevel>
 			<section className={panel("flex w-64 flex-col gap-4 p-4")}>
@@ -143,8 +161,53 @@ function RoomSettings({
 						placeholder="Enter your name"
 					/>
 				</Field>
+
+				<form action={leaveAction} className="contents">
+					<Button
+						type="submit"
+						className="border border-red-900/50 text-red-400 hover:bg-red-950/30"
+						icon={<Icon icon="mingcute:open-door-fill" />}
+						disabled={isLeaving}
+					>
+						{isLeaving ? "Leaving..." : "Leave room"}
+					</Button>
+				</form>
 			</section>
 		</Ariakit.HeadingLevel>
+	)
+}
+
+function RoomInvitation({ room }: { room: ClientRoom }) {
+	const joinRoom = useMutation(api.rooms.joinRoom)
+
+	const [, joinAction, isPending] = useActionState(async () => {
+		await joinRoom({ roomId: room._id })
+	}, undefined)
+
+	return (
+		<div className="flex h-screen flex-col items-center justify-center gap-6 bg-gray-950 p-6 text-center">
+			<form
+				action={joinAction}
+				className="flex max-w-md flex-col items-center gap-4"
+			>
+				<p className="text-sm font-medium text-gray-400">
+					You have been invited to
+				</p>
+				<Ariakit.HeadingLevel>
+					<Ariakit.Heading className="text-4xl font-light text-white">
+						{room.name}
+					</Ariakit.Heading>
+				</Ariakit.HeadingLevel>
+				<Button
+					type="submit"
+					className="mt-4 hover:bg-gray-800"
+					icon={<Icon icon="mingcute:open-door-fill" />}
+					pending={isPending}
+				>
+					{isPending ? "Joining..." : "Join room"}
+				</Button>
+			</form>
+		</div>
 	)
 }
 
