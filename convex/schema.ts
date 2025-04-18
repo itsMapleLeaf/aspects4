@@ -19,26 +19,6 @@ export default defineSchema({
 		roomId: v.id("rooms"),
 		key: v.string(),
 		clientData: v.optional(v.any() as Validator<unknown, "required">),
-		name: v.optional(v.string()),
-		data: v.optional(v.record(v.string(), v.union(v.string(), v.number()))),
-		bonds: v.optional(
-			v.array(
-				v.object({
-					name: v.string(),
-					description: v.string(),
-					strength: v.number(),
-					aura: v.optional(v.union(v.string(), v.null())),
-				}),
-			),
-		),
-		items: v.optional(
-			v.array(
-				v.object({
-					name: v.string(),
-					description: v.string(),
-				}),
-			),
-		),
 	})
 		.index("roomId", ["roomId", "clientData.name"])
 		.index("key", ["key", "roomId", "clientData.name"]),
