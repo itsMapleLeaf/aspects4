@@ -17,6 +17,8 @@
 	},
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
+		"@auth/core": "0.37.0",
+		"@convex-dev/auth": "^0.0.81",
 		"@fontsource-variable/quicksand": "^5.2.5",
 		"@iconify/react": "^5.2.0",
 		"@notionhq/client": "^2.3.0",

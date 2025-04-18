@@ -1,9 +1,5 @@
-import {
-	ConvexProvider,
-	ConvexReactClient,
-	useMutation,
-	useQuery,
-} from "convex/react"
+import { ConvexAuthProvider } from "@convex-dev/auth/react"
+import { ConvexReactClient, useMutation, useQuery } from "convex/react"
 import { useActionState, useState } from "react"
 import { Route, Switch, useLocation } from "wouter"
 import { api } from "../convex/_generated/api"
@@ -18,7 +14,7 @@ const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
 
 export function Root() {
 	return (
-		<ConvexProvider client={convex}>
+		<ConvexAuthProvider client={convex}>
 			<DragProvider>
 				<DocumentTitle title="Aspects VTT">
 					<Switch>
@@ -31,7 +27,7 @@ export function Root() {
 					</Switch>
 				</DocumentTitle>
 			</DragProvider>
-		</ConvexProvider>
+		</ConvexAuthProvider>
 	)
 }
 

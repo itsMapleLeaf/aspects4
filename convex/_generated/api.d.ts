@@ -14,7 +14,9 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as assets from "../assets.js";
+import type * as auth from "../auth.js";
 import type * as characters from "../characters.js";
+import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as rooms from "../rooms.js";
 import type * as storage from "../storage.js";
@@ -29,7 +31,9 @@ import type * as storage from "../storage.js";
  */
 declare const fullApi: ApiFromModules<{
   assets: typeof assets;
+  auth: typeof auth;
   characters: typeof characters;
+  http: typeof http;
   messages: typeof messages;
   rooms: typeof rooms;
   storage: typeof storage;
