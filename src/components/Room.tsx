@@ -3,7 +3,9 @@ import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useRef, useState } from "react"
 import { api } from "../../convex/_generated/api"
+import { Id, type Doc } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"
+import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { panel } from "../styles/panel.ts"
 import { AssetsPanel } from "./AssetsPanel.tsx"
 import { CharacterManager } from "./CharacterManager.tsx"
@@ -13,6 +15,7 @@ import { EditableText } from "./EditableText.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
+import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Input } from "./ui/Input.tsx"
 
@@ -65,10 +68,10 @@ export function Room({ slug }: { slug: string }) {
 			icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
 			content: (
 				<RoomSettings
-					roomName={room?.name || ""}
 					playerName={playerName}
 					onUpdateRoom={(name) => updateRoom({ roomId: room._id, name })}
 					onUpdatePlayerName={setPlayerName}
+					room={room}
 				/>
 			),
 		},
@@ -76,7 +79,7 @@ export function Room({ slug }: { slug: string }) {
 
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
-			<SceneViewer roomId={room._id} />
+			<SceneViewer room={room} />
 			<div className="fixed top-0 left-0 grid h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
 				<Sidebar tabs={sidebarTabs} />
 			</div>
@@ -92,48 +95,120 @@ export function Room({ slug }: { slug: string }) {
 }
 
 interface RoomSettingsProps {
-	roomName: string
-	playerName: string
+	room: Doc<"rooms">
 	onUpdateRoom: (name: string) => void
+	playerName: string
 	onUpdatePlayerName: (name: string) => void
 }
 
 function RoomSettings({
-	roomName,
-	playerName,
+	room,
 	onUpdateRoom,
+	playerName,
 	onUpdatePlayerName,
 }: RoomSettingsProps) {
 	return (
-		<div className={panel("flex w-64 flex-col gap-4 p-4")}>
-			<h2 className="text-xl font-light">Settings</h2>
+		<Ariakit.HeadingLevel>
+			<section className={panel("flex w-64 flex-col gap-4 p-4")}>
+				<Ariakit.Heading className="text-xl font-light">
+					Settings
+				</Ariakit.Heading>
 
-			<div className="flex flex-col gap-4">
-				<EditableText
-					label="Room Name"
-					value={roomName}
-					onChange={(value) => {
-						if (value.trim() && value !== roomName) {
-							onUpdateRoom(value.trim())
-						}
-					}}
-					placeholder="Enter room name"
-				/>
-			</div>
+				<Field label="Room Name" htmlFor="roomName">
+					<EditableText
+						id="roomName"
+						value={room.name}
+						onChange={(value) => {
+							if (value.trim() && value !== room.name) {
+								onUpdateRoom(value.trim())
+							}
+						}}
+						placeholder="Enter room name"
+					/>
+				</Field>
 
-			<div className="flex flex-col gap-4">
-				<EditableText
-					label="Your Name"
-					value={playerName}
-					onChange={(value) => {
-						if (value.trim() && value !== playerName) {
-							onUpdatePlayerName(value.trim())
+				<Field label="Background">
+					<BackgroundUploader roomId={room._id} />
+				</Field>
+
+				<Field label="Your Name" htmlFor="localName">
+					<EditableText
+						id="localName"
+						value={playerName}
+						onChange={(value) => {
+							if (value.trim() && value !== playerName) {
+								onUpdatePlayerName(value.trim())
+							}
+						}}
+						placeholder="Enter your name"
+					/>
+				</Field>
+			</section>
+		</Ariakit.HeadingLevel>
+	)
+}
+
+function BackgroundUploader({ roomId }: { roomId: Id<"rooms"> }) {
+	const updateRoom = useMutation(api.rooms.update)
+	const room = useQuery(api.rooms.get, { roomId })
+
+	const { uploadFile, isUploading } = useFileUpload({
+		onSuccess: async (storageId) => {
+			await updateRoom({ roomId, backgroundId: storageId })
+		},
+		onError: (error) => {
+			console.error("Error uploading background:", error)
+		},
+	})
+
+	const handleFileChange = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const file = event.target.files?.[0]
+		if (file) {
+			await uploadFile(file)
+		}
+	}
+
+	return (
+		<>
+			<div className="group relative aspect-video w-full overflow-hidden rounded border border-gray-800 bg-gray-950/25 transition focus-within:ring-2 focus-within:ring-primary-500/50 hover:border-gray-700 hover:bg-gray-950/50">
+				{room?.backgroundUrl && (
+					<div
+						className={`h-full w-full bg-cover bg-center brightness-25 transition group-hover:brightness-50`}
+						style={{ backgroundImage: `url(${room.backgroundUrl})` }}
+					/>
+				)}
+				<label className="absolute inset-0 flex items-center justify-center gap-2 p-2">
+					<Icon
+						icon={
+							isUploading ? "mingcute:loading-3-fill" : "mingcute:upload-2-fill"
 						}
-					}}
-					placeholder="Enter your name"
-				/>
+						className={`size-5 ${isUploading ? "animate-spin" : ""}`}
+						aria-hidden
+					/>
+					<span className="text-sm font-medium">
+						{room?.backgroundUrl ? "Change Background" : "Upload Background"}
+					</span>
+					<input
+						type="file"
+						accept="image/*"
+						className="hidden"
+						onChange={handleFileChange}
+					/>
+				</label>
 			</div>
-		</div>
+			{room?.backgroundUrl && (
+				<Button
+					icon={<Icon icon="mingcute:close-fill" />}
+					onClick={() => {
+						updateRoom({ roomId, backgroundId: null })
+					}}
+				>
+					Remove Background
+				</Button>
+			)}
+		</>
 	)
 }
 

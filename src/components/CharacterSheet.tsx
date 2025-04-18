@@ -29,6 +29,7 @@ import { CharacterInventory } from "./CharacterInventory.tsx"
 import { CharacterRestButton } from "./CharacterRestButton.tsx"
 import { ChatInputRef } from "./Chat.tsx"
 import { Button } from "./ui/Button.tsx"
+import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
 
@@ -747,22 +748,6 @@ function SelectField({
 				{options.find((opt) => opt.value === props.value)?.description}
 			</div>
 		</Field>
-	)
-}
-
-function Field({
-	className,
-	label,
-	children,
-	...props
-}: ComponentProps<"label"> & { label: ReactNode }) {
-	return (
-		<div className={className}>
-			<label {...props} className="mb-0.5 block text-sm font-semibold">
-				{label}
-			</label>
-			{children}
-		</div>
 	)
 }
 

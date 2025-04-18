@@ -21,8 +21,15 @@ import {
 } from "../lib/viewport.ts"
 import { Icon } from "./ui/Icon.tsx"
 
-export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
-	const { assets, addAssetToScene } = useSceneAssets(roomId)
+export function SceneViewer({
+	room,
+}: {
+	room: {
+		_id: Id<"rooms">
+		backgroundUrl: string | null | undefined
+	}
+}) {
+	const { assets, addAssetToScene } = useSceneAssets(room._id)
 	const { dragState } = useDrag()
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"assets">>()
 	const removeAsset = useRemoveAsset()
@@ -149,6 +156,14 @@ export function SceneViewer({ roomId }: { roomId: Id<"rooms"> }) {
 					scale: getViewportScale(viewportTransform.zoom),
 				}}
 			>
+				{room.backgroundUrl && (
+					<img
+						src={room.backgroundUrl}
+						alt=""
+						className="pointer-events-none max-w-[unset] brightness-50"
+						draggable={false}
+					/>
+				)}
 				{assets.map((asset) => (
 					<AssetImage
 						key={asset._id}
@@ -255,7 +270,7 @@ function AssetImage({
 				{isSelected && (
 					<div
 						className={twMerge(
-							"outline-primary-400 bg-primary-800/10 absolute inset-0 outline",
+							"absolute inset-0 bg-primary-800/10 outline outline-primary-400",
 						)}
 						style={{
 							outlineWidth: 2 / getViewportScale(viewportTransform.zoom),
@@ -276,7 +291,7 @@ function AssetImage({
 
 						{!asset.locked && (
 							<div
-								className="bg-primary-400 absolute cursor-nwse-resize"
+								className="absolute cursor-nwse-resize bg-primary-400"
 								style={{
 									width: 16 / getViewportScale(viewportTransform.zoom),
 									height: 16 / getViewportScale(viewportTransform.zoom),

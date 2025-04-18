@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "convex/react"
 import type { FunctionReturnType } from "convex/server"
 import { useCallback, useState } from "react"
+import { useFileUpload } from "./useFileUpload"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 
@@ -12,7 +13,7 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 
 	const assets = useQuery(api.assets.list, { roomId }) || []
 
-	const generateUploadUrl = useMutation(api.assets.generateUploadUrl)
+	const { uploadFile } = useFileUpload()
 	const createAsset = useMutation(api.assets.create)
 	const updateAsset = useMutation(api.assets.update)
 	const removeAsset = useMutation(api.assets.remove)
@@ -27,25 +28,14 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 				setError(null)
 
 				const assetBlob = await fetch(asset.url).then((res) => res.blob())
-
 				const { width, height } = await createImageBitmap(assetBlob)
 
-				const uploadUrl = await generateUploadUrl()
+				// Upload the blob directly using our reusable hook
+				const fileId = await uploadFile(assetBlob)
 
-				const result = await fetch(uploadUrl, {
-					method: "POST",
-					headers: {
-						"Content-Type": asset.type,
-					},
-					body: assetBlob,
-				})
-
-				if (!result.ok) {
-					throw new Error(`Failed to upload file: ${result.statusText}`)
+				if (!fileId) {
+					throw new Error('File upload failed')
 				}
-
-				const responseData = (await result.json()) as { storageId: string }
-				const fileId = responseData.storageId as Id<"_storage">
 
 				await createAsset({
 					name: asset.name,
@@ -68,7 +58,7 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 				setIsUploading(false)
 			}
 		},
-		[generateUploadUrl, createAsset, roomId],
+		[uploadFile, createAsset, roomId],
 	)
 
 	const updateAssetProperties = useCallback(

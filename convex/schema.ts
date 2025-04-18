@@ -5,6 +5,7 @@ export default defineSchema({
 	rooms: defineTable({
 		name: v.string(),
 		slug: v.string(),
+		backgroundId: v.optional(v.union(v.id("_storage"), v.null())),
 	})
 		.index("name", ["name"])
 		.index("slug", ["slug"]),

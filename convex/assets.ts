@@ -34,13 +34,6 @@ export const get = query({
 	},
 })
 
-export const generateUploadUrl = mutation({
-	args: {},
-	async handler(ctx) {
-		return await ctx.storage.generateUploadUrl()
-	},
-})
-
 export const create = mutation({
 	args: {
 		name: v.string(),

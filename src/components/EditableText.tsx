@@ -5,14 +5,12 @@ import { Icon } from "./ui/Icon.tsx"
 export function EditableText({
 	id,
 	className,
-	label,
 	value,
 	placeholder,
 	onChange,
 }: {
 	id?: string
 	className?: string
-	label?: string
 	value: string
 	placeholder?: string
 	onChange: (value: string) => void
@@ -39,7 +37,6 @@ export function EditableText({
 
 	return (
 		<div className={twMerge("flex flex-col gap-1", className)}>
-			{label && <label className="text-sm text-gray-400">{label}</label>}
 			{editing ?
 				<input
 					id={id}
