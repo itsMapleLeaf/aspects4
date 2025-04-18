@@ -25,10 +25,10 @@ export function ContentState({
 				)}
 				{...props}
 			>
-				<div aria-hidden className="text-primary-300/40 mb-2 *:size-16">
+				<div aria-hidden className="mb-2 text-primary-300/40 *:size-16">
 					{icon}
 				</div>
-				<Heading className="heading-xl mb-4 text-balance">{heading}</Heading>
+				<Heading className="mb-4 heading-xl text-balance">{heading}</Heading>
 				{children}
 			</section>
 		</HeadingLevel>

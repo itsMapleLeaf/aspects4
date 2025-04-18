@@ -34,7 +34,7 @@ export function useSceneAssets(roomId: Id<"rooms">) {
 				const fileId = await uploadFile(assetBlob)
 
 				if (!fileId) {
-					throw new Error('File upload failed')
+					throw new Error("File upload failed")
 				}
 
 				await createAsset({
@@ -147,19 +147,19 @@ export function useMoveAssetToFront() {
 		(localStore, { assetId }) => {
 			for (const query of localStore.getAllQueries(api.assets.list)) {
 				if (query.value === undefined) return
-				
+
 				const assets = [...query.value]
 				const assetIndex = assets.findIndex((asset) => asset._id === assetId)
-				
+
 				if (assetIndex !== -1) {
 					const asset = assets[assetIndex]
 					if (asset) {
 						asset.updatedAt = Date.now()
-						
+
 						localStore.setQuery(
 							api.assets.list,
 							{ roomId: query.args.roomId },
-							assets.sort((a, b) => a.updatedAt - b.updatedAt)
+							assets.sort((a, b) => a.updatedAt - b.updatedAt),
 						)
 					}
 				}

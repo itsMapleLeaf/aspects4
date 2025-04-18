@@ -3,7 +3,7 @@
 }
 
 @utility button-solid {
-	@apply button-base bg-primary-500/20 border-primary-500 hover:button-solid-active focus:ring-primary-500/50;
+	@apply button-base border-primary-500 bg-primary-500/20 hover:button-solid-active focus:ring-primary-500/50;
 }
 
 @utility button-solid-active {

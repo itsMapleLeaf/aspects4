@@ -22,7 +22,7 @@ export function Tooltip({
 			<Ariakit.TooltipAnchor
 				store={tooltip}
 				className={twMerge(
-					"focus-visible:ring-primary-400 inline-block rounded-md focus-visible:ring-2 focus-visible:outline-none",
+					"inline-block rounded-md focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none",
 					className,
 				)}
 			>

@@ -40,7 +40,7 @@ export function DialogPanel({
 				<Ariakit.DialogHeading className="heading-2xl">
 					{title}
 				</Ariakit.DialogHeading>
-				<Ariakit.DialogDismiss className="hover:text-primary-300 rounded p-1 transition">
+				<Ariakit.DialogDismiss className="rounded p-1 transition hover:text-primary-300">
 					<Icon icon="mingcute:close-fill" className="size-6" />
 				</Ariakit.DialogDismiss>
 			</header>

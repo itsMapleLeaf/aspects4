@@ -26,7 +26,7 @@ export function OptionCard({
 				"rounded select-none",
 				"border border-gray-800 bg-gray-900 hover:border-gray-700",
 				"px-2 py-1.5 transition-colors",
-				"has-checked:bg-primary-dark has-checked:border-primary-900/75 has-checked:hover:border-primary-900",
+				"has-checked:border-primary-900/75 has-checked:bg-primary-dark has-checked:hover:border-primary-900",
 				className,
 			)}
 			{...props}
@@ -45,10 +45,10 @@ export function OptionCard({
 				className="group flex items-center gap-1.5"
 				data-checked={checked}
 			>
-				<h3 className="heading-xl min-w-0 flex-1 truncate">{label}</h3>
+				<h3 className="min-w-0 flex-1 truncate heading-xl">{label}</h3>
 				<Icon
 					icon="mingcute:check-circle-fill"
-					className="text-primary-200/50 shrink-0 opacity-0 transition-opacity group-data-[checked=true]:opacity-100"
+					className="shrink-0 text-primary-200/50 opacity-0 transition-opacity group-data-[checked=true]:opacity-100"
 				/>
 			</header>
 

@@ -32,7 +32,7 @@ export function ToggleSection({
 		<section className={twMerge("", className)} {...props}>
 			<DisclosureProvider open={open} setOpen={setOpen}>
 				<header className="grid grid-cols-[1fr_auto]">
-					<Disclosure className="heading-2xl group hover:text-primary-200 flex cursor-default list-none items-center gap-1 transition select-none">
+					<Disclosure className="group flex cursor-default list-none items-center gap-1 heading-2xl transition select-none hover:text-primary-200">
 						<Icon
 							icon="mingcute:right-fill"
 							className="size-6 transition group-aria-expanded:rotate-90"
