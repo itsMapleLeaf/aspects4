@@ -11,7 +11,7 @@
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"test": "vitest --run",
-		"format": "prettier . --write",
+		"format": "prettier . --write --list-different",
 		"fetch-notion-data": "bun run scripts/fetch-notion-data.ts",
 		"predeploy": "convex deploy --cmd 'bun run build' --cmd-url-env-var-name VITE_CONVEX_URL"
 	},
