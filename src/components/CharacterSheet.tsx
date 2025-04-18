@@ -12,10 +12,10 @@ import {
 } from "react"
 import { twMerge } from "tailwind-merge"
 import {
+	Character,
 	createCharacterModel,
 	getAspects,
 	getAttributes,
-	type Character,
 	type CharacterBond,
 } from "~/lib/character.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
@@ -47,14 +47,17 @@ export function CharacterSheet({
 }) {
 	const model = createCharacterModel(character)
 
-	const shared = useQuery(api.characters.get, { key: character.key, roomId })
+	const sharedDoc = useSharedCharacter(character, roomId)
 	const updateShared = useMutation(api.characters.update)
 
 	function handleChange(patch: Partial<Character>) {
 		const newCharacter = { ...character, ...patch }
 		onChange(newCharacter)
-		if (shared) {
-			updateShared({ characterId: shared._id, data: newCharacter })
+		if (sharedDoc) {
+			updateShared({
+				characterId: sharedDoc._id,
+				data: { clientData: newCharacter },
+			})
 		}
 	}
 
@@ -451,6 +454,10 @@ export function CharacterSheet({
 	)
 }
 
+function useSharedCharacter(character: { key: string }, roomId: Id<"rooms">) {
+	return useQuery(api.characters.get, { key: character.key, roomId })
+}
+
 // Shared characters exist in the cloud, are visible to others in the room,
 // and can only be updated by the owner.
 // A character is un-shared if they don't exist in the cloud.
@@ -461,7 +468,7 @@ function ShareCheckbox({
 	character: Character
 	roomId: Id<"rooms">
 }) {
-	const existing = useQuery(api.characters.get, { key: character.key, roomId })
+	const sharedDoc = useSharedCharacter(character, roomId)
 	const create = useMutation(api.characters.create)
 	const remove = useMutation(api.characters.remove)
 	const [pending, startTransition] = useTransition()
@@ -472,11 +479,11 @@ function ShareCheckbox({
 
 		startTransition(async () => {
 			try {
-				if (checked && !existing) {
-					await create({ ...character, roomId })
+				if (checked && !sharedDoc) {
+					await create({ roomId, key: character.key, clientData: character })
 				}
-				if (!checked && existing) {
-					await remove({ characterId: existing._id })
+				if (!checked && sharedDoc) {
+					await remove({ characterId: sharedDoc._id })
 				}
 			} catch (error) {
 				console.error("Error updating character:", error)
@@ -488,7 +495,7 @@ function ShareCheckbox({
 		<Checkbox
 			label="Share with others"
 			disabled={pending}
-			checked={existing != null}
+			checked={sharedDoc != null}
 			onChange={handleChange}
 		/>
 	)

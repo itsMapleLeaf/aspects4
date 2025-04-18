@@ -90,10 +90,6 @@ export function createCharacterModel(character: Character) {
 		Object.entries(aspectScores),
 	)
 
-	const bondStrengthSum = sum(
-		character.bonds?.map((bond) => bond.strength) ?? [],
-	)
-
 	const attributePointsAssigned = sum(Object.values(attributeScores))
 	const aspectPointsAssigned = sum(Object.values(aspectScores))
 

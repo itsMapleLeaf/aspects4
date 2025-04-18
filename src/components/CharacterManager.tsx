@@ -42,8 +42,21 @@ export function CharacterManager({
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
 	)
 
-	const sharedCharacters = useQuery(api.characters.list, { roomId })?.filter(
-		(character) => characters.get(character.key) == null,
+	const sharedCharacters = useQuery(api.characters.list, { roomId })?.flatMap(
+		(doc) => {
+			const parsed = Character(doc.clientData)
+			if (parsed instanceof type.errors) {
+				console.warn("Failed to parse character", parsed, doc)
+				return []
+			}
+
+			// ignore characters that also exist locally
+			if (characters.get(parsed.key) != null) {
+				return []
+			}
+
+			return [parsed]
+		},
 	)
 
 	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorageState<

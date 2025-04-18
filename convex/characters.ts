@@ -53,3 +53,24 @@ export const remove = mutation({
 		await ctx.db.delete(characterId)
 	},
 })
+
+export const migrateClientData = mutation({
+	async handler(ctx) {
+		for await (const {
+			_id,
+			_creationTime,
+			roomId,
+			key,
+			clientData,
+			...rest
+		} of ctx.db.query("characters")) {
+			if (!clientData) {
+				await ctx.db.replace(_id, {
+					roomId,
+					key,
+					clientData: { ...rest, key },
+				})
+			}
+		}
+	},
+})

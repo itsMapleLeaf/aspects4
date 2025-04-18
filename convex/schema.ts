@@ -1,5 +1,5 @@
 import { defineSchema, defineTable } from "convex/server"
-import { v } from "convex/values"
+import { v, type Validator } from "convex/values"
 
 export default defineSchema({
 	rooms: defineTable({
@@ -18,8 +18,9 @@ export default defineSchema({
 	characters: defineTable({
 		roomId: v.id("rooms"),
 		key: v.string(),
-		name: v.string(),
-		data: v.record(v.string(), v.union(v.string(), v.number())),
+		clientData: v.optional(v.any() as Validator<unknown, "required">),
+		name: v.optional(v.string()),
+		data: v.optional(v.record(v.string(), v.union(v.string(), v.number()))),
 		bonds: v.optional(
 			v.array(
 				v.object({
@@ -39,9 +40,8 @@ export default defineSchema({
 			),
 		),
 	})
-		.index("roomId", ["roomId", "name"])
-		.index("key", ["key", "roomId", "name"])
-		.index("name", ["name"]),
+		.index("roomId", ["roomId", "clientData.name"])
+		.index("key", ["key", "roomId", "clientData.name"]),
 
 	assets: defineTable({
 		name: v.string(),
