@@ -7,8 +7,6 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 	providers: [
 		Password({
 			profile(params) {
-				console.log(params)
-
 				if (typeof params.email !== "string") {
 					throw new Error("Email is required")
 				}
