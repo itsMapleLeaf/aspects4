@@ -270,7 +270,7 @@ function AssetImage({
 				<img
 					src={asset.url || ""}
 					alt=""
-					className="size-full object-cover"
+					className="size-full object-contain"
 					draggable={false}
 				/>
 
