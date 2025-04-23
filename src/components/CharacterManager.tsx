@@ -122,58 +122,56 @@ export function CharacterManager({
 						</ul>
 					</Ariakit.TabList>
 
-					<div className={panel("h-full w-148 flex-1 p-0")}>
-						{ownedCharacters?.map((character) => (
-							<Ariakit.TabPanel
-								id={character._id}
-								key={character._id}
-								className="contents"
-								unmountOnHide
-							>
-								<CharacterSheet
-									character={character}
-									chatInputRef={chatInputRef}
-									onChange={(patch) => {
-										updateCharacter({
-											characterId: character._id,
-											data: patch,
-										})
-									}}
-									sharing={{
-										isShared: roomCharacterIds.has(character._id),
-										onChange: async (shouldShare) => {
-											if (shouldShare) {
-												await addToRoom({
-													characterId: character._id,
-													roomId,
-												})
-											} else {
-												await removeFromRoom({
-													characterId: character._id,
-													roomId,
-												})
-											}
-										},
-									}}
-								/>
-							</Ariakit.TabPanel>
-						))}
+					{ownedCharacters?.map((character) => (
+						<Ariakit.TabPanel
+							id={character._id}
+							key={character._id}
+							className={panel("h-full w-148 flex-1 p-0")}
+							unmountOnHide
+						>
+							<CharacterSheet
+								character={character}
+								chatInputRef={chatInputRef}
+								onChange={(patch) => {
+									updateCharacter({
+										characterId: character._id,
+										data: patch,
+									})
+								}}
+								sharing={{
+									isShared: roomCharacterIds.has(character._id),
+									onChange: async (shouldShare) => {
+										if (shouldShare) {
+											await addToRoom({
+												characterId: character._id,
+												roomId,
+											})
+										} else {
+											await removeFromRoom({
+												characterId: character._id,
+												roomId,
+											})
+										}
+									},
+								}}
+							/>
+						</Ariakit.TabPanel>
+					))}
 
-						{roomCharactersWithoutOwned?.map((character) => (
-							<Ariakit.TabPanel
-								id={character._id}
-								key={character._id}
-								className="contents"
-							>
-								<CharacterSheet
-									className="p-4"
-									character={character}
-									chatInputRef={chatInputRef}
-									onChange={() => {}}
-								/>
-							</Ariakit.TabPanel>
-						))}
-					</div>
+					{roomCharactersWithoutOwned?.map((character) => (
+						<Ariakit.TabPanel
+							id={character._id}
+							key={character._id}
+							className={panel("h-full w-148 flex-1 p-0")}
+						>
+							<CharacterSheet
+								className="p-4"
+								character={character}
+								chatInputRef={chatInputRef}
+								onChange={() => {}}
+							/>
+						</Ariakit.TabPanel>
+					))}
 				</section>
 			</Ariakit.HeadingLevel>
 		</Ariakit.TabProvider>
