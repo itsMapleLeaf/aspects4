@@ -69,6 +69,7 @@ export const create = mutation({
 		if (!userId) throw new Error("Not logged in")
 
 		const data = {
+			name: "New Character",
 			...args,
 			ownerId: userId,
 		}
