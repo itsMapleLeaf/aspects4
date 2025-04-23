@@ -27,7 +27,7 @@ export function SceneViewer({
 	}
 }) {
 	const assets = useQuery(api.roomAssets.list, { roomId: room._id })
-	const createRoomAsset = useMutation(api.roomAssets.create)
+	const createRoomAsset = useMutation(api.roomAssets.place)
 	const removeRoomAsset = useRemoveRoomAsset(room._id)
 	const updateRoomAsset = useUpdateRoomAsset(room._id)
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"roomAssets">>()
@@ -93,10 +93,8 @@ export function SceneViewer({
 			}
 
 			const scale = getViewportScale(viewportTransform.zoom)
-			const dropX =
-				(event.clientX - viewportTransform.offset.x) / scale - result.size.x / 2
-			const dropY =
-				(event.clientY - viewportTransform.offset.y) / scale - result.size.y / 2
+			const dropX = (event.clientX - viewportTransform.offset.x) / scale
+			const dropY = (event.clientY - viewportTransform.offset.y) / scale
 			createRoomAsset({
 				roomId: room._id,
 				assetId: result.assetId as Id<"assets">,

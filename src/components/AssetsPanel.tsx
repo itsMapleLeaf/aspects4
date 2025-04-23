@@ -13,6 +13,11 @@ import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
 export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	const assets = useQuery(api.assets.list)
 	const createAsset = useMutation(api.assets.create)
+	const roomAssets = useQuery(api.roomAssets.list, { roomId })
+
+	const roomAssetsByAssetId = new Map(
+		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
+	)
 
 	const [isFileOver, setIsFileOver] = useState(false)
 	const { uploadFile } = useFileUpload()
@@ -92,11 +97,13 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 				</header>
 
 				<ul className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2">
-					{assets?.map((asset) => (
-						<li key={asset._id}>
-							<AssetCard asset={asset} roomId={roomId} />
-						</li>
-					))}
+					{assets
+						?.filter((asset) => !roomAssetsByAssetId.has(asset._id))
+						?.map((asset) => (
+							<li key={asset._id}>
+								<AssetCard asset={asset} roomId={roomId} />
+							</li>
+						))}
 				</ul>
 			</HeadingLevel>
 
@@ -115,7 +122,6 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 
 export const AssetDropData = type("string.json.parse").to({
 	assetId: "string",
-	size: { x: "number", y: "number" },
 })
 
 function AssetCard({
@@ -126,7 +132,7 @@ function AssetCard({
 	roomId: Id<"rooms">
 }) {
 	const removeAsset = useMutation(api.assets.remove)
-	const createRoomAsset = useMutation(api.roomAssets.create)
+	const createRoomAsset = useMutation(api.roomAssets.place)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 	return (
 		<Menu placement="bottom-start">
@@ -139,7 +145,6 @@ function AssetCard({
 				onDragStart={(event: React.DragEvent) => {
 					const data: typeof AssetDropData.inferOut = {
 						assetId: asset._id,
-						size: asset.size,
 					}
 					event.dataTransfer.setData("application/json", JSON.stringify(data))
 					event.dataTransfer.dropEffect = "move"

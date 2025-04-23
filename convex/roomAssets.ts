@@ -27,22 +27,43 @@ export const list = query({
 			.query("roomAssets")
 			.withIndex("roomId", (q) => q.eq("roomId", roomId))
 			.collect()
-		return await Array.fromAsync(assets, (asset) =>
+
+		const normalized = await Array.fromAsync(assets, (asset) =>
 			normalizeRoomAsset(ctx, asset),
 		)
+
+		return normalized.filter((asset) => asset.inScene)
 	},
 })
 
-export const create = mutation({
+export const place = mutation({
 	args: {
 		...partial(schema.tables.roomAssets.validator.fields),
 		roomId: v.id("rooms"),
 		assetId: v.id("assets"),
 	},
-	async handler(ctx, { roomId, assetId, ...args }) {
+	async handler(ctx, { roomId, assetId, position = { x: 0, y: 0 }, ...args }) {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) {
 			throw new Error("Not signed in")
+		}
+
+		const existing = await ctx.db
+			.query("roomAssets")
+			.withIndex("roomId", (q) => q.eq("roomId", roomId).eq("assetId", assetId))
+			.first()
+
+		if (existing) {
+			await ctx.db.patch(existing._id, {
+				...args,
+				inScene: true,
+				position: {
+					x: position.x - existing.size.x / 2,
+					y: position.y - existing.size.y / 2,
+				},
+				updateTime: Date.now(),
+			})
+			return
 		}
 
 		const assetDoc = await ctx.db.get(assetId)
@@ -51,13 +72,16 @@ export const create = mutation({
 		}
 
 		await ctx.db.insert("roomAssets", {
-			position: { x: 0, y: 0 },
 			size: assetDoc.size,
 			rotation: 0,
 			locked: false,
-			inScene: true,
 			updateTime: Date.now(),
 			...args,
+			position: {
+				x: position.x - assetDoc.size.x / 2,
+				y: position.y - assetDoc.size.y / 2,
+			},
+			inScene: true,
 			roomId,
 			assetId,
 		})
@@ -88,6 +112,6 @@ export const remove = mutation({
 		roomAssetId: v.id("roomAssets"),
 	},
 	async handler(ctx, { roomAssetId }) {
-		await ctx.db.delete(roomAssetId)
+		await ctx.db.patch(roomAssetId, { inScene: false })
 	},
 })
