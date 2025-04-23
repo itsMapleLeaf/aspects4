@@ -153,9 +153,9 @@ export function CharacterManager({
 								id={character.key}
 								key={character.key}
 								className="contents"
+								unmountOnHide
 							>
 								<CharacterSheet
-									className="p-4"
 									character={character}
 									chatInputRef={chatInputRef}
 									roomId={roomId}

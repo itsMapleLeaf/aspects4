@@ -11,6 +11,8 @@ import {
 	type ChangeEvent,
 } from "react"
 import { twMerge } from "tailwind-merge"
+import type { NonEmptyTuple } from "type-fest"
+import { useLocalStorageState } from "~/hooks/storage.ts"
 import {
 	Character,
 	createCharacterModel,
@@ -348,17 +350,17 @@ export function CharacterSheet({
 				</>
 			),
 		},
-	]
+	] as const
 
 	return (
 		<div
 			className={twMerge(
-				"flex h-full min-h-0 flex-col overflow-y-auto [scrollbar-gutter:stable]",
+				"flex h-full min-h-0 flex-col gap-4 overflow-y-auto p-4 [scrollbar-gutter:stable]",
 				className,
 			)}
 		>
-			<Ariakit.TabProvider>
-				<div className={"sticky top-0 flex flex-col bg-gray-900"}>
+			<CharacterSheetTabs tabs={tabs}>
+				<div className={"sticky -top-4 -m-4 flex flex-col bg-gray-900 p-4"}>
 					<div className="grid gap-3">
 						<div className="flex items-end gap-2">
 							<InputField
@@ -423,28 +425,60 @@ export function CharacterSheet({
 						{hasShareCheckbox && (
 							<ShareCheckbox character={character} roomId={roomId} />
 						)}
+
+						<CharacterSheetTabList tabs={tabs} />
 					</div>
-
-					<Ariakit.TabList className="my-4 grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
-						{tabs.map((tab) => (
-							<Ariakit.Tab
-								key={tab.name}
-								id={tab.name}
-								className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
-							>
-								{tab.name}
-							</Ariakit.Tab>
-						))}
-					</Ariakit.TabList>
 				</div>
-
-				{tabs.map((tab) => (
-					<Ariakit.TabPanel key={tab.name} id={tab.name}>
-						{tab.content}
-					</Ariakit.TabPanel>
-				))}
-			</Ariakit.TabProvider>
+			</CharacterSheetTabs>
 		</div>
+	)
+}
+
+function CharacterSheetTabs({
+	tabs,
+	children,
+}: {
+	tabs: NonEmptyTuple<{ name: string; content: ReactNode }>
+	children: ReactNode
+}) {
+	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
+		string | undefined | null
+	>("CharacterSheet:selectedTabId", null, (input) =>
+		input == null ? undefined : String(input),
+	)
+
+	return (
+		<Ariakit.TabProvider
+			selectedId={selectedTabId ?? tabs[0].name}
+			setSelectedId={setSelectedTabId}
+		>
+			{children}
+			{tabs.map((tab) => (
+				<Ariakit.TabPanel key={tab.name} id={tab.name}>
+					{tab.content}
+				</Ariakit.TabPanel>
+			))}
+		</Ariakit.TabProvider>
+	)
+}
+
+function CharacterSheetTabList({
+	tabs,
+}: {
+	tabs: NonEmptyTuple<{ name: string; content: ReactNode }>
+}) {
+	return (
+		<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
+			{tabs.map((tab) => (
+				<Ariakit.Tab
+					key={tab.name}
+					id={tab.name}
+					className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+				>
+					{tab.name}
+				</Ariakit.Tab>
+			))}
+		</Ariakit.TabList>
 	)
 }
 

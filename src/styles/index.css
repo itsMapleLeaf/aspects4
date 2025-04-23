@@ -65,6 +65,31 @@
 	}
 }
 
+/**
+ * Utility class that makes the element itself not receive pointer events,
+ * while allowing its children to receive pointer events.
+ * Useful for container elements whose backgrounds shouldn't be clickable,
+ * but whose children should remain interactive.
+ *
+ * Note: When nesting elements with this class, a child with
+ * `pointer-events-children` under a parent with `pointer-events-children`
+ * will not receive pointer events itself, but its children will.
+ *
+ * Example:
+ * <div class="pointer-events-children">
+ *   <!-- This div doesn't receive clicks -->
+ *   <button>This button is clickable</button>
+ *   <div class="pointer-events-children">
+ *     <!-- This nested div doesn't receive clicks -->
+ *     <a href="#">This link is clickable</a>
+ *   </div>
+ * </div>
+ */
 @utility pointer-events-children {
-	@apply pointer-events-none *:pointer-events-auto;
+	& {
+		& > * {
+			pointer-events: auto;
+		}
+		pointer-events: none;
+	}
 }

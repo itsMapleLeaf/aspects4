@@ -1,32 +1,25 @@
 import { useEffect, useState } from "react"
 import type { JsonValue } from "type-fest"
-import { useValueRef } from "./common.ts"
 
 export function useLocalStorageState<T>(
 	key: string,
 	defaultValue: T,
 	load: (input: JsonValue) => T,
 ) {
-	const [value, setValue] = useState<T>(defaultValue)
-	const [loaded, setLoaded] = useState(false)
-	const loadRef = useValueRef(load)
-
-	if (!loaded) {
+	// not SSR-safe but we don't care about that rn
+	const [value, setValue] = useState<T>(() => {
 		try {
 			const saved = window.localStorage.getItem(key)
-			if (saved) {
-				setValue(loadRef.current(JSON.parse(saved) as JsonValue))
-			}
-			setLoaded(true)
+			return saved == null ? defaultValue : load(JSON.parse(saved) as JsonValue)
 		} catch (error) {
-			console.warn("failed to parse", error)
+			console.warn(`failed to parse (key "${key}")`, error)
+			return defaultValue
 		}
-	}
+	})
 
 	useEffect(() => {
-		if (!loaded) return
 		window.localStorage.setItem(key, JSON.stringify(value))
-	}, [key, value, loaded])
+	}, [key, value])
 
 	return [value, setValue] as const
 }
