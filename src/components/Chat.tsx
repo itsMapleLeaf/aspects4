@@ -171,14 +171,11 @@ export function Chat({
 	const bottomScrollRef = useCallback((element: Element | null) => {
 		if (!element?.firstElementChild) return
 
-		console.log(element.firstElementChild)
-
 		const obs = new MutationObserver(() => {
 			element.scrollTo({
 				top: element.scrollHeight,
 				behavior: "smooth",
 			})
-			console.log("the")
 		})
 		obs.observe(element.firstElementChild, { childList: true })
 		return () => obs.disconnect()
