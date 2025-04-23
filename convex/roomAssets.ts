@@ -9,8 +9,13 @@ import schema from "./schema.ts"
 export type NormalizedRoomAsset = Awaited<ReturnType<typeof normalizeRoomAsset>>
 async function normalizeRoomAsset(ctx: QueryCtx, doc: Doc<"roomAssets">) {
 	const assetDoc = await ctx.db.get(doc.assetId)
-	const asset = assetDoc && (await normalizeAsset(ctx, assetDoc))
-	return { ...doc, asset }
+	const { name, url } =
+		(assetDoc && (await normalizeAsset(ctx, assetDoc))) || {}
+	return {
+		...doc,
+		name,
+		url,
+	}
 }
 
 export const list = query({
@@ -40,13 +45,18 @@ export const create = mutation({
 			throw new Error("Not signed in")
 		}
 
+		const assetDoc = await ctx.db.get(assetId)
+		if (!assetDoc) {
+			throw new Error("Asset not found")
+		}
+
 		await ctx.db.insert("roomAssets", {
 			position: { x: 0, y: 0 },
-			scale: 1,
+			size: assetDoc.size,
 			rotation: 0,
 			locked: false,
 			inScene: true,
-			updatedDate: Date.now(),
+			updateTime: Date.now(),
 			...args,
 			roomId,
 			assetId,
@@ -61,6 +71,15 @@ export const update = mutation({
 	},
 	async handler(ctx, { roomAssetId, data }) {
 		await ctx.db.patch(roomAssetId, data)
+	},
+})
+
+export const moveToFront = mutation({
+	args: {
+		roomAssetId: v.id("roomAssets"),
+	},
+	async handler(ctx, { roomAssetId }) {
+		await ctx.db.patch(roomAssetId, { updateTime: Date.now() })
 	},
 })
 

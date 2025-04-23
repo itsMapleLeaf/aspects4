@@ -58,11 +58,11 @@ export default defineSchema({
 		roomId: v.id("rooms"),
 		assetId: v.id("assets"),
 		position: vector(),
-		scale: v.number(),
+		size: vector(),
 		rotation: v.number(),
 		locked: v.boolean(),
 		inScene: v.boolean(),
-		updatedDate: v.number(),
+		updateTime: v.number(),
 	}).index("roomId", ["roomId", "assetId"]),
 
 	messages: defineTable({

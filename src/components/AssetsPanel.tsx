@@ -1,4 +1,5 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
+import { type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
@@ -112,6 +113,11 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	)
 }
 
+export const AssetDropData = type("string.json.parse").to({
+	assetId: "string",
+	size: { x: "number", y: "number" },
+})
+
 function AssetCard({
 	asset,
 	roomId,
@@ -129,6 +135,14 @@ function AssetCard({
 				draggable
 				onPointerDown={(event: React.PointerEvent) => {
 					setMenuPosition({ x: event.clientX, y: event.clientY })
+				}}
+				onDragStart={(event: React.DragEvent) => {
+					const data: typeof AssetDropData.inferOut = {
+						assetId: asset._id,
+						size: asset.size,
+					}
+					event.dataTransfer.setData("application/json", JSON.stringify(data))
+					event.dataTransfer.dropEffect = "move"
 				}}
 			>
 				<img

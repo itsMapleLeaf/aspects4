@@ -1,13 +1,12 @@
-import { ArkErrors } from "arktype"
+import { ArkErrors, type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { isEqual } from "es-toolkit"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { useValueRef } from "~/hooks/common.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
-import { useDrag } from "../contexts/DragContext.tsx"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
@@ -16,6 +15,7 @@ import {
 	handleViewportZoom,
 	ViewportTransform,
 } from "../lib/viewport.ts"
+import { AssetDropData } from "./AssetsPanel.tsx"
 import { Icon } from "./ui/Icon.tsx"
 
 export function SceneViewer({
@@ -28,9 +28,8 @@ export function SceneViewer({
 }) {
 	const assets = useQuery(api.roomAssets.list, { roomId: room._id })
 	const createRoomAsset = useMutation(api.roomAssets.create)
-	const removeRoomAsset = useMutation(api.roomAssets.remove)
-	const updateRoomAsset = useMutation(api.roomAssets.update)
-	const { dragState } = useDrag()
+	const removeRoomAsset = useRemoveRoomAsset(room._id)
+	const updateRoomAsset = useUpdateRoomAsset(room._id)
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"roomAssets">>()
 
 	const [viewportTransform, setViewportTransform] =
@@ -69,39 +68,44 @@ export function SceneViewer({
 		}
 	}
 
-	const handleDrop = async (event: React.DragEvent) => {
-		event.preventDefault()
-		event.stopPropagation()
-
-		try {
-			// TODO
-			// const data = dragState.assetData
-			// if (!data) return
-			// const scale = getViewportScale(viewportTransform.zoom)
-			// const dropX = (event.clientX - viewportTransform.offset.x) / scale
-			// const dropY = (event.clientY - viewportTransform.offset.y) / scale
-			// createRoomAsset({
-			// 	roomId: room._id,
-			// 	assetId: data._id,
-			// 	position: { x: dropX, y: dropY },
-			// })
-		} catch (err) {
-			console.error("Error processing dropped asset:", err)
-		}
+	const handleWheel = (event: React.WheelEvent) => {
+		setViewportTransform((transform) => handleViewportZoom(transform, event))
 	}
 
 	const handleDragOver = (event: React.DragEvent) => {
 		if (event.dataTransfer.types.includes("application/json")) {
 			event.preventDefault()
-			event.dataTransfer.dropEffect = "copy"
+			event.dataTransfer.dropEffect = "move"
 		}
 	}
 
-	const handleWheel = (event: React.WheelEvent) => {
-		setViewportTransform((transform) => handleViewportZoom(transform, event))
-	}
+	const handleDrop = async (event: React.DragEvent) => {
+		event.preventDefault()
+		event.stopPropagation()
 
-	const handleDragLeave = () => {}
+		try {
+			const result = AssetDropData(
+				event.dataTransfer.getData("application/json"),
+			)
+			if (result instanceof type.errors) {
+				console.warn(result)
+				return
+			}
+
+			const scale = getViewportScale(viewportTransform.zoom)
+			const dropX =
+				(event.clientX - viewportTransform.offset.x) / scale - result.size.x / 2
+			const dropY =
+				(event.clientY - viewportTransform.offset.y) / scale - result.size.y / 2
+			createRoomAsset({
+				roomId: room._id,
+				assetId: result.assetId as Id<"assets">,
+				position: { x: dropX, y: dropY },
+			})
+		} catch (err) {
+			console.error("Error processing dropped asset:", err)
+		}
+	}
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -150,7 +154,6 @@ export function SceneViewer({
 			onWheel={handleWheel}
 			onDrop={handleDrop}
 			onDragOver={handleDragOver}
-			onDragLeave={handleDragLeave}
 		>
 			<div
 				className="pointer-events-children absolute top-0 left-0 origin-top-left transition-[scale,translate] duration-100 ease-out"
@@ -167,15 +170,17 @@ export function SceneViewer({
 						draggable={false}
 					/>
 				)}
-				{assets?.map((asset) => (
-					<AssetImage
-						key={asset._id}
-						asset={asset}
-						viewportTransform={viewportTransform}
-						isSelected={selectedAsssetId === asset._id}
-						onPrimaryPointerDown={() => setSelectedAsssetId(asset._id)}
-					/>
-				))}
+				{assets
+					?.sort((a, b) => a.updateTime - b.updateTime)
+					.map((asset) => (
+						<AssetImage
+							key={asset._id}
+							asset={asset}
+							viewportTransform={viewportTransform}
+							isSelected={selectedAsssetId === asset._id}
+							onPrimaryPointerDown={() => setSelectedAsssetId(asset._id)}
+						/>
+					))}
 			</div>
 		</div>
 	)
@@ -194,21 +199,22 @@ function AssetImage({
 }) {
 	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 	const dragOffsetRef = useValueRef(dragOffset)
-	const [resizeOffset, setResizeOffset] = useState({ width: 0, height: 0 })
+	const [resizeOffset, setResizeOffset] = useState({ x: 0, y: 0 })
 	const resizeOffsetRef = useValueRef(resizeOffset)
-	const updateRoomAsset = useMutation(api.roomAssets.update)
 
-	const setBodyCursor = useCallback((cursor: string | null) => {
+	const updateRoomAsset = useUpdateRoomAsset(asset.roomId)
+	const moveToFront = useMoveRoomAssetToFront(asset.roomId)
+
+	const setBodyCursor = (cursor: string | null) => {
 		if (cursor) {
 			document.body.style.cursor = cursor
 		} else {
 			document.body.style.removeProperty("cursor")
 		}
-	}, [])
+	}
 
 	const isIdle =
-		isEqual(dragOffset, { x: 0, y: 0 }) &&
-		isEqual(resizeOffset, { width: 0, height: 0 })
+		isEqual(dragOffset, { x: 0, y: 0 }) && isEqual(resizeOffset, { x: 0, y: 0 })
 
 	return (
 		<div
@@ -219,23 +225,21 @@ function AssetImage({
 			)}
 			style={{
 				translate: `${asset.position.x + dragOffset.x}px ${asset.position.y + dragOffset.y}px`,
-				rotate: `${asset.rotation ?? 0}deg`,
-				width: `${(asset.asset?.size?.x ?? 0) + resizeOffset.width}px`,
-				height: `${(asset.asset?.size?.y ?? 0) + resizeOffset.height}px`,
-				scale: asset.scale,
+				rotate: `${asset.rotation}deg`,
+				width: `${asset.size.x + resizeOffset.x}px`,
+				height: `${asset.size.y + resizeOffset.y}px`,
 			}}
 			onPointerDown={(event) => {
 				if (event.button !== 0) return
 
-				onPrimaryPointerDown()
-
 				event.preventDefault()
+				onPrimaryPointerDown()
 
 				if (asset.locked) return
 
 				handleDrag({
 					onDragStart: () => {
-						// moveToFront({ assetId: asset._id })
+						moveToFront({ roomAssetId: asset._id })
 						setBodyCursor("move")
 					},
 					onDrag: (event) => {
@@ -266,8 +270,8 @@ function AssetImage({
 		>
 			<div className="relative size-full">
 				<img
-					src={asset.asset?.url || ""}
-					alt={asset.asset?.name || ""}
+					src={asset.url || ""}
+					alt=""
 					className="size-full object-cover"
 					draggable={false}
 				/>
@@ -309,37 +313,38 @@ function AssetImage({
 									event.stopPropagation()
 									event.preventDefault()
 
-									// moveToFront({ assetId: asset._id })
+									moveToFront({ roomAssetId: asset._id })
 									setBodyCursor("nwse-resize")
 
 									handleDrag({
 										onDrag: (event) => {
 											setResizeOffset((offset) => ({
-												width:
-													offset.width +
+												x:
+													offset.x +
 													event.movementX /
 														getViewportScale(viewportTransform.zoom),
-												height:
-													offset.height +
+												y:
+													offset.y +
 													event.movementY /
 														getViewportScale(viewportTransform.zoom),
 											}))
 										},
 										onDragEnd: () => {
 											const newWidth =
-												(asset.asset?.size?.x ?? 0) +
-												resizeOffsetRef.current.width
+												(asset?.size?.x ?? 0) + resizeOffsetRef.current.x
 											const newHeight =
-												(asset.asset?.size?.y ?? 0) +
-												resizeOffsetRef.current.height
+												(asset?.size?.y ?? 0) + resizeOffsetRef.current.y
 
 											updateRoomAsset({
 												roomAssetId: asset._id,
 												data: {
-													scale: Math.max(10, newWidth),
+													size: {
+														x: newWidth,
+														y: newHeight,
+													},
 												},
 											})
-											setResizeOffset({ width: 0, height: 0 })
+											setResizeOffset({ x: 0, y: 0 })
 											setBodyCursor(null)
 										},
 									})
@@ -350,5 +355,50 @@ function AssetImage({
 				)}
 			</div>
 		</div>
+	)
+}
+
+function useUpdateRoomAsset(roomId: Id<"rooms">) {
+	return useMutation(api.roomAssets.update).withOptimisticUpdate(
+		(store, args) => {
+			const items = store.getQuery(api.roomAssets.list, { roomId })
+			store.setQuery(
+				api.roomAssets.list,
+				{ roomId },
+				items?.map((item) =>
+					item._id === args.roomAssetId ? { ...item, ...args.data } : item,
+				),
+			)
+		},
+	)
+}
+
+function useMoveRoomAssetToFront(roomId: Id<"rooms">) {
+	return useMutation(api.roomAssets.moveToFront).withOptimisticUpdate(
+		(store, args) => {
+			const items = store.getQuery(api.roomAssets.list, { roomId })
+			store.setQuery(
+				api.roomAssets.list,
+				{ roomId },
+				items?.map((item) =>
+					item._id === args.roomAssetId ?
+						{ ...item, updateTime: Date.now() }
+					:	item,
+				),
+			)
+		},
+	)
+}
+
+function useRemoveRoomAsset(roomId: Id<"rooms">) {
+	return useMutation(api.roomAssets.remove).withOptimisticUpdate(
+		(store, args) => {
+			const items = store.getQuery(api.roomAssets.list, { roomId })
+			store.setQuery(
+				api.roomAssets.list,
+				{ roomId },
+				items?.filter((item) => item._id !== args.roomAssetId),
+			)
+		},
 	)
 }
