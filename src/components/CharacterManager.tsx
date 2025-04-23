@@ -1,13 +1,10 @@
 import * as Ariakit from "@ariakit/react"
-import { type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { RefObject, type ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
-import { useDictionary } from "~/hooks/useDictionary.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
-import { useLocalStorage, useLocalStorageState } from "../hooks/storage.ts"
-import { Character } from "../lib/character.ts"
+import { useLocalStorageState } from "../hooks/storage.ts"
 import { panel } from "../styles/panel.ts"
 import { CharacterSheet } from "./CharacterSheet.tsx"
 import { ChatInputRef } from "./Chat.tsx"
@@ -20,59 +17,37 @@ export function CharacterManager({
 	chatInputRef: RefObject<ChatInputRef | null>
 	roomId: Id<"rooms">
 }) {
-	const characters = useDictionary<Character>({
-		initialItems: {},
-		fallback: (key) => ({ key, name: "New Character", data: {} }),
-	})
+	const ownedCharacters = useQuery(api.characters.listOwned)
+	const ownedCharacterIds = new Set(ownedCharacters?.map((it) => it._id))
 
-	useLocalStorage({
-		state: [characters.items, characters.setAll],
-		key: "CharacterManager:characters",
-		load(input) {
-			const result = type.Record("string", Character)(input)
-			if (result instanceof type.errors) {
-				console.error("Invalid character data", result)
-				return {}
-			}
-			return result
-		},
+	const roomCharacters = useQuery(api.characters.listByRoom, {
+		roomId,
 	})
+	const roomCharacterIds = new Set(roomCharacters?.map((it) => it._id))
 
-	const localCharacters = characters.values.sort((a, b) =>
-		a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+	const roomCharactersWithoutOwned = roomCharacters?.filter(
+		(it) => !ownedCharacterIds.has(it._id),
 	)
 
-	const sharedCharacterDocs = useQuery(api.characters.list, { roomId })
-	const updateShared = useMutation(api.characters.update)
+	const createCharacter = useMutation(api.characters.create)
+	const updateCharacter = useMutation(api.characters.update)
+	const removeCharacter = useMutation(api.characters.remove)
+	const addToRoom = useMutation(api.characters.addToRoom)
+	const removeFromRoom = useMutation(api.characters.removeFromRoom)
 
-	const sharedCharacters = sharedCharacterDocs?.flatMap((doc) => {
-		const parsed = Character(doc.clientData)
-		if (parsed instanceof type.errors) {
-			console.warn("Failed to parse character", parsed, doc)
-			return []
-		}
-
-		// ignore characters that also exist locally
-		if (characters.get(parsed.key) != null) {
-			return []
-		}
-
-		return [parsed]
-	})
-
-	const [activeCharacterKey, setActiveCharacterKey] = useLocalStorageState<
+	const [activeCharacterId, setActiveCharacterId] = useLocalStorageState<
 		string | undefined | null
-	>("CharacterManager:activeCharacterKey", null, (input) =>
+	>("CharacterManager:activeCharacterId", null, (input) =>
 		input == null ? null : String(input),
 	)
 
-	function addNewCharacter() {
-		const character = characters.create(crypto.randomUUID())
-		setActiveCharacterKey(character.key)
+	async function addNewCharacter() {
+		const character = await createCharacter({})
+		setActiveCharacterId(character._id)
 	}
 
 	return (
-		<Ariakit.TabProvider selectedId={activeCharacterKey} orientation="vertical">
+		<Ariakit.TabProvider selectedId={activeCharacterId} orientation="vertical">
 			<Ariakit.HeadingLevel level={2}>
 				<section className="flex h-full w-full gap-2">
 					<Ariakit.TabList
@@ -91,15 +66,15 @@ export function CharacterManager({
 						</header>
 
 						<ul className="flex flex-col gap-1">
-							{localCharacters.map((character, index) => (
-								<li key={character.key} className="-mx-2 flex gap-1">
+							{ownedCharacters?.map((character, index) => (
+								<li key={character._id} className="-mx-2 flex gap-1">
 									<SidebarTab
-										id={character.key}
+										id={character._id}
 										onClick={() => {
-											if (activeCharacterKey === character.key) {
-												setActiveCharacterKey(null)
+											if (activeCharacterId === character._id) {
+												setActiveCharacterId(null)
 											} else {
-												setActiveCharacterKey(character.key)
+												setActiveCharacterId(character._id)
 											}
 										}}
 									>
@@ -110,15 +85,15 @@ export function CharacterManager({
 										type="button"
 										className="flex aspect-square h-full items-center justify-center rounded transition-colors hover:bg-white/5"
 										onClick={() => {
-											characters.remove(character.key)
+											removeCharacter({ characterId: character._id })
 
-											if (character.key === activeCharacterKey) {
+											if (character._id === activeCharacterId) {
 												const nextIndex = Math.min(
 													index + 1,
-													localCharacters.length - 2, // -1 for the removed character
+													ownedCharacters.length - 2, // -1 for the removed character
 												)
-												const nextKey = localCharacters[nextIndex]?.key ?? null
-												setActiveCharacterKey(nextKey)
+												const nextKey = ownedCharacters[nextIndex]?.key ?? null
+												setActiveCharacterId(nextKey)
 											}
 										}}
 									>
@@ -128,15 +103,15 @@ export function CharacterManager({
 								</li>
 							))}
 
-							{sharedCharacters?.map((character) => (
-								<li key={character.key} className="-mx-2 flex gap-1">
+							{roomCharactersWithoutOwned?.map((character) => (
+								<li key={character._id} className="-mx-2 flex gap-1">
 									<SidebarTab
-										id={character.key}
+										id={character._id}
 										onClick={() => {
-											if (activeCharacterKey === character.key) {
-												setActiveCharacterKey(null)
+											if (activeCharacterId === character._id) {
+												setActiveCharacterId(null)
 											} else {
-												setActiveCharacterKey(character.key)
+												setActiveCharacterId(character._id)
 											}
 										}}
 									>
@@ -148,46 +123,52 @@ export function CharacterManager({
 					</Ariakit.TabList>
 
 					<div className={panel("h-full w-148 flex-1 p-0")}>
-						{localCharacters.map((character) => (
+						{ownedCharacters?.map((character) => (
 							<Ariakit.TabPanel
-								id={character.key}
-								key={character.key}
+								id={character._id}
+								key={character._id}
 								className="contents"
 								unmountOnHide
 							>
 								<CharacterSheet
 									character={character}
 									chatInputRef={chatInputRef}
-									roomId={roomId}
-									hasShareCheckbox
-									onChange={(newCharacter) => {
-										characters.set(character.key, newCharacter)
-										const sharedDoc = sharedCharacterDocs?.find(
-											(doc) => doc.key === character.key,
-										)
-										if (sharedDoc) {
-											updateShared({
-												characterId: sharedDoc._id,
-												data: { clientData: newCharacter },
-											})
-										}
+									onChange={(patch) => {
+										updateCharacter({
+											characterId: character._id,
+											data: patch,
+										})
+									}}
+									sharing={{
+										isShared: roomCharacterIds.has(character._id),
+										onChange: async (shouldShare) => {
+											if (shouldShare) {
+												await addToRoom({
+													characterId: character._id,
+													roomId,
+												})
+											} else {
+												await removeFromRoom({
+													characterId: character._id,
+													roomId,
+												})
+											}
+										},
 									}}
 								/>
 							</Ariakit.TabPanel>
 						))}
 
-						{sharedCharacters?.map((character) => (
+						{roomCharactersWithoutOwned?.map((character) => (
 							<Ariakit.TabPanel
-								id={character.key}
-								key={character.key}
+								id={character._id}
+								key={character._id}
 								className="contents"
 							>
 								<CharacterSheet
 									className="p-4"
 									character={character}
 									chatInputRef={chatInputRef}
-									roomId={roomId}
-									hasShareCheckbox={false}
 									onChange={() => {}}
 								/>
 							</Ariakit.TabPanel>

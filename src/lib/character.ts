@@ -1,5 +1,5 @@
-import { type } from "arktype"
 import { sum } from "es-toolkit"
+import type { NormalizedCharacter } from "../../convex/characters.ts"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
@@ -36,28 +36,9 @@ export function getAspects() {
 	return aspects
 }
 
-export type CharacterBond = typeof CharacterBond.inferOut
-const CharacterBond = type({
-	"name": "string",
-	"description": "string",
-	"strength": "number",
-	"aura?": "string | null | undefined",
-})
-
-export type CharacterItem = typeof CharacterItem.inferOut
-const CharacterItem = type({
-	name: "string",
-	description: "string",
-})
-
-export type Character = typeof Character.inferOut
-export const Character = type({
-	"key": "string",
-	"name": "string",
-	"data": `Record<string, string | number>`,
-	"bonds?": CharacterBond.array(),
-	"items?": CharacterItem.array(),
-})
+export type Character = NormalizedCharacter
+export type CharacterItem = Character["items"][number]
+export type CharacterBond = Character["bonds"][number]
 
 const skillAttributes = new Map(
 	skillList.map((skill) => [skill.skill, skill.attribute]),

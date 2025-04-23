@@ -1,5 +1,4 @@
 import * as Ariakit from "@ariakit/react"
-import { useMutation, useQuery } from "convex/react"
 import { clamp } from "es-toolkit"
 import {
 	ComponentProps,
@@ -20,8 +19,6 @@ import {
 	type CharacterBond,
 } from "~/lib/character.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
-import { api } from "../../convex/_generated/api"
-import type { Id } from "../../convex/_generated/dataModel"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import lineageList from "../data/list-of-lineages.json"
 import personaList from "../data/list-of-personas.json"
@@ -34,29 +31,30 @@ import { EditableTextField } from "./EditableTextField.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { LoadingSpinner } from "./ui/LoadingSpinner.tsx"
 import { SelectField } from "./ui/SelectField.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
 
 export function CharacterSheet({
 	character,
 	chatInputRef,
-	roomId,
 	onChange,
 	className,
-	hasShareCheckbox,
+	sharing,
 }: {
 	character: Character
 	chatInputRef: RefObject<ChatInputRef | null>
-	roomId: Id<"rooms">
-	onChange: (name: Character) => void
+	onChange: (patch: Partial<Character>) => void
 	className?: string
-	hasShareCheckbox: boolean
+	sharing?: {
+		isShared: boolean
+		onChange: (isShared: boolean) => void
+	}
 }) {
 	const model = createCharacterModel(character)
 
 	function handleChange(patch: Partial<Character>) {
-		const newCharacter = { ...character, ...patch }
-		onChange(newCharacter)
+		onChange(patch)
 	}
 
 	function handleDataChange(newData: Character["data"]) {
@@ -436,8 +434,11 @@ export function CharacterSheet({
 							</Field>
 						</div>
 
-						{hasShareCheckbox && (
-							<ShareCheckbox character={character} roomId={roomId} />
+						{sharing && (
+							<ShareCheckbox
+								checked={sharing.isShared}
+								onChange={sharing.onChange}
+							/>
 						)}
 
 						<CharacterSheetTabList tabs={tabs} />
@@ -496,52 +497,36 @@ function CharacterSheetTabList({
 	)
 }
 
-function useSharedCharacter(character: { key: string }, roomId: Id<"rooms">) {
-	return useQuery(api.characters.get, { key: character.key, roomId })
-}
-
-// Shared characters exist in the cloud, are visible to others in the room,
-// and can only be updated by the owner.
-// A character is un-shared if they don't exist in the cloud.
 function ShareCheckbox({
-	character,
-	roomId,
+	checked,
+	onChange,
 }: {
-	character: Character
-	roomId: Id<"rooms">
+	checked: boolean
+	onChange: (checked: boolean) => unknown
 }) {
-	const sharedDoc = useSharedCharacter(character, roomId)
-	const create = useMutation(api.characters.create)
-	const remove = useMutation(api.characters.remove)
 	const [pending, startTransition] = useTransition()
-
-	function handleChange(event: ChangeEvent<HTMLInputElement>) {
-		// assign checked now so we don't try to access a stale event asynchronously
-		const { checked } = event.target
-
-		startTransition(async () => {
-			try {
-				if (checked && !sharedDoc) {
-					await create({ roomId, key: character.key, clientData: character })
-				}
-				if (!checked && sharedDoc) {
-					await remove({ characterId: sharedDoc._id })
-				}
-			} catch (error) {
-				console.error("Error updating character:", error)
-			}
-		})
-	}
-
 	return (
 		<Checkbox
-			label="Share with others"
-			checked={sharedDoc != null}
-			onChange={handleChange}
-			className={twMerge(
-				// "transition-opacity",
-				pending ? "opacity-50" : "opacity-100",
-			)}
+			label={
+				<div className="flex items-center gap-1.5">
+					<span>Share with room</span>
+					<LoadingSpinner
+						className="size-6 opacity-0 transition-opacity data-[visible=true]:opacity-100"
+						data-visible={pending}
+					/>
+				</div>
+			}
+			checked={checked}
+			onChange={() => {
+				if (pending) return
+				startTransition(async () => {
+					try {
+						await onChange(!checked)
+					} catch (error) {
+						console.error("Error updating character:", error)
+					}
+				})
+			}}
 		/>
 	)
 }

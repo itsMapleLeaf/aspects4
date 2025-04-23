@@ -1,4 +1,5 @@
 import { authTables } from "@convex-dev/auth/server"
+import { deprecated } from "convex-helpers/validators"
 import { defineSchema, defineTable } from "convex/server"
 import { v, type Validator } from "convex/values"
 
@@ -6,14 +7,34 @@ export default defineSchema({
 	...authTables,
 
 	characters: defineTable({
+		name: v.optional(v.string()),
+		data: v.optional(v.record(v.string(), v.union(v.string(), v.number()))),
+		bonds: v.optional(
+			v.array(
+				v.object({
+					name: v.string(),
+					description: v.string(),
+					strength: v.number(),
+					aura: v.optional(v.string()),
+				}),
+			),
+		),
+		items: v.optional(
+			v.array(
+				v.object({
+					name: v.string(),
+					description: v.string(),
+				}),
+			),
+		),
 		ownerId: v.id("users"),
-		roomId: optionull(v.id("rooms")),
-		key: v.string(),
-		clientData: v.optional(v.any()),
+		roomId: deprecated,
+		key: deprecated,
+		clientData: deprecated,
 	})
-		.index("roomId", ["roomId", "clientData.name"])
-		.index("ownerId", ["ownerId", "clientData.name"])
-		.index("key", ["key", "roomId", "clientData.name"]),
+		.index("roomId", ["roomId", "name"])
+		.index("ownerId", ["ownerId", "name"])
+		.index("key", ["key", "roomId", "name"]),
 
 	rooms: defineTable({
 		name: v.string(),
@@ -28,9 +49,7 @@ export default defineSchema({
 	roomCharacters: defineTable({
 		roomId: v.id("rooms"),
 		characterId: v.id("characters"),
-	})
-		.index("roomId", ["roomId"])
-		.index("characterId", ["characterId"]),
+	}).index("roomId", ["roomId", "characterId"]),
 
 	messages: defineTable({
 		sender: v.string(),
