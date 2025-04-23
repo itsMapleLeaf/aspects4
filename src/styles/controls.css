@@ -1,0 +1,19 @@
+@utility control {
+	@apply h-10 panel-dark rounded border px-3 ring-2 ring-transparent transition focus:ring-primary-500/50 focus:outline-none;
+}
+
+@utility button-solid {
+	@apply control border-primary-500 bg-primary-500/20 hover:button-solid-active focus:ring-primary-500/50;
+}
+
+@utility button-solid-active {
+	@apply bg-primary-500/30;
+}
+
+@utility button-ghost {
+	@apply control border-transparent opacity-75 hover:bg-gray-500/30 hover:opacity-100 focus:ring-gray-500/50;
+}
+
+@utility input {
+	@apply control min-w-0;
+}

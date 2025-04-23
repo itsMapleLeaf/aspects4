@@ -9,7 +9,7 @@
 @import "./layout.css";
 @import "./typography.css";
 @import "./panel.css";
-@import "./button.css";
+@import "./controls.css";
 @import "./menu.css";
 
 @theme {
@@ -46,11 +46,13 @@
 	);
 
 	--spacing-page-body: 960px;
+
+	--spacing-control-height: --spacing(10);
 }
 
 @layer base {
 	:root {
-		@apply overflow-x-clip bg-gray-950 selection:bg-primary-950;
+		@apply selection:bg-primary-950 overflow-x-clip bg-gray-950;
 		scrollbar-color: var(--color-gray-700) var(--color-gray-950);
 		/* scrollbar-gutter: stable; */
 		color-scheme: dark;

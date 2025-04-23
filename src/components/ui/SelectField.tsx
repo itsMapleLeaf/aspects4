@@ -1,25 +1,50 @@
-import { useId, type ComponentProps } from "react"
-import { Field } from "./Field.tsx"
+import { ComponentProps, ReactNode, useId } from "react"
+import { twMerge } from "tailwind-merge"
+import { Field } from "~/components/ui/Field.tsx"
 
 export function SelectField({
-	label,
 	className,
-	children,
+	label,
+	options,
 	...props
-}: ComponentProps<"select"> & {
-	label: string
+}: ComponentProps<typeof Select> & {
+	label: ReactNode
 }) {
 	const id = useId()
-
 	return (
-		<Field label={label} className={className} htmlFor={props.id ?? id}>
-			<select
-				{...props}
-				id={props.id ?? id}
-				className="h-10 w-full min-w-0 rounded border border-gray-800 bg-gray-900 px-3 transition focus:border-gray-700 focus:outline-none"
-			>
-				{children}
-			</select>
+		<Field className={className} label={label} htmlFor={id}>
+			<Select id={id} options={options} {...props} />
+			<div className="mt-1 text-sm font-medium empty:hidden">
+				{options.find((opt) => opt.value === props.value)?.description}
+			</div>
 		</Field>
+	)
+}
+
+export function Select({
+	className,
+	options,
+	placeholder,
+	value,
+	onChange,
+	...props
+}: ComponentProps<"select"> & {
+	placeholder: string
+	options: Array<{ value: string; label: string; description?: ReactNode }>
+}) {
+	return (
+		<select
+			className={twMerge("control", className)}
+			value={value || ""}
+			onChange={onChange}
+			{...props}
+		>
+			<option value="">{placeholder}</option>
+			{options.map((option) => (
+				<option key={option.value} value={option.value}>
+					{option.label}
+				</option>
+			))}
+		</select>
 	)
 }

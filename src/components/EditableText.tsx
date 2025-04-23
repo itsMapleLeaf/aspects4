@@ -1,76 +1,75 @@
 import { useState } from "react"
 import { twMerge } from "tailwind-merge"
+import { Button } from "./ui/Button.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { Input } from "./ui/Input.tsx"
+import { TextArea } from "./ui/TextArea.tsx"
 
 export function EditableText({
 	id,
 	className,
 	value,
 	placeholder,
+	multiline = false,
 	onChange,
 }: {
 	id?: string
 	className?: string
 	value: string
 	placeholder?: string
+	multiline?: boolean
 	onChange: (value: string) => void
 }) {
 	const [editing, setEditing] = useState(false)
-	const [tempValue, setTempValue] = useState(value)
+	const InputComponent = multiline ? TextArea : Input
 
-	const startEditing = () => {
-		setEditing(true)
-		setTempValue(value)
-	}
-
-	const handleSubmit = () => {
-		const trimmedValue = tempValue.trim()
-		if (trimmedValue && trimmedValue !== value) {
-			onChange(trimmedValue)
-			setEditing(false)
-		} else if (!trimmedValue) {
-			setTempValue("") // Clear whitespace
-		} else {
-			setEditing(false)
-		}
+	function commit(newValue: string) {
+		onChange(newValue)
+		setEditing(false)
 	}
 
 	return (
 		<div className={twMerge("flex flex-col gap-1", className)}>
-			{editing ?
-				<input
+			{editing === false ?
+				<Button
 					id={id}
-					className={`h-9 w-full rounded border ${!tempValue.trim() ? "border-red-500" : "border-gray-800"} bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none`}
-					value={tempValue}
+					className="h-fit min-h-control-height py-1.5 whitespace-pre-line"
+					align="start"
+					onClick={() => setEditing(true)}
+					onFocus={() => setEditing(true)}
+				>
+					{value || placeholder}
+					<Icon
+						icon="mingcute:edit-line"
+						className="size-4 shrink-0 text-gray-400"
+					/>
+				</Button>
+			:	<InputComponent
+					id={id}
+					defaultValue={value}
 					placeholder={placeholder}
 					autoFocus
 					onFocus={(event) => {
 						event.currentTarget.select()
 					}}
-					onChange={(e) => setTempValue(e.target.value)}
-					onBlur={handleSubmit}
+					onBlur={(event) => {
+						commit(event.currentTarget.value)
+					}}
 					onKeyDown={(event) => {
-						if (event.key === "Enter") {
+						if (!multiline && event.key === "Enter") {
 							event.preventDefault()
-							handleSubmit()
+							commit(event.currentTarget.value)
+						}
+						if (multiline && event.key === "Enter" && event.ctrlKey) {
+							event.preventDefault()
+							commit(event.currentTarget.value)
 						}
 						if (event.key === "Escape") {
 							event.preventDefault()
-							setTempValue(value) // Reset to original value
-							setEditing(false)
+							commit(event.currentTarget.value)
 						}
 					}}
 				/>
-			:	<button
-					id={id}
-					type="button"
-					className="flex h-9 w-full items-center justify-between rounded border border-gray-800 bg-gray-950/25 px-3 text-left hover:border-gray-700 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none"
-					onClick={startEditing}
-					onFocus={startEditing}
-				>
-					<span>{value || placeholder}</span>
-					<Icon icon="mingcute:edit-line" className="size-4 text-gray-400" />
-				</button>
 			}
 		</div>
 	)

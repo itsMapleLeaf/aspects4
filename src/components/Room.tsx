@@ -2,7 +2,6 @@ import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useActionState, useRef, useState } from "react"
-import { twMerge } from "tailwind-merge"
 import { useLocation } from "wouter"
 import { api } from "../../convex/_generated/api"
 import { Id, type Doc } from "../../convex/_generated/dataModel"
@@ -99,18 +98,99 @@ export function Room({ slug }: { slug: string }) {
 							<UserButton />
 						</div>
 					</header>
-					<main className="pointer-events-children grid min-h-0 flex-1 grid-flow-col grid-cols-[minmax(auto,48rem)_20rem] justify-between gap-2">
+					<main className="pointer-events-children flex min-h-0 flex-1 gap-2">
 						<SidebarPanels tabs={sidebarTabs} />
 						<Chat
 							roomId={room._id}
 							playerName={playerName}
 							chatInputRef={chatInputRef}
-							className="col-2"
+							className="ml-auto w-72"
 						/>
 					</main>
 				</div>
 			</SidebarProvider>
 		</DocumentTitle>
+	)
+}
+
+interface TabConfig {
+	name: string
+	icon: ReactNode
+	content: ReactNode
+}
+
+function SidebarProvider({ children }: { children: ReactNode }) {
+	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
+		string | undefined | null
+	>("Sidebar:selectedTabId", null, (input) =>
+		input == null ? null : String(input),
+	)
+
+	return (
+		<Ariakit.TabProvider
+			selectedId={selectedTabId}
+			setSelectedId={setSelectedTabId}
+		>
+			{children}
+		</Ariakit.TabProvider>
+	)
+}
+
+function SidebarTabs({ tabs }: { tabs: TabConfig[] }) {
+	return (
+		<Ariakit.TabList className={panel("flex gap-1 p-1")}>
+			{tabs.map((tab) => (
+				<SidebarTab key={tab.name} name={tab.name} icon={tab.icon} />
+			))}
+		</Ariakit.TabList>
+	)
+}
+
+function SidebarPanels({
+	tabs,
+	className,
+}: {
+	tabs: TabConfig[]
+	className?: string
+}) {
+	return tabs.map((tab) => (
+		<Ariakit.TabPanel
+			key={tab.name}
+			id={tab.name}
+			className={className}
+			unmountOnHide
+		>
+			{tab.content}
+		</Ariakit.TabPanel>
+	))
+}
+
+function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
+	const store = Ariakit.useTabContext()
+	const selectedTabId = Ariakit.useStoreState(
+		store,
+		(state) => state?.selectedId,
+	)
+	return (
+		<Ariakit.TooltipProvider placement="bottom-start">
+			<Ariakit.Tab
+				id={name}
+				className="flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5 aria-selected:bg-white/5 aria-selected:text-primary-300"
+				render={<Ariakit.TooltipAnchor />}
+				onClick={() => {
+					if (selectedTabId === name) {
+						store?.setSelectedId(null)
+					} else {
+						store?.setSelectedId(name)
+					}
+				}}
+			>
+				{icon}
+			</Ariakit.Tab>
+			<Ariakit.Tooltip className="translate-y-1 rounded border border-gray-300 bg-white px-2 py-0.5 text-sm font-bold text-gray-900 opacity-0 transition data-enter:translate-y-0 data-enter:opacity-100">
+				{name}
+			</Ariakit.Tooltip>
+		</Ariakit.TooltipProvider>
 	)
 }
 
@@ -323,101 +403,5 @@ function PlayerNameDialog({ onSubmit }: { onSubmit: (name: string) => void }) {
 				</form>
 			</DialogPanel>
 		</Dialog>
-	)
-}
-
-interface TabConfig {
-	name: string
-	icon: ReactNode
-	content: ReactNode
-}
-
-interface SidebarProps {
-	tabs: TabConfig[]
-}
-
-function Sidebar({ tabs }: SidebarProps) {
-	return (
-		<SidebarProvider>
-			<div className="flex h-full flex-col items-start gap-2">
-				<SidebarTabs tabs={tabs} />
-				<SidebarPanels tabs={tabs} />
-			</div>
-		</SidebarProvider>
-	)
-}
-
-function SidebarProvider({ children }: { children: ReactNode }) {
-	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
-		string | undefined | null
-	>("Sidebar:selectedTabId", null, (input) =>
-		input == null ? null : String(input),
-	)
-
-	return (
-		<Ariakit.TabProvider
-			selectedId={selectedTabId}
-			setSelectedId={setSelectedTabId}
-		>
-			{children}
-		</Ariakit.TabProvider>
-	)
-}
-
-function SidebarTabs({ tabs }: { tabs: TabConfig[] }) {
-	return (
-		<Ariakit.TabList className={panel("flex gap-1 p-1")}>
-			{tabs.map((tab) => (
-				<SidebarTab key={tab.name} name={tab.name} icon={tab.icon} />
-			))}
-		</Ariakit.TabList>
-	)
-}
-
-function SidebarPanels({
-	tabs,
-	className,
-}: {
-	tabs: TabConfig[]
-	className?: string
-}) {
-	return tabs.map((tab) => (
-		<Ariakit.TabPanel
-			key={tab.name}
-			id={tab.name}
-			className={twMerge("min-h-0 flex-1", className)}
-			unmountOnHide
-		>
-			{tab.content}
-		</Ariakit.TabPanel>
-	))
-}
-
-function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
-	const store = Ariakit.useTabContext()
-	const selectedTabId = Ariakit.useStoreState(
-		store,
-		(state) => state?.selectedId,
-	)
-	return (
-		<Ariakit.TooltipProvider placement="bottom-start">
-			<Ariakit.Tab
-				id={name}
-				className="flex size-8 items-center justify-center rounded transition-colors hover:bg-white/5 aria-selected:bg-white/5 aria-selected:text-primary-300"
-				render={<Ariakit.TooltipAnchor />}
-				onClick={() => {
-					if (selectedTabId === name) {
-						store?.setSelectedId(null)
-					} else {
-						store?.setSelectedId(name)
-					}
-				}}
-			>
-				{icon}
-			</Ariakit.Tab>
-			<Ariakit.Tooltip className="translate-y-1 rounded border border-gray-300 bg-white px-2 py-0.5 text-sm font-bold text-gray-900 opacity-0 transition data-enter:translate-y-0 data-enter:opacity-100">
-				{name}
-			</Ariakit.Tooltip>
-		</Ariakit.TooltipProvider>
 	)
 }

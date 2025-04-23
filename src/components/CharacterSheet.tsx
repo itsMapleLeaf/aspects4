@@ -6,7 +6,6 @@ import {
 	ReactNode,
 	RefObject,
 	useId,
-	useState,
 	useTransition,
 	type ChangeEvent,
 } from "react"
@@ -30,9 +29,12 @@ import skillList from "../data/list-of-skills.json"
 import { CharacterInventory } from "./CharacterInventory.tsx"
 import { CharacterRestButton } from "./CharacterRestButton.tsx"
 import { ChatInputRef } from "./Chat.tsx"
+import { EditableNumber } from "./EditableNumber.tsx"
+import { EditableTextField } from "./EditableTextField.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { SelectField } from "./ui/SelectField.tsx"
 import { Tooltip } from "./ui/Tooltip.tsx"
 
 export function CharacterSheet({
@@ -63,8 +65,13 @@ export function CharacterSheet({
 
 	const bindString = (key: keyof Character["data"]) => ({
 		value: String(character.data[key] || ""),
-		onChange: (event: ChangeEvent<{ value: string }>) =>
-			handleDataChange({ [key]: event.target.value }),
+		onChange: (eventOrValue: string | ChangeEvent<{ value: string }>) => {
+			const value =
+				typeof eventOrValue === "string" ? eventOrValue : (
+					eventOrValue.currentTarget.value
+				)
+			handleDataChange({ [key]: value })
+		},
 	})
 
 	const bindNumber = (key: keyof Character["data"], fallback = 0) => ({
@@ -159,7 +166,11 @@ export function CharacterSheet({
 						{...bindString("lineage")}
 					/>
 
-					<TextAreaField label="Details" {...bindString("details")} />
+					<EditableTextField
+						label="Details"
+						multiline
+						{...bindString("details")}
+					/>
 				</div>
 			),
 		},
@@ -363,11 +374,11 @@ export function CharacterSheet({
 				<div className={"sticky -top-4 -m-4 flex flex-col bg-gray-900 p-4"}>
 					<div className="grid gap-3">
 						<div className="flex items-end gap-2">
-							<InputField
+							<EditableTextField
 								label="Name"
 								className="flex-1"
 								value={character.name}
-								onChange={(event) => handleChange({ name: event.target.value })}
+								onChange={(name) => handleChange({ name })}
 							/>
 
 							<Field
@@ -375,7 +386,7 @@ export function CharacterSheet({
 								htmlFor="bondActivations"
 								className="w-32"
 							>
-								<NumberInput
+								<EditableNumber
 									id="bondActivations"
 									min={0}
 									{...bindNumber("bondActivations", 3)}
@@ -405,20 +416,23 @@ export function CharacterSheet({
 								label={`Hits / ${model.hitsMax}${model.hitsBonus > 0 ? ` (+${model.hitsBonus})` : ""}`}
 								htmlFor="hits"
 							>
-								<NumberInput id="hits" {...bindNumber("hits")} />
+								<EditableNumber id="hits" {...bindNumber("hits")} />
 							</Field>
 							<Field label="Hits Bonus" htmlFor="hitsBonus">
-								<NumberInput id="hitsBonus" {...bindNumber("hitsMax")} />
+								<EditableNumber id="hitsBonus" {...bindNumber("hitsMax")} />
 							</Field>
 
 							<Field
 								label={`Fatigue / ${model.fatigueMax}${model.fatigueBonus > 0 ? ` (+${model.fatigueBonus})` : ""}`}
 								htmlFor="fatigue"
 							>
-								<NumberInput id="fatigue" {...bindNumber("fatigue")} />
+								<EditableNumber id="fatigue" {...bindNumber("fatigue")} />
 							</Field>
 							<Field label="Fatigue Bonus" htmlFor="fatigueBonus">
-								<NumberInput id="fatigueBonus" {...bindNumber("fatigueMax")} />
+								<EditableNumber
+									id="fatigueBonus"
+									{...bindNumber("fatigueMax")}
+								/>
 							</Field>
 						</div>
 
@@ -522,9 +536,12 @@ function ShareCheckbox({
 	return (
 		<Checkbox
 			label="Share with others"
-			disabled={pending}
 			checked={sharedDoc != null}
 			onChange={handleChange}
+			className={twMerge(
+				// "transition-opacity",
+				pending ? "opacity-50" : "opacity-100",
+			)}
 		/>
 	)
 }
@@ -561,7 +578,7 @@ function BondSection({
 		<ul className="flex flex-col gap-3">
 			{bonds.map((bond, index) => (
 				<li key={index}>
-					<BondSectionItem
+					<BondForm
 						bond={bond}
 						onChange={(bond) => {
 							onChange(bonds.with(index, bond))
@@ -586,7 +603,7 @@ function BondSection({
 	)
 }
 
-function BondSectionItem({
+function BondForm({
 	bond,
 	onChange,
 	onRemove,
@@ -599,18 +616,17 @@ function BondSectionItem({
 	return (
 		<div className="grid gap-4 rounded border border-gray-800 bg-gray-950/25 p-3">
 			<div className="flex items-end justify-between gap-2">
-				<InputField
+				<EditableTextField
 					label="Name"
 					className="flex-1"
-					autoFocus
 					value={bond.name}
-					onChange={(event) => {
-						onChange({ ...bond, name: event.target.value })
+					onChange={(name) => {
+						onChange({ ...bond, name })
 					}}
 				/>
 
 				<Field label="Strength" htmlFor={strengthId} className="w-20">
-					<NumberInput
+					<EditableNumber
 						id={strengthId}
 						min={1}
 						max={5}
@@ -663,11 +679,12 @@ function BondSectionItem({
 				]}
 			/>
 
-			<TextAreaField
+			<EditableTextField
 				label="Description"
+				multiline
 				value={bond.description}
-				onChange={(event) => {
-					onChange({ ...bond, description: event.target.value })
+				onChange={(description) => {
+					onChange({ ...bond, description })
 				}}
 			/>
 		</div>
@@ -692,19 +709,6 @@ function Section({
 	)
 }
 
-export function InputField({
-	className,
-	label,
-	...props
-}: ComponentProps<"input"> & { label: ReactNode }) {
-	const id = useId()
-	return (
-		<Field className={className} label={label} htmlFor={id}>
-			<Input id={id} {...props} />
-		</Field>
-	)
-}
-
 function StatField({
 	className,
 	label,
@@ -712,7 +716,7 @@ function StatField({
 	fadedLabel,
 	tooltip,
 	...props
-}: ComponentProps<typeof NumberInput> & {
+}: ComponentProps<typeof EditableNumber> & {
 	label: ReactNode
 	onLabelClick?: () => void
 	fadedLabel?: boolean
@@ -746,97 +750,8 @@ function StatField({
 					{labelContent}
 				</Tooltip>
 			:	labelContent}
-			<NumberInput id={id} className="w-10 text-center" {...props} />
+			<EditableNumber id={id} className="w-10 text-center" {...props} />
 		</div>
-	)
-}
-
-export function TextAreaField({
-	className,
-	label,
-	...props
-}: ComponentProps<"textarea"> & { label: ReactNode }) {
-	const id = useId()
-	return (
-		<Field className={className} label={label} htmlFor={id}>
-			<TextArea id={id} {...props} />
-		</Field>
-	)
-}
-
-function SelectField({
-	className,
-	label,
-	options,
-	...props
-}: ComponentProps<typeof Select> & {
-	label: ReactNode
-}) {
-	const id = useId()
-	return (
-		<Field className={className} label={label} htmlFor={id}>
-			<Select id={id} options={options} {...props} />
-			<div className="mt-1 text-sm font-medium empty:hidden">
-				{options.find((opt) => opt.value === props.value)?.description}
-			</div>
-		</Field>
-	)
-}
-
-function Input({ className, ...props }: ComponentProps<"input">) {
-	return (
-		<input
-			className={twMerge(
-				"h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 transition hover:border-gray-700 focus:border-primary-800 focus:bg-gray-950/25 focus:outline-none",
-				className,
-			)}
-			{...props}
-		/>
-	)
-}
-
-function TextArea({ className, ...props }: ComponentProps<"textarea">) {
-	const id = useId()
-	return (
-		<textarea
-			id={id}
-			className={twMerge(
-				"field-sizing-content min-h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 py-2 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none",
-				className,
-			)}
-			{...props}
-		/>
-	)
-}
-
-function Select({
-	className,
-	options,
-	placeholder,
-	value,
-	onChange,
-	...props
-}: ComponentProps<"select"> & {
-	placeholder: string
-	options: Array<{ value: string; label: string; description?: ReactNode }>
-}) {
-	return (
-		<select
-			className={twMerge(
-				"h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none",
-				className,
-			)}
-			value={value || ""}
-			onChange={onChange}
-			{...props}
-		>
-			<option value="">{placeholder}</option>
-			{options.map((option) => (
-				<option key={option.value} value={option.value}>
-					{option.label}
-				</option>
-			))}
-		</select>
 	)
 }
 
@@ -860,115 +775,5 @@ function ErrorList(props: {
 				))}
 			</ul>
 		</Ariakit.HeadingLevel>
-	)
-}
-
-function NumberInput({
-	id,
-	className,
-	value,
-	min = 0,
-	max = Number.POSITIVE_INFINITY,
-	onChange,
-}: {
-	id?: string
-	className?: string
-	value: number
-	min?: number
-	max?: number
-	onChange: (value: number) => void
-}) {
-	const [editing, setEditing] = useState(false)
-
-	const wheelHandlerRef = (element: HTMLElement | null) => {
-		const controller = new AbortController()
-
-		element?.addEventListener(
-			"wheel",
-			(event) => {
-				const tweak = (delta: number) => {
-					event.preventDefault()
-
-					const currentValue =
-						event.target instanceof HTMLInputElement ?
-							(safeParseNumber(event.target.value) ?? 0)
-						:	value
-
-					const newValue = clamp(currentValue + delta, min, max)
-
-					if (event.target instanceof HTMLInputElement) {
-						event.target.value = String(newValue)
-					}
-
-					onChange(newValue)
-					setEditing(true)
-				}
-
-				if (event.deltaY < 0) tweak(1)
-				if (event.deltaY > 0) tweak(-1)
-			},
-			{ signal: controller.signal, passive: false },
-		)
-
-		return () => controller.abort()
-	}
-
-	return (
-		<div className={twMerge("text-center", className)}>
-			{editing ?
-				<Input
-					id={id}
-					className="text-center"
-					inputMode="numeric"
-					defaultValue={value}
-					autoFocus
-					ref={wheelHandlerRef}
-					onFocus={(event) => {
-						event.currentTarget.select()
-					}}
-					onBlur={(event) => {
-						onChange(clamp(Number(event.currentTarget.value) || 0, min, max))
-						setEditing(false)
-					}}
-					onKeyDown={(event) => {
-						if (event.key === "Enter") {
-							event.preventDefault()
-							onChange(clamp(Number(event.currentTarget.value) || 0, min, max))
-							setEditing(false)
-						}
-						if (event.key === "ArrowUp") {
-							event.preventDefault()
-							const newValue = clamp(
-								(Number(event.currentTarget.value) || 0) + 1,
-								min,
-								max,
-							)
-							event.currentTarget.value = String(newValue)
-							onChange(newValue)
-						}
-						if (event.key === "ArrowDown") {
-							event.preventDefault()
-							const newValue = clamp(
-								(Number(event.currentTarget.value) || 0) - 1,
-								min,
-								max,
-							)
-							event.currentTarget.value = String(newValue)
-							onChange(newValue)
-						}
-					}}
-				/>
-			:	<button
-					id={id}
-					type="button"
-					className="h-9 w-full rounded border border-gray-800 bg-gray-950/25 px-3 focus:border-gray-700 focus:bg-gray-950/25 focus:outline-none"
-					ref={wheelHandlerRef}
-					onClick={() => setEditing(true)}
-					onFocus={() => setEditing(true)}
-				>
-					{value}
-				</button>
-			}
-		</div>
 	)
 }

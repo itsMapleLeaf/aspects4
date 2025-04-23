@@ -1,5 +1,5 @@
 import type { CharacterItem } from "~/lib/character.ts"
-import { InputField, TextAreaField } from "./CharacterSheet.tsx"
+import { EditableTextField } from "./EditableTextField.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Icon } from "./ui/Icon.tsx"
 
@@ -52,13 +52,12 @@ function CharacterItemForm({
 	return (
 		<div className="grid gap-4 rounded border border-gray-800 bg-gray-950/25 p-3">
 			<div className="flex items-end justify-between gap-2">
-				<InputField
+				<EditableTextField
 					label="Name"
 					className="flex-1"
-					autoFocus
 					value={item.name}
-					onChange={(event) => {
-						onChange({ ...item, name: event.target.value })
+					onChange={(name) => {
+						onChange({ ...item, name })
 					}}
 				/>
 				<Button
@@ -69,11 +68,12 @@ function CharacterItemForm({
 				</Button>
 			</div>
 
-			<TextAreaField
+			<EditableTextField
 				label="Description"
+				multiline
 				value={item.description}
-				onChange={(event) => {
-					onChange({ ...item, description: event.target.value })
+				onChange={(description) => {
+					onChange({ ...item, description })
 				}}
 			/>
 		</div>

@@ -49,7 +49,7 @@ export function Button({
 	className = "",
 	children,
 	pending,
-	align = "center",
+	align = "start",
 	...props
 }: ButtonProps) {
 	const combinedClasses = twMerge(
@@ -58,9 +58,9 @@ export function Button({
 		sizeClasses[size].button,
 		shapeClasses[shape],
 		className,
-		align === "start" && "justify-start",
-		align === "center" && "justify-center",
-		align === "end" && "justify-end",
+		align === "start" && "text-start justify-start",
+		align === "center" && "text-center justify-center",
+		align === "end" && "text-end justify-end",
 	)
 
 	const content = (
