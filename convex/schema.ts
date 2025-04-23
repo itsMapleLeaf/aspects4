@@ -1,5 +1,4 @@
 import { authTables } from "@convex-dev/auth/server"
-import { deprecated } from "convex-helpers/validators"
 import { defineSchema, defineTable } from "convex/server"
 import { v, type Validator } from "convex/values"
 
@@ -28,13 +27,7 @@ export default defineSchema({
 			),
 		),
 		ownerId: v.id("users"),
-		roomId: deprecated,
-		key: deprecated,
-		clientData: deprecated,
-	})
-		.index("roomId", ["roomId", "name"])
-		.index("ownerId", ["ownerId", "name"])
-		.index("key", ["key", "roomId", "name"]),
+	}).index("ownerId", ["ownerId", "name"]),
 
 	rooms: defineTable({
 		name: v.string(),

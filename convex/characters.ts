@@ -8,30 +8,15 @@ import schema from "./schema.ts"
 
 export type NormalizedCharacter = ReturnType<typeof normalizeCharacter>
 
-function normalizeCharacter({ clientData, ...rest }: Doc<"characters">) {
+function normalizeCharacter(doc: Doc<"characters">) {
 	return {
 		name: "",
 		data: {},
 		bonds: [],
 		items: [],
-		...rest,
+		...doc,
 	}
 }
-
-export const migrateClientData = mutation({
-	async handler(ctx) {
-		for await (const character of ctx.db.query("characters")) {
-			if (character.clientData) {
-				await ctx.db.patch(character._id, {
-					...(character.clientData as any),
-					clientData: undefined,
-					key: undefined,
-					roomId: undefined,
-				})
-			}
-		}
-	},
-})
 
 export const get = query({
 	args: {
@@ -78,12 +63,7 @@ export const listOwned = query({
 })
 
 export const create = mutation({
-	args: omit(schema.tables.characters.validator.fields, [
-		"ownerId",
-		"roomId",
-		"key",
-		"clientData",
-	]),
+	args: omit(schema.tables.characters.validator.fields, ["ownerId"]),
 	async handler(ctx, args) {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new Error("Not logged in")

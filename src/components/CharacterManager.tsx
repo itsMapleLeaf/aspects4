@@ -92,7 +92,7 @@ export function CharacterManager({
 													index + 1,
 													ownedCharacters.length - 2, // -1 for the removed character
 												)
-												const nextKey = ownedCharacters[nextIndex]?.key ?? null
+												const nextKey = ownedCharacters[nextIndex]?._id ?? null
 												setActiveCharacterId(nextKey)
 											}
 										}}
