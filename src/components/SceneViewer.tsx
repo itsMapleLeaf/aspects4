@@ -1,17 +1,14 @@
 import { ArkErrors } from "arktype"
+import { useMutation, useQuery } from "convex/react"
 import { isEqual } from "es-toolkit"
 import { useCallback, useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { useValueRef } from "~/hooks/common.ts"
+import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
+import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
 import { useDrag } from "../contexts/DragContext.tsx"
 import { useLocalStorageState } from "../hooks/storage.ts"
-import {
-	useMoveAssetToFront,
-	useRemoveAsset,
-	useUpdateAsset,
-} from "../hooks/useSceneAssets"
-import { useSceneAssets, type SceneAsset } from "../hooks/useSceneAssets.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
 	defaultViewportTransform,
@@ -29,11 +26,12 @@ export function SceneViewer({
 		backgroundUrl: string | null | undefined
 	}
 }) {
-	const { assets, addAssetToScene } = useSceneAssets(room._id)
+	const assets = useQuery(api.roomAssets.list, { roomId: room._id })
+	const createRoomAsset = useMutation(api.roomAssets.create)
+	const removeRoomAsset = useMutation(api.roomAssets.remove)
+	const updateRoomAsset = useMutation(api.roomAssets.update)
 	const { dragState } = useDrag()
-	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"assets">>()
-	const removeAsset = useRemoveAsset()
-	const update = useUpdateAsset()
+	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"roomAssets">>()
 
 	const [viewportTransform, setViewportTransform] =
 		useLocalStorageState<ViewportTransform>(
@@ -76,14 +74,17 @@ export function SceneViewer({
 		event.stopPropagation()
 
 		try {
-			const data = dragState.assetData
-			if (!data) return
-
-			const scale = getViewportScale(viewportTransform.zoom)
-			const dropX = (event.clientX - viewportTransform.offset.x) / scale
-			const dropY = (event.clientY - viewportTransform.offset.y) / scale
-
-			addAssetToScene(data, { x: dropX, y: dropY })
+			// TODO
+			// const data = dragState.assetData
+			// if (!data) return
+			// const scale = getViewportScale(viewportTransform.zoom)
+			// const dropX = (event.clientX - viewportTransform.offset.x) / scale
+			// const dropY = (event.clientY - viewportTransform.offset.y) / scale
+			// createRoomAsset({
+			// 	roomId: room._id,
+			// 	assetId: data._id,
+			// 	position: { x: dropX, y: dropY },
+			// })
 		} catch (err) {
 			console.error("Error processing dropped asset:", err)
 		}
@@ -113,7 +114,7 @@ export function SceneViewer({
 				selectedAsssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
-				removeAsset({ assetId: selectedAsssetId })
+				removeRoomAsset({ roomAssetId: selectedAsssetId })
 				setSelectedAsssetId(undefined)
 			}
 
@@ -122,13 +123,15 @@ export function SceneViewer({
 				selectedAsssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
-				const selectedAsset = assets.find(
+				const selectedAsset = assets?.find(
 					(asset) => asset._id === selectedAsssetId,
 				)
 				if (selectedAsset) {
-					update({
-						assetId: selectedAsssetId,
-						locked: !selectedAsset.locked,
+					updateRoomAsset({
+						roomAssetId: selectedAsssetId,
+						data: {
+							locked: !selectedAsset.locked,
+						},
 					})
 				}
 			}
@@ -164,7 +167,7 @@ export function SceneViewer({
 						draggable={false}
 					/>
 				)}
-				{assets.map((asset) => (
+				{assets?.map((asset) => (
 					<AssetImage
 						key={asset._id}
 						asset={asset}
@@ -184,7 +187,7 @@ function AssetImage({
 	isSelected,
 	onPrimaryPointerDown,
 }: {
-	asset: SceneAsset
+	asset: NormalizedRoomAsset
 	viewportTransform: ViewportTransform
 	isSelected: boolean
 	onPrimaryPointerDown: () => void
@@ -193,8 +196,7 @@ function AssetImage({
 	const dragOffsetRef = useValueRef(dragOffset)
 	const [resizeOffset, setResizeOffset] = useState({ width: 0, height: 0 })
 	const resizeOffsetRef = useValueRef(resizeOffset)
-	const update = useUpdateAsset()
-	const moveToFront = useMoveAssetToFront()
+	const updateRoomAsset = useMutation(api.roomAssets.update)
 
 	const setBodyCursor = useCallback((cursor: string | null) => {
 		if (cursor) {
@@ -218,8 +220,9 @@ function AssetImage({
 			style={{
 				translate: `${asset.position.x + dragOffset.x}px ${asset.position.y + dragOffset.y}px`,
 				rotate: `${asset.rotation ?? 0}deg`,
-				width: `${(asset.size?.width ?? 0) + resizeOffset.width}px`,
-				height: `${(asset.size?.height ?? 0) + resizeOffset.height}px`,
+				width: `${(asset.asset?.size?.x ?? 0) + resizeOffset.width}px`,
+				height: `${(asset.asset?.size?.y ?? 0) + resizeOffset.height}px`,
+				scale: asset.scale,
 			}}
 			onPointerDown={(event) => {
 				if (event.button !== 0) return
@@ -232,7 +235,7 @@ function AssetImage({
 
 				handleDrag({
 					onDragStart: () => {
-						moveToFront({ assetId: asset._id })
+						// moveToFront({ assetId: asset._id })
 						setBodyCursor("move")
 					},
 					onDrag: (event) => {
@@ -246,11 +249,13 @@ function AssetImage({
 						}))
 					},
 					onDragEnd: () => {
-						update({
-							assetId: asset._id,
-							position: {
-								x: asset.position.x + dragOffsetRef.current.x,
-								y: asset.position.y + dragOffsetRef.current.y,
+						updateRoomAsset({
+							roomAssetId: asset._id,
+							data: {
+								position: {
+									x: asset.position.x + dragOffsetRef.current.x,
+									y: asset.position.y + dragOffsetRef.current.y,
+								},
 							},
 						})
 						setDragOffset({ x: 0, y: 0 })
@@ -261,8 +266,8 @@ function AssetImage({
 		>
 			<div className="relative size-full">
 				<img
-					src={asset.url || ""}
-					alt={asset.name || ""}
+					src={asset.asset?.url || ""}
+					alt={asset.asset?.name || ""}
 					className="size-full object-cover"
 					draggable={false}
 				/>
@@ -304,7 +309,7 @@ function AssetImage({
 									event.stopPropagation()
 									event.preventDefault()
 
-									moveToFront({ assetId: asset._id })
+									// moveToFront({ assetId: asset._id })
 									setBodyCursor("nwse-resize")
 
 									handleDrag({
@@ -322,16 +327,16 @@ function AssetImage({
 										},
 										onDragEnd: () => {
 											const newWidth =
-												(asset.size?.width ?? 0) + resizeOffsetRef.current.width
+												(asset.asset?.size?.x ?? 0) +
+												resizeOffsetRef.current.width
 											const newHeight =
-												(asset.size?.height ?? 0) +
+												(asset.asset?.size?.y ?? 0) +
 												resizeOffsetRef.current.height
 
-											update({
-												assetId: asset._id,
-												size: {
-													width: Math.max(10, newWidth),
-													height: Math.max(10, newHeight),
+											updateRoomAsset({
+												roomAssetId: asset._id,
+												data: {
+													scale: Math.max(10, newWidth),
 												},
 											})
 											setResizeOffset({ width: 0, height: 0 })

@@ -9,6 +9,7 @@ import { panel } from "../styles/panel.ts"
 import { CharacterSheet } from "./CharacterSheet.tsx"
 import { ChatInputRef } from "./Chat.tsx"
 import { Icon } from "./ui/Icon.tsx"
+import { SmallIconButton } from "./ui/SmallIconButton.tsx"
 
 export function CharacterManager({
 	chatInputRef,
@@ -55,14 +56,12 @@ export function CharacterManager({
 					>
 						<header className="flex items-center justify-between">
 							<h2 className="heading-xl leading-none">Characters</h2>
-							<button
-								type="button"
-								className="-mr-2 flex size-8 items-center justify-center gap-2 rounded transition-colors hover:bg-white/5"
+							<SmallIconButton
+								className="-mr-2"
+								icon="mingcute:user-add-2-fill"
+								label="New Character"
 								onClick={addNewCharacter}
-							>
-								<Icon icon="mingcute:user-add-2-fill" />
-								<span className="sr-only">New Character</span>
-							</button>
+							/>
 						</header>
 
 						<ul className="flex flex-col gap-1">

@@ -4,6 +4,25 @@ import { pick } from "es-toolkit"
 import type { Doc } from "./_generated/dataModel"
 import { mutation, query, type QueryCtx } from "./_generated/server"
 
+export type ClientRoom = Awaited<ReturnType<typeof toClientRoom>>
+async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
+	const backgroundUrl =
+		room.backgroundId && (await ctx.storage.getUrl(room.backgroundId))
+
+	const userId = await getAuthUserId(ctx)
+
+	let members = room.memberUserIds ?? []
+	if (room.ownerId) {
+		members.push(room.ownerId)
+	}
+
+	return {
+		...pick(room, ["_id", "_creationTime", "name", "slug"]),
+		backgroundUrl,
+		isMember: userId != null && members.includes(userId),
+	}
+}
+
 export const list = query({
 	args: {},
 	async handler(ctx) {
@@ -79,7 +98,7 @@ export const update = mutation({
 	},
 })
 
-export const joinRoom = mutation({
+export const join = mutation({
 	args: {
 		roomId: v.id("rooms"),
 	},
@@ -111,7 +130,7 @@ export const joinRoom = mutation({
 	},
 })
 
-export const leaveRoom = mutation({
+export const leave = mutation({
 	args: {
 		roomId: v.id("rooms"),
 	},
@@ -135,30 +154,10 @@ export const leaveRoom = mutation({
 		const memberUserIds = room.memberUserIds || []
 		if (memberUserIds.includes(userId)) {
 			await ctx.db.patch(roomId, {
-				memberUserIds: memberUserIds.filter(id => id !== userId),
+				memberUserIds: memberUserIds.filter((id) => id !== userId),
 			})
 		}
 
 		return roomId
 	},
 })
-
-export type ClientRoom = Awaited<ReturnType<typeof toClientRoom>>
-
-async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
-	const backgroundUrl =
-		room.backgroundId && (await ctx.storage.getUrl(room.backgroundId))
-
-	const userId = await getAuthUserId(ctx)
-
-	let members = room.memberUserIds ?? []
-	if (room.ownerId) {
-		members.push(room.ownerId)
-	}
-
-	return {
-		...pick(room, ["_id", "_creationTime", "name", "slug"]),
-		backgroundUrl,
-		isMember: userId != null && members.includes(userId),
-	}
-}

@@ -69,7 +69,7 @@ export function Room({ slug }: { slug: string }) {
 		{
 			name: "Assets",
 			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
-			content: <AssetsPanel />,
+			content: <AssetsPanel roomId={room._id} />,
 		},
 		{
 			name: "Settings",
@@ -207,7 +207,7 @@ function RoomSettings({
 	playerName,
 	onUpdatePlayerName,
 }: RoomSettingsProps) {
-	const leaveRoom = useMutation(api.rooms.leaveRoom)
+	const leaveRoom = useMutation(api.rooms.leave)
 	const [, navigate] = useLocation()
 
 	const [, leaveAction, isLeaving] = useActionState(async () => {
@@ -272,10 +272,10 @@ function RoomSettings({
 }
 
 function RoomInvitation({ room }: { room: ClientRoom }) {
-	const joinRoom = useMutation(api.rooms.joinRoom)
+	const join = useMutation(api.rooms.join)
 
 	const [, joinAction, isPending] = useActionState(async () => {
-		await joinRoom({ roomId: room._id })
+		await join({ roomId: room._id })
 	}, undefined)
 
 	return (

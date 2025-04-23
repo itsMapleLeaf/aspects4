@@ -1,36 +1,31 @@
+import { getAuthUserId } from "@convex-dev/auth/server"
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import type { Doc } from "./_generated/dataModel"
+import { mutation, query, type QueryCtx } from "./_generated/server"
+import { vector } from "./lib/validators.ts"
+
+export type NormalizedAsset = Awaited<ReturnType<typeof normalizeAsset>>
+export async function normalizeAsset(ctx: QueryCtx, asset: Doc<"assets">) {
+	const { storageId, ...doc } = asset
+	return {
+		...doc,
+		url: await ctx.storage.getUrl(storageId),
+	}
+}
 
 export const list = query({
-	args: {
-		roomId: v.id("rooms"),
-	},
-	async handler(ctx, { roomId }) {
-		const assets = await ctx.db
+	async handler(ctx) {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) return []
+
+		const ownedAssets = await ctx.db
 			.query("assets")
-			.filter((q) => q.eq(q.field("roomId"), roomId))
-			.order("desc")
+			.withIndex("ownerId", (q) => q.eq("ownerId", userId))
 			.collect()
 
-		const assetsWithUrl = await Array.fromAsync(assets, async (asset) => ({
-			...asset,
-			url: await ctx.storage.getUrl(asset.fileId),
-		}))
-
-		return assetsWithUrl.sort((a, b) => a.updatedAt - b.updatedAt)
-	},
-})
-
-export const get = query({
-	args: {
-		assetId: v.id("assets"),
-	},
-	async handler(ctx, { assetId }) {
-		const asset = await ctx.db.get(assetId)
-		if (!asset) return null
-
-		const url = await ctx.storage.getUrl(asset.fileId)
-		return { ...asset, url }
+		return await Array.fromAsync(ownedAssets, (asset) =>
+			normalizeAsset(ctx, asset),
+		)
 	},
 })
 
@@ -38,46 +33,20 @@ export const create = mutation({
 	args: {
 		name: v.string(),
 		type: v.string(),
-		fileId: v.id("_storage"),
-		roomId: v.id("rooms"),
-		position: v.object({
-			x: v.number(),
-			y: v.number(),
-		}),
-		size: v.optional(
-			v.object({
-				width: v.number(),
-				height: v.number(),
-			}),
-		),
-		rotation: v.optional(v.number()),
+		size: vector(),
+		storageId: v.id("_storage"),
 	},
 	async handler(ctx, args) {
-		const assetId = await ctx.db.insert("assets", {
-			...args,
-			updatedAt: Date.now(),
-		})
-		return assetId
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new Error("Not logged in")
+		return await ctx.db.insert("assets", { ...args, ownerId: userId })
 	},
 })
 
 export const update = mutation({
 	args: {
 		assetId: v.id("assets"),
-		position: v.optional(
-			v.object({
-				x: v.number(),
-				y: v.number(),
-			}),
-		),
-		size: v.optional(
-			v.object({
-				width: v.number(),
-				height: v.number(),
-			}),
-		),
-		rotation: v.optional(v.number()),
-		locked: v.optional(v.boolean()),
+		name: v.string(),
 	},
 	async handler(ctx, { assetId, ...updates }) {
 		await ctx.db.patch(assetId, {
@@ -88,29 +57,14 @@ export const update = mutation({
 
 export const remove = mutation({
 	args: {
-		assetId: v.id("assets"),
+		assetIds: v.array(v.id("assets")),
 	},
-	async handler(ctx, { assetId }) {
-		const asset = await ctx.db.get(assetId)
-		if (!asset) throw new Error("Asset not found")
-
-		await ctx.storage.delete(asset.fileId)
-
-		await ctx.db.delete(assetId)
-		return assetId
-	},
-})
-
-export const moveToFront = mutation({
-	args: {
-		assetId: v.id("assets"),
-	},
-	async handler(ctx, { assetId }) {
-		const asset = await ctx.db.get(assetId)
-		if (!asset) throw new Error("Asset not found")
-
-		await ctx.db.patch(assetId, {
-			updatedAt: Date.now(),
-		})
+	async handler(ctx, { assetIds }) {
+		for (const assetId of assetIds) {
+			const asset = await ctx.db.get(assetId)
+			if (!asset) throw new Error("Asset not found")
+			await ctx.storage.delete(asset.storageId)
+			await ctx.db.delete(assetId)
+		}
 	},
 })

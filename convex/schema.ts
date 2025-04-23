@@ -1,6 +1,7 @@
 import { authTables } from "@convex-dev/auth/server"
 import { defineSchema, defineTable } from "convex/server"
-import { v, type Validator } from "convex/values"
+import { v } from "convex/values"
+import { optionull, vector } from "./lib/validators.ts"
 
 export default defineSchema({
 	...authTables,
@@ -29,6 +30,15 @@ export default defineSchema({
 		ownerId: v.id("users"),
 	}).index("ownerId", ["ownerId", "name"]),
 
+	assets: defineTable({
+		name: v.string(),
+		type: v.string(),
+		size: vector(),
+		storageId: v.id("_storage"),
+		ownerId: v.id("users"),
+		// thumbnailId: v.id("_storage"), // TODO
+	}).index("ownerId", ["ownerId", "name"]),
+
 	rooms: defineTable({
 		name: v.string(),
 		slug: v.string(),
@@ -44,35 +54,20 @@ export default defineSchema({
 		characterId: v.id("characters"),
 	}).index("roomId", ["roomId", "characterId"]),
 
+	roomAssets: defineTable({
+		roomId: v.id("rooms"),
+		assetId: v.id("assets"),
+		position: vector(),
+		scale: v.number(),
+		rotation: v.number(),
+		locked: v.boolean(),
+		inScene: v.boolean(),
+		updatedDate: v.number(),
+	}).index("roomId", ["roomId", "assetId"]),
+
 	messages: defineTable({
 		sender: v.string(),
 		content: v.string(),
 		roomId: v.id("rooms"),
 	}).index("roomId", ["roomId"]),
-
-	assets: defineTable({
-		name: v.string(),
-		type: v.string(),
-		fileId: v.id("_storage"),
-		roomId: v.id("rooms"),
-		position: v.object({
-			x: v.number(),
-			y: v.number(),
-		}),
-		size: v.optional(
-			v.object({
-				width: v.number(),
-				height: v.number(),
-			}),
-		),
-		rotation: v.optional(v.number()),
-		locked: v.optional(v.boolean()),
-		updatedAt: v.number(),
-	}).index("roomId", ["roomId"]),
 })
-
-function optionull<T, FieldPaths extends string>(
-	validator: Validator<T, "required", FieldPaths>,
-) {
-	return v.optional(v.union(validator, v.null()))
-}

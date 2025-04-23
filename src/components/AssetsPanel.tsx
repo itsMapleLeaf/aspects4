@@ -1,217 +1,163 @@
+import { Heading, HeadingLevel } from "@ariakit/react"
+import { useMutation, useQuery } from "convex/react"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
-import { useDrag } from "../contexts/DragContext.tsx"
-import { useLocalAssets } from "../hooks/useLocalAssets.ts"
-import { panel } from "../styles/panel.ts"
-import { Button } from "./ui/Button.tsx"
+import { useFileUpload } from "~/hooks/useFileUpload.ts"
+import { api } from "../../convex/_generated/api"
+import type { Id } from "../../convex/_generated/dataModel"
+import type { NormalizedAsset } from "../../convex/assets.ts"
 import { Icon } from "./ui/Icon.tsx"
+import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
 
-export function AssetsPanel() {
-	const assets = useLocalAssets()
-	const { startAssetDrag, endAssetDrag } = useDrag()
-	const [isImporting, setIsImporting] = useState(false)
-	const [isDragging, setIsDragging] = useState(false)
+export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
+	const assets = useQuery(api.assets.list)
+	const createAsset = useMutation(api.assets.create)
 
-	const handleFileSelect = async (
-		event: React.ChangeEvent<HTMLInputElement>,
-	) => {
-		const files = event.target.files
-		if (!files || files.length === 0) return
-
-		try {
-			setIsImporting(true)
-			for (const file of files) {
-				await assets.add(file)
-			}
-		} catch (err) {
-			console.error("Failed to import asset:", err)
-		} finally {
-			setIsImporting(false)
-		}
-
-		event.target.value = ""
-	}
-
-	const openFileSelector = () => {
-		const fileInput = document.getElementById(
-			"asset-file-input",
-		) as HTMLInputElement
-		if (fileInput) fileInput.click()
-	}
+	const [isFileOver, setIsFileOver] = useState(false)
+	const { uploadFile } = useFileUpload()
 
 	useEffect(() => {
-		const handleDragOver = (e: DragEvent) => {
-			e.preventDefault()
-			e.stopPropagation()
+		const controller = new AbortController()
 
-			// Only show drag overlay for file system drags (not for our internal asset drags)
-			if (!isDragging && e.dataTransfer?.types.includes("Files")) {
-				setIsDragging(true)
-			}
-		}
+		window.addEventListener(
+			"dragenter",
+			(event) => {
+				if (event.dataTransfer?.types.includes("Files")) {
+					event.preventDefault()
+					setIsFileOver(true)
+				}
+			},
+			{ signal: controller.signal },
+		)
 
-		const handleDragLeave = (e: DragEvent) => {
-			e.preventDefault()
-			e.stopPropagation()
+		window.addEventListener(
+			"dragleave",
+			(event) => {
+				if (event.dataTransfer?.types.includes("Files")) {
+					event.preventDefault()
+					setIsFileOver(false)
+				}
+			},
+			{ signal: controller.signal },
+		)
 
-			// Only consider it a leave if we're leaving the window
-			if (
-				e.clientX <= 0 ||
-				e.clientX >= window.innerWidth ||
-				e.clientY <= 0 ||
-				e.clientY >= window.innerHeight
-			) {
-				setIsDragging(false)
-			}
-		}
+		window.addEventListener(
+			"dragover",
+			(event) => {
+				if (event.dataTransfer?.types.includes("Files")) {
+					event.preventDefault()
+					setIsFileOver(true)
+				}
+			},
+			{ signal: controller.signal },
+		)
 
-		const handleDrop = async (e: DragEvent) => {
-			e.preventDefault()
-			e.stopPropagation()
-			setIsDragging(false)
+		window.addEventListener(
+			"drop",
+			async (event) => {
+				const isFileType = event.dataTransfer?.types.includes("Files")
+				if (!isFileType) return
 
-			// Only process file drops, not our internal asset drags
-			if (
-				!e.dataTransfer?.files.length ||
-				!e.dataTransfer.types.includes("Files")
-			)
-				return
+				event.preventDefault()
+				setIsFileOver(false)
 
-			try {
-				setIsImporting(true)
+				for (const file of event.dataTransfer?.files ?? []) {
+					const { width, height } = await createImageBitmap(file)
 
-				const filePromises = Array.from(e.dataTransfer.files)
-					.filter((file) => file.type.startsWith("image/"))
-					.map((file) => assets.add(file))
+					const storageId = await uploadFile(file)
+					if (!storageId) return
 
-				await Promise.all(filePromises)
-			} catch (err) {
-				console.error("Error importing dropped files:", err)
-			} finally {
-				setIsImporting(false)
-			}
-		}
-
-		window.addEventListener("dragover", handleDragOver)
-		window.addEventListener("dragleave", handleDragLeave)
-		window.addEventListener("drop", handleDrop)
+					await createAsset({
+						name: file.name,
+						type: file.type,
+						size: { x: width, y: height },
+						storageId,
+					})
+				}
+			},
+			{ signal: controller.signal },
+		)
 
 		return () => {
-			window.removeEventListener("dragover", handleDragOver)
-			window.removeEventListener("dragleave", handleDragLeave)
-			window.removeEventListener("drop", handleDrop)
+			controller.abort()
 		}
 	})
 
 	return (
-		<>
-			{(isDragging || isImporting) &&
-				createPortal(
-					<div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-						<div className="text-center">
-							<h2 className="mb-4 text-4xl font-light text-white">
-								{isImporting ? "Importing assets..." : "Add files as assets"}
-							</h2>
-							{isImporting && (
-								<div className="animate-pulse text-xl text-white/80">
-									Processing files...
-								</div>
-							)}
-						</div>
-					</div>,
-					document.body,
-				)}
+		<section className="isolate flex h-full w-64 flex-col gap-4 overflow-y-auto panel p-4">
+			<HeadingLevel>
+				<header className="sticky -top-4 z-10 -m-4 flex h-16 items-center justify-between bg-gray-900 px-4">
+					<Heading className="heading-xl">Assets</Heading>
+				</header>
 
-			<div className={panel("flex h-full w-64 flex-col gap-4 p-4")}>
-				<h2 className="heading-xl">Assets</h2>
+				<ul className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2">
+					{assets?.map((asset) => (
+						<li key={asset._id}>
+							<AssetCard asset={asset} roomId={roomId} />
+						</li>
+					))}
+				</ul>
+			</HeadingLevel>
 
-				<input
-					id="asset-file-input"
-					type="file"
-					accept="image/*"
-					multiple
-					onChange={handleFileSelect}
-					className="hidden"
-				/>
-
-				<Button
-					appearance="default"
-					size="default"
-					icon={<Icon icon="mingcute:file-import-line" />}
-					onClick={openFileSelector}
-					pending={isImporting}
-					className="w-full"
+			{createPortal(
+				<div
+					className="invisible fixed inset-0 flex items-center justify-center bg-black/25 opacity-0 backdrop-blur transition-all data-[visible=true]:visible data-[visible=true]:opacity-100"
+					data-visible={isFileOver}
 				>
-					Import Asset
-				</Button>
+					<p className="heading-4xl text-white">Drop files to import assets</p>
+				</div>,
+				document.body,
+			)}
+		</section>
+	)
+}
 
-				{assets.error && (
-					<div className="mt-2 text-sm text-red-500">
-						{assets.error.message}
-					</div>
-				)}
-
-				{assets.loading && (
-					<div className="flex justify-center py-4">
-						<Icon
-							icon="mingcute:loading-3-fill"
-							className="size-6 animate-spin"
-						/>
-					</div>
-				)}
-
-				<div className="-mx-4 min-h-0 flex-1 overflow-y-auto px-4">
-					{assets.list.length === 0 && !assets.loading ?
-						<div className="py-4 text-center text-gray-400">
-							No assets imported yet
-						</div>
-					:	<div className="grid grid-cols-2 gap-2">
-							{assets.list.map((asset) => (
-								<div
-									key={asset.id}
-									className="group relative cursor-grab active:cursor-grabbing"
-									draggable
-									onDragStart={async () => {
-										startAssetDrag({
-											id: asset.id,
-											name: asset.name,
-											type: asset.type,
-											url: asset.url || "",
-										})
-									}}
-									onDragEnd={() => {
-										endAssetDrag()
-									}}
-								>
-									<img
-										src={asset.url}
-										alt={asset.name}
-										className="h-24 w-full rounded-md border border-gray-700 object-cover"
-									/>
-									<div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-										<div className="flex gap-2">
-											<button
-												onClick={() => assets.remove(asset.id)}
-												className="rounded-full bg-red-500 p-1 transition-colors hover:bg-red-600"
-												title="Delete asset"
-											>
-												<Icon icon="mingcute:delete-fill" className="size-4" />
-											</button>
-											<button
-												className="rounded-full bg-blue-500 p-1 transition-colors hover:bg-blue-600"
-												title="Drag to add to scene"
-											>
-												<Icon icon="mingcute:move-fill" className="size-4" />
-											</button>
-										</div>
-									</div>
-									<div className="mt-1 truncate text-xs">{asset.name}</div>
-								</div>
-							))}
-						</div>
+function AssetCard({
+	asset,
+	roomId,
+}: {
+	asset: NormalizedAsset
+	roomId: Id<"rooms">
+}) {
+	const removeAsset = useMutation(api.assets.remove)
+	const createRoomAsset = useMutation(api.roomAssets.create)
+	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+	return (
+		<Menu placement="bottom-start">
+			<MenuButton
+				className="block w-full overflow-clip panel-dark rounded outline-2 outline-transparent transition select-none hover:border-gray-600"
+				draggable
+				onPointerDown={(event: React.PointerEvent) => {
+					setMenuPosition({ x: event.clientX, y: event.clientY })
+				}}
+			>
+				<img
+					src={asset.url || ""}
+					alt=""
+					className="aspect-square w-full rounded-xs object-cover object-top transition"
+					draggable={false}
+				/>
+				<p className="truncate px-2 py-1 text-center text-xs leading-none font-medium">
+					{asset.name}
+				</p>
+			</MenuButton>
+			<MenuPanel gutter={0} getAnchorRect={() => menuPosition}>
+				<MenuItem
+					onClick={() =>
+						createRoomAsset({
+							assetId: asset._id,
+							roomId,
+						})
 					}
-				</div>
-			</div>
-		</>
+				>
+					<Icon icon="mingcute:classify-add-2-fill" />
+					<span>Add to scene</span>
+				</MenuItem>
+				<MenuItem onClick={() => removeAsset({ assetIds: [asset._id] })}>
+					<Icon icon="mingcute:delete-2-fill" />
+					<span>Delete</span>
+				</MenuItem>
+			</MenuPanel>
+		</Menu>
 	)
 }
