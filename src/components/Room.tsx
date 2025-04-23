@@ -2,6 +2,7 @@ import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useActionState, useRef, useState } from "react"
+import { twMerge } from "tailwind-merge"
 import { useLocation } from "wouter"
 import { api } from "../../convex/_generated/api"
 import { Id, type Doc } from "../../convex/_generated/dataModel"
@@ -9,6 +10,7 @@ import type { ClientRoom } from "../../convex/rooms.ts"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { panel } from "../styles/panel.ts"
+import { AppLogoLink } from "./AppLogoLink.tsx"
 import { AssetsPanel } from "./AssetsPanel.tsx"
 import { CharacterManager } from "./CharacterManager.tsx"
 import { Chat, ChatInputRef } from "./Chat.tsx"
@@ -20,6 +22,7 @@ import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Input } from "./ui/Input.tsx"
+import { UserButton } from "./UserButton.tsx"
 
 export function Room({ slug }: { slug: string }) {
 	const room = useQuery(api.rooms.getBySlug, { slug })
@@ -86,16 +89,27 @@ export function Room({ slug }: { slug: string }) {
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
 			<SceneViewer room={room} />
-			<div className="fixed top-0 left-0 grid h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Sidebar tabs={sidebarTabs} />
-			</div>
-			<div className="fixed right-0 bottom-0 grid h-dvh grid-rows-[100%] p-2 opacity-90 transition-opacity hover:opacity-100">
-				<Chat
-					roomId={room._id}
-					playerName={playerName}
-					chatInputRef={chatInputRef}
-				/>
-			</div>
+
+			<SidebarProvider>
+				<div className="pointer-events-children fixed inset-0 flex flex-col gap-2 p-2">
+					<header className="pointer-events-children flex items-center gap-4">
+						<SidebarTabs tabs={sidebarTabs} />
+						<AppLogoLink />
+						<div className="ml-auto px-3">
+							<UserButton />
+						</div>
+					</header>
+					<main className="pointer-events-children grid min-h-0 flex-1 grid-flow-col grid-cols-[minmax(auto,48rem)_20rem] justify-between gap-2">
+						<SidebarPanels tabs={sidebarTabs} />
+						<Chat
+							roomId={room._id}
+							playerName={playerName}
+							chatInputRef={chatInputRef}
+							className="col-2"
+						/>
+					</main>
+				</div>
+			</SidebarProvider>
 		</DocumentTitle>
 	)
 }
@@ -323,6 +337,17 @@ interface SidebarProps {
 }
 
 function Sidebar({ tabs }: SidebarProps) {
+	return (
+		<SidebarProvider>
+			<div className="flex h-full flex-col items-start gap-2">
+				<SidebarTabs tabs={tabs} />
+				<SidebarPanels tabs={tabs} />
+			</div>
+		</SidebarProvider>
+	)
+}
+
+function SidebarProvider({ children }: { children: ReactNode }) {
 	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
 		string | undefined | null
 	>("Sidebar:selectedTabId", null, (input) =>
@@ -334,25 +359,38 @@ function Sidebar({ tabs }: SidebarProps) {
 			selectedId={selectedTabId}
 			setSelectedId={setSelectedTabId}
 		>
-			<div className="flex h-full flex-col items-start gap-2">
-				<Ariakit.TabList className={panel("flex gap-1 p-1")}>
-					{tabs.map((tab) => (
-						<SidebarTab key={tab.name} name={tab.name} icon={tab.icon} />
-					))}
-				</Ariakit.TabList>
-
-				{tabs.map((tab) => (
-					<Ariakit.TabPanel
-						key={tab.name}
-						id={tab.name}
-						className="min-h-0 flex-1"
-					>
-						{tab.content}
-					</Ariakit.TabPanel>
-				))}
-			</div>
+			{children}
 		</Ariakit.TabProvider>
 	)
+}
+
+function SidebarTabs({ tabs }: { tabs: TabConfig[] }) {
+	return (
+		<Ariakit.TabList className={panel("flex gap-1 p-1")}>
+			{tabs.map((tab) => (
+				<SidebarTab key={tab.name} name={tab.name} icon={tab.icon} />
+			))}
+		</Ariakit.TabList>
+	)
+}
+
+function SidebarPanels({
+	tabs,
+	className,
+}: {
+	tabs: TabConfig[]
+	className?: string
+}) {
+	return tabs.map((tab) => (
+		<Ariakit.TabPanel
+			key={tab.name}
+			id={tab.name}
+			className={twMerge("min-h-0 flex-1", className)}
+			unmountOnHide
+		>
+			{tab.content}
+		</Ariakit.TabPanel>
+	))
 }
 
 function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {

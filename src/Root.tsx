@@ -1,8 +1,16 @@
-import { ConvexAuthProvider, useAuthActions } from "@convex-dev/auth/react"
-import { Authenticated, AuthLoading, ConvexReactClient, Unauthenticated, useMutation, useQuery } from "convex/react"
+import { ConvexAuthProvider } from "@convex-dev/auth/react"
+import {
+	Authenticated,
+	AuthLoading,
+	ConvexReactClient,
+	Unauthenticated,
+	useMutation,
+	useQuery,
+} from "convex/react"
 import { useActionState, useState } from "react"
 import { Route, Switch, useLocation } from "wouter"
 import { api } from "../convex/_generated/api"
+import { AppHeader } from "./components/AppHeader.tsx"
 import { AuthScreen } from "./components/AuthScreen.tsx"
 import { DocumentTitle } from "./components/DocumentTitle.tsx"
 import { Room } from "./components/Room.tsx"
@@ -22,11 +30,11 @@ function AuthenticatedRoutes() {
 			</AuthLoading>
 			<Authenticated>
 				<Switch>
+					<Route path="/">
+						<NewRoomRoute />
+					</Route>
 					<Route path="/rooms/:slug">
 						{(params) => <Room slug={params.slug} />}
-					</Route>
-					<Route path="/">
-						<Landing />
 					</Route>
 				</Switch>
 			</Authenticated>
@@ -49,7 +57,7 @@ export function Root() {
 	)
 }
 
-function Landing() {
+function NewRoomRoute() {
 	const [roomName, setRoomName] = useState("")
 	const [slugInput, setSlugInput] = useState("")
 	const slug = slugify(slugInput || roomName)
@@ -81,43 +89,52 @@ function Landing() {
 	}, "")
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center gap-4">
-			<div className={panel("flex w-96 flex-col gap-4 p-6")}>
-				<h1 className="text-2xl font-light text-white">Create a New Room</h1>
-				<form className="contents" action={action}>
-					<Input
-						name="roomName"
-						label="Room name"
-						placeholder="Enter room name"
-						required
-						value={roomName}
-						onChange={(event) => setRoomName(event.target.value)}
-					/>
+		<div className="flex min-h-screen flex-col">
+			<AppHeader>
+				<div className="flex flex-1 flex-col items-center justify-center gap-4">
+					<main className={panel("flex w-96 flex-col gap-4 p-6")}>
+						<h1 className="text-2xl font-light text-white">
+							Create a New Room
+						</h1>
+						<form className="contents" action={action}>
+							<Input
+								name="roomName"
+								label="Room name"
+								placeholder="Enter room name"
+								required
+								value={roomName}
+								onChange={(event) => setRoomName(event.target.value)}
+							/>
 
-					<div>
-						<Input
-							name="roomSlug"
-							label="Room slug"
-							placeholder={slugify(roomName)}
-							value={slugInput}
-							onChange={(event) => setSlugInput(slugify(event.target.value))}
-						/>
-						<p className="mt-1 text-sm font-semibold text-gray-300">
-							Used in the URL. Can only contain lowercase letters, numbers, and
-							hyphens (-).
-						</p>
-					</div>
+							<div>
+								<Input
+									name="roomSlug"
+									label="Room slug"
+									placeholder={slugify(roomName)}
+									value={slugInput}
+									onChange={(event) =>
+										setSlugInput(slugify(event.target.value))
+									}
+								/>
+								<p className="mt-1 text-sm font-semibold text-gray-300">
+									Used in the URL. Can only contain lowercase letters, numbers,
+									and hyphens (-).
+								</p>
+							</div>
 
-					{error && (
-						<div className="text-sm font-semibold text-red-400">{error}</div>
-					)}
+							{error && (
+								<div className="text-sm font-semibold text-red-400">
+									{error}
+								</div>
+							)}
 
-					<Button type="submit" disabled={pending} className="self-start">
-						{pending ? "Creating..." : "Create Room"}
-					</Button>
-				</form>
-			</div>
-			<SignOutButton />
+							<Button type="submit" disabled={pending} className="self-start">
+								{pending ? "Creating..." : "Create Room"}
+							</Button>
+						</form>
+					</main>
+				</div>
+			</AppHeader>
 		</div>
 	)
 }
@@ -127,23 +144,4 @@ function slugify(name: string) {
 		.toLowerCase()
 		.replace(/\s+/g, "-")
 		.replace(/[^\w-]+/g, "")
-}
-
-function SignOutButton() {
-	const { signOut } = useAuthActions()
-	const [_, startSignOut, isPending] = useActionState(async () => {
-		await signOut()
-		return null
-	}, null)
-
-	return (
-		<button
-			type="button"
-			onClick={startSignOut}
-			className="text-primary-400 text-sm hover:underline"
-			disabled={isPending}
-		>
-			{isPending ? "Signing out..." : "Sign out"}
-		</button>
-	)
 }

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "convex/react"
 import { useCallback, useImperativeHandle, useRef, useState } from "react"
+import { twMerge } from "tailwind-merge"
 import { rollDice } from "~/lib/dice.ts"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
@@ -30,10 +31,12 @@ export function Chat({
 	roomId,
 	playerName,
 	chatInputRef,
+	className,
 }: {
 	roomId: Id<"rooms">
 	playerName: string
 	chatInputRef: React.RefObject<ChatInputRef | null>
+	className?: string
 }) {
 	const remoteMessages = useQuery(api.messages.list, { roomId })
 	const createMessage = useMutation(api.messages.create)
@@ -184,7 +187,10 @@ export function Chat({
 	return (
 		<section
 			aria-label="Chat"
-			className="flex h-full w-80 flex-col gap-2 overflow-y-auto [scrollbar-gutter:stable]"
+			className={twMerge(
+				"flex h-full flex-col gap-2 overflow-y-auto [scrollbar-gutter:stable]",
+				className,
+			)}
 			ref={bottomScrollRef}
 		>
 			<ul className="flex flex-1 flex-col justify-end gap-2">
