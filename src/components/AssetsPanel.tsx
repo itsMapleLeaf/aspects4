@@ -1,6 +1,6 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
 import { type } from "arktype"
-import { useMutation, useQuery } from "convex/react"
+import { useAction, useMutation, useQuery } from "convex/react"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { useFileUpload } from "~/hooks/useFileUpload.ts"
@@ -133,6 +133,7 @@ function AssetCard({
 }) {
 	const removeAsset = useMutation(api.assets.remove)
 	const createRoomAsset = useMutation(api.roomAssets.place)
+	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 	return (
 		<Menu placement="bottom-start">
@@ -169,11 +170,22 @@ function AssetCard({
 						})
 					}
 				>
-					<Icon icon="mingcute:classify-add-2-fill" />
+					<Icon icon="mingcute:classify-add-2-fill" className="size-5" />
 					<span>Add to scene</span>
 				</MenuItem>
+				<MenuItem
+					onClick={() =>
+						setAsRoomBackground({
+							assetId: asset._id,
+							roomId,
+						})
+					}
+				>
+					<Icon icon="mingcute:pic-fill" className="size-5" />
+					<span>Set as background</span>
+				</MenuItem>
 				<MenuItem onClick={() => removeAsset({ assetIds: [asset._id] })}>
-					<Icon icon="mingcute:delete-2-fill" />
+					<Icon icon="mingcute:delete-2-fill" className="size-5" />
 					<span>Delete</span>
 				</MenuItem>
 			</MenuPanel>

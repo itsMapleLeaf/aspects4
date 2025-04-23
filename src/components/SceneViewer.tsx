@@ -164,7 +164,7 @@ export function SceneViewer({
 					<img
 						src={room.backgroundUrl}
 						alt=""
-						className="pointer-events-none max-w-[unset] brightness-50"
+						className="pointer-events-none w-[2048px] brightness-50"
 						draggable={false}
 					/>
 				)}
