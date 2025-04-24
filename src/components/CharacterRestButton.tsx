@@ -1,8 +1,10 @@
 import * as Ariakit from "@ariakit/react"
+import {} from "es-toolkit"
 import { useState } from "react"
 import type { Except } from "type-fest"
 import { Button } from "~/components/ui/Button.tsx"
 import { Icon } from "~/components/ui/Icon.tsx"
+import { safeParseNumber } from "~/lib/utils.ts"
 import { panel } from "~/styles/panel.ts"
 import { InputField } from "./ui/InputField.tsx"
 
@@ -48,7 +50,11 @@ export function CharacterRestButton({
 						type="number"
 						min={1}
 						value={hourCount}
-						onChange={(event) => setHourCount(event.target.valueAsNumber)}
+						onChange={(event) =>
+							setHourCount(
+								Math.max(safeParseNumber(event.target.value) ?? 1, 1),
+							)
+						}
 					/>
 					<Button type="submit" icon={<Icon icon="mingcute:sleep-fill" />}>
 						Rest for {hourCount} {hourCount === 1 ? "hour" : "hours"}
