@@ -47,7 +47,8 @@ export default defineSchema({
 		memberUserIds: v.optional(v.array(v.id("users"))),
 	})
 		.index("name", ["name"])
-		.index("slug", ["slug"]),
+		.index("slug", ["slug"])
+		.index("ownerId", ["ownerId"]),
 
 	roomCharacters: defineTable({
 		roomId: v.id("rooms"),

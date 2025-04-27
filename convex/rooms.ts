@@ -11,7 +11,7 @@ async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
 
 	const userId = await getAuthUserId(ctx)
 
-	let members = room.memberUserIds ?? []
+	const members = room.memberUserIds ?? []
 	if (room.ownerId) {
 		members.push(room.ownerId)
 	}
@@ -26,7 +26,19 @@ async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
 export const list = query({
 	args: {},
 	async handler(ctx) {
-		const rooms = await ctx.db.query("rooms").collect()
+		const userId = await getAuthUserId(ctx)
+		if (!userId) {
+			return []
+		}
+
+		// room member users are an array property on docs, and we can't query for those
+		// TODO: optimize this with a membership join table eventually
+		const rooms = []
+		for await (const room of ctx.db.query("rooms")) {
+			if (room.ownerId === userId || room.memberUserIds?.includes(userId)) {
+				rooms.push(room)
+			}
+		}
 		return rooms
 	},
 })
