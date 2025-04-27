@@ -34,7 +34,7 @@ export const list = query({
 		// room member users are an array property on docs, and we can't query for those
 		// TODO: optimize this with a membership join table eventually
 		const rooms = []
-		for await (const room of ctx.db.query("rooms")) {
+		for await (const room of ctx.db.query("rooms").order("desc")) {
 			if (room.ownerId === userId || room.memberUserIds?.includes(userId)) {
 				rooms.push(room)
 			}
