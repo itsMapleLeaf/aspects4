@@ -22,7 +22,6 @@ import { Icon } from "./components/ui/Icon.tsx"
 import { Input } from "./components/ui/Input.tsx"
 import { LoadingScreen } from "./components/ui/LoadingScreen.tsx"
 import { DragProvider } from "./contexts/DragContext.tsx"
-import { panel } from "./styles/panel.ts"
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
 
@@ -65,59 +64,52 @@ function RoomsList() {
 	const rooms = useQuery(api.rooms.list)
 
 	return (
-		<div className="flex min-h-screen flex-col">
-			<AppHeader>
-				<div className="flex w-full flex-col items-center justify-center">
-					<main className="w-full max-w-screen-md px-6 py-4">
-						<Ariakit.HeadingLevel>
-							<div className="mb-4 flex items-center justify-between">
-								<Ariakit.Heading className="text-2xl font-light text-white">
-									Your rooms
-								</Ariakit.Heading>
-								<CreateRoomDialog />
-							</div>
-							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-								{rooms?.length ?
-									rooms.map((room) => (
-										<Link
-											key={room._id}
-											to={`/rooms/${room.slug}`}
-											className={panel(
-												"flex flex-col items-start gap-2 px-3 py-2.5 transition hover:border-gray-700 hover:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:outline-none",
-											)}
-										>
-											<Ariakit.HeadingLevel>
-												<Ariakit.Heading className="text-xl/tight font-medium text-white">
-													{room.name}
-												</Ariakit.Heading>
-												<p className="flex items-center gap-1 text-sm text-gray-400">
-													<span className="sr-only">Created at</span>
-													<Icon icon="mingcute:time-fill" />
-													<time
-														dateTime={new Date(
-															room._creationTime,
-														).toISOString()}
-													>
-														{formatDistanceToNow(room._creationTime, {
-															addSuffix: true,
-														})}
-													</time>
-												</p>
-											</Ariakit.HeadingLevel>
-										</Link>
-									))
-								:	<div className="col-span-full flex flex-col items-center justify-center p-8 text-center">
-										<p className="mb-4 text-gray-400">
-											You don't have any rooms yet
+		<Ariakit.HeadingLevel>
+			<div className="flex min-h-screen w-full flex-col">
+				<AppHeader />
+				<main className="mx-auto w-full max-w-screen-md px-6 py-4">
+					<div className="mb-4 flex items-center justify-between">
+						<Ariakit.Heading className="text-2xl font-light text-white">
+							Your rooms
+						</Ariakit.Heading>
+						<CreateRoomDialog />
+					</div>
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+						{rooms?.length ?
+							rooms.map((room) => (
+								<Link
+									key={room._id}
+									to={`/rooms/${room.slug}`}
+									className="flex flex-col items-start gap-2 panel px-3 py-2.5 transition hover:border-gray-700 hover:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:outline-none"
+								>
+									<Ariakit.HeadingLevel>
+										<Ariakit.Heading className="text-xl/tight font-medium text-white">
+											{room.name}
+										</Ariakit.Heading>
+										<p className="flex items-center gap-1 text-sm text-gray-400">
+											<span className="sr-only">Created at</span>
+											<Icon icon="mingcute:time-fill" />
+											<time
+												dateTime={new Date(room._creationTime).toISOString()}
+											>
+												{formatDistanceToNow(room._creationTime, {
+													addSuffix: true,
+												})}
+											</time>
 										</p>
-									</div>
-								}
+									</Ariakit.HeadingLevel>
+								</Link>
+							))
+						:	<div className="col-span-full flex flex-col items-center justify-center p-8 text-center">
+								<p className="mb-4 text-gray-400">
+									You don't have any rooms yet
+								</p>
 							</div>
-						</Ariakit.HeadingLevel>
-					</main>
-				</div>
-			</AppHeader>
-		</div>
+						}
+					</div>
+				</main>
+			</div>
+		</Ariakit.HeadingLevel>
 	)
 }
 
