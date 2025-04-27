@@ -5,7 +5,9 @@ import { twMerge } from "tailwind-merge"
 import { Icon } from "~/components/ui/Icon.tsx"
 
 const appearanceClasses = {
-	default: twMerge("panel-dark hover:bg-gray-950 focus:ring-primary-500/50"),
+	default: twMerge(
+		"panel-dark hover:bg-gray-900 hover:border-gray-700 focus:ring-primary-500/50",
+	),
 	ghost: twMerge(
 		"border-transparent opacity-75 hover:bg-gray-500/30 hover:opacity-100 focus:ring-gray-500/50",
 	),
