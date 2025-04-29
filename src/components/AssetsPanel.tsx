@@ -1,19 +1,28 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
 import { type } from "arktype"
 import { useAction, useMutation, useQuery } from "convex/react"
-import { useEffect, useState } from "react"
+import {
+	startTransition,
+	useActionState,
+	useEffect,
+	useRef,
+	useState,
+} from "react"
 import { createPortal } from "react-dom"
 import { useFileUpload } from "~/hooks/useFileUpload.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedAsset } from "../../convex/assets.ts"
 import { Icon } from "./ui/Icon.tsx"
+import { LoadingSpinner } from "./ui/LoadingSpinner.tsx"
 import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
+import { SmallIconButton } from "./ui/SmallIconButton.tsx"
 
 export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	const assets = useQuery(api.assets.list)
 	const createAsset = useMutation(api.assets.create)
 	const roomAssets = useQuery(api.roomAssets.list, { roomId })
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const roomAssetsByAssetId = new Map(
 		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
@@ -89,11 +98,55 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 		}
 	})
 
+	const [, importFiles, isFileImportPending] = useActionState(
+		async (_state, files: Iterable<File>) => {
+			for (const file of files) {
+				try {
+					const { width, height } = await createImageBitmap(file)
+					const storageId = await uploadFile(file)
+					if (!storageId) return
+					await createAsset({
+						name: file.name,
+						type: file.type,
+						size: { x: width, y: height },
+						storageId,
+					})
+				} catch (error) {
+					console.error(error)
+				}
+			}
+		},
+	)
+
 	return (
 		<section className="isolate flex h-full w-64 flex-col gap-4 overflow-y-auto panel p-4">
 			<HeadingLevel>
 				<header className="sticky -top-4 z-10 -m-4 flex h-16 items-center justify-between bg-gray-900 px-4">
 					<Heading className="heading-xl">Assets</Heading>
+					{isFileImportPending ?
+						<LoadingSpinner className="size-5" />
+					:	<SmallIconButton
+							icon="mdi:file-import"
+							label="Import Asset"
+							className="-mr-2"
+							onClick={() => {
+								fileInputRef.current?.click()
+							}}
+						/>
+					}
+					<input
+						ref={fileInputRef}
+						type="file"
+						multiple
+						accept="image/*"
+						hidden
+						onChange={async (event) => {
+							const files = event.target.files ?? []
+							startTransition(() => {
+								importFiles(files)
+							})
+						}}
+					/>
 				</header>
 
 				<ul className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2">
