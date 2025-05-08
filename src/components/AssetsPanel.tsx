@@ -28,9 +28,29 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
 	)
 
-	const [isFileOver, setIsFileOver] = useState(false)
-	const { uploadFile } = useFileUpload()
+	const uploadFile = useFileUpload()
 
+	const [, importFiles, isFileImportPending] = useActionState(
+		async (_state, files: Iterable<File>) => {
+			for (const file of files) {
+				try {
+					const { width, height } = await createImageBitmap(file)
+					const storageId = await uploadFile(file)
+					if (!storageId) return
+					await createAsset({
+						name: file.name,
+						type: file.type,
+						size: { x: width, y: height },
+						storageId,
+					})
+				} catch (error) {
+					console.error(error)
+				}
+			}
+		},
+	)
+
+	const [isFileOver, setIsFileOver] = useState(false)
 	useEffect(() => {
 		const controller = new AbortController()
 
@@ -75,20 +95,7 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 
 				event.preventDefault()
 				setIsFileOver(false)
-
-				for (const file of event.dataTransfer?.files ?? []) {
-					const { width, height } = await createImageBitmap(file)
-
-					const storageId = await uploadFile(file)
-					if (!storageId) return
-
-					await createAsset({
-						name: file.name,
-						type: file.type,
-						size: { x: width, y: height },
-						storageId,
-					})
-				}
+				importFiles(event.dataTransfer?.files ?? [])
 			},
 			{ signal: controller.signal },
 		)
@@ -97,26 +104,6 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 			controller.abort()
 		}
 	})
-
-	const [, importFiles, isFileImportPending] = useActionState(
-		async (_state, files: Iterable<File>) => {
-			for (const file of files) {
-				try {
-					const { width, height } = await createImageBitmap(file)
-					const storageId = await uploadFile(file)
-					if (!storageId) return
-					await createAsset({
-						name: file.name,
-						type: file.type,
-						size: { x: width, y: height },
-						storageId,
-					})
-				} catch (error) {
-					console.error(error)
-				}
-			}
-		},
-	)
 
 	return (
 		<section className="isolate flex h-full w-64 flex-col gap-4 overflow-y-auto panel p-4">

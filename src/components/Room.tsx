@@ -308,24 +308,24 @@ function RoomInvitation({ room }: { room: ClientRoom }) {
 function BackgroundUploader({ roomId }: { roomId: Id<"rooms"> }) {
 	const updateRoom = useMutation(api.rooms.update)
 	const room = useQuery(api.rooms.get, { roomId })
+	const uploadFile = useFileUpload()
 
-	const { uploadFile, isUploading } = useFileUpload({
-		onSuccess: async (storageId) => {
-			await updateRoom({ roomId, backgroundId: storageId })
-		},
-		onError: (error) => {
-			console.error("Error uploading background:", error)
-		},
-	})
+	const [uploadError, handleFileChange, isUploading] = useActionState(
+		async (
+			_state: string | void,
+			event: React.ChangeEvent<HTMLInputElement>,
+		) => {
+			const file = event.target.files?.[0]
+			if (!file) return
 
-	const handleFileChange = async (
-		event: React.ChangeEvent<HTMLInputElement>,
-	) => {
-		const file = event.target.files?.[0]
-		if (file) {
-			await uploadFile(file)
-		}
-	}
+			try {
+				const storageId = await uploadFile(file)
+				await updateRoom({ roomId, backgroundId: storageId })
+			} catch (error) {
+				return error instanceof Error ? error.message : String(error)
+			}
+		},
+	)
 
 	return (
 		<>
@@ -365,6 +365,7 @@ function BackgroundUploader({ roomId }: { roomId: Id<"rooms"> }) {
 					Remove Background
 				</Button>
 			)}
+			<p className="text-red-300 empty:hidden">{uploadError}</p>
 		</>
 	)
 }
