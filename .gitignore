@@ -34,8 +34,9 @@ dist-ssr
 *.sw?
 .windsurfrules
 
-# Local Netlify folder
+# Netlify
 .netlify
+deno.lock
 
 # cache
 .eslintcache

@@ -1,3 +1,15 @@
+[dev]
+# I would just inline the setup script here,
+# but the way Netlify runs processes breaks the use of
+# `&&` and other shell constructs
+command = "bun dev-setup"
+
 [build]
 command = "bun run predeploy"
 publish = "dist"
+
+[images]
+remote_images = [
+	"http://127.0.0.1:3210/api/storage/.*",
+	"https://elegant-eel-777.convex.site/.*",
+]
