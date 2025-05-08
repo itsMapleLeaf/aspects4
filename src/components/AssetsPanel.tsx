@@ -4,6 +4,7 @@ import { useAction, useMutation, useQuery } from "convex/react"
 import {
 	startTransition,
 	useActionState,
+	useDeferredValue,
 	useEffect,
 	useRef,
 	useState,
@@ -18,15 +19,13 @@ import { LoadingSpinner } from "./ui/LoadingSpinner.tsx"
 import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
 import { SmallIconButton } from "./ui/SmallIconButton.tsx"
 
-export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
-	const assets = useQuery(api.assets.list)
-	const createAsset = useMutation(api.assets.create)
-	const roomAssets = useQuery(api.roomAssets.list, { roomId })
-	const fileInputRef = useRef<HTMLInputElement>(null)
+export const AssetDropData = type("string.json.parse").to({
+	assetId: "string",
+})
 
-	const roomAssetsByAssetId = new Map(
-		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
-	)
+export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
+	const createAsset = useMutation(api.assets.create)
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const uploadFile = useFileUpload()
 
@@ -106,7 +105,7 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	})
 
 	return (
-		<section className="isolate flex h-full w-64 flex-col gap-4 overflow-y-auto panel p-4">
+		<section className="isolate flex h-full w-64 flex-col gap-4 overflow-y-auto panel p-4 will-change-scroll [scrollbar-gutter:stable]">
 			<HeadingLevel>
 				<header className="sticky -top-4 z-10 -m-4 flex h-16 items-center justify-between bg-gray-900 px-4">
 					<Heading className="heading-xl">Assets</Heading>
@@ -135,16 +134,7 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 						}}
 					/>
 				</header>
-
-				<ul className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2">
-					{assets
-						?.filter((asset) => !roomAssetsByAssetId.has(asset._id))
-						?.map((asset) => (
-							<li key={asset._id}>
-								<AssetCard asset={asset} roomId={roomId} />
-							</li>
-						))}
-				</ul>
+				<AssetList roomId={roomId} />
 			</HeadingLevel>
 
 			{createPortal(
@@ -160,9 +150,33 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	)
 }
 
-export const AssetDropData = type("string.json.parse").to({
-	assetId: "string",
-})
+function AssetList({ roomId }: { roomId: Id<"rooms"> }) {
+	const originalAssets = useQuery(api.assets.list, {})
+	const assets = useDeferredValue(originalAssets)
+	const isPending = assets !== originalAssets
+
+	const roomAssets = useQuery(api.roomAssets.list, { roomId })
+	const roomAssetsByAssetId = new Map(
+		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
+	)
+
+	return (
+		<ul className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2">
+			{isPending && assets == null && (
+				<div className="col-span-full flex justify-center py-4">
+					<LoadingSpinner />
+				</div>
+			)}
+			{assets
+				?.filter((asset) => !roomAssetsByAssetId.has(asset._id))
+				?.map((asset) => (
+					<li key={asset._id}>
+						<AssetCard asset={asset} roomId={roomId} />
+					</li>
+				))}
+		</ul>
+	)
+}
 
 function AssetCard({
 	asset,
@@ -175,6 +189,12 @@ function AssetCard({
 	const createRoomAsset = useMutation(api.roomAssets.place)
 	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+
+	const url =
+		asset.url &&
+		`/.netlify/images?` +
+			urlSearchParams({ url: asset.url, w: 150, h: 150, quality: 100 })
+
 	return (
 		<Menu placement="bottom-start">
 			<MenuButton
@@ -192,7 +212,7 @@ function AssetCard({
 				}}
 			>
 				<img
-					src={asset.url || ""}
+					src={url ?? ""}
 					alt=""
 					className="aspect-square w-full rounded-xs object-cover object-top transition"
 					draggable={false}
@@ -231,4 +251,11 @@ function AssetCard({
 			</MenuPanel>
 		</Menu>
 	)
+}
+
+// the URL constructor and URLSearchParams encode param values which sometimes breaks things
+function urlSearchParams(params: Record<string, string | number>) {
+	return Object.entries(params)
+		.map(([k, v]) => `${k}=${v}`)
+		.join("&")
 }
