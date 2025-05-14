@@ -4,3 +4,5 @@
 - visibility toggle (same former purpose-ish as share toggle)
 - text autocomplete options
 - "grow" option for blocks in containers (?)
+- prefill chat on click
+- cooler dice rolls
