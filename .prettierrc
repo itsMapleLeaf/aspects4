@@ -3,6 +3,7 @@
 	"useTabs": true,
 	"quoteProps": "consistent",
 	"experimentalTernaries": true,
+	"objectWrap": "collapse",
 	"plugins": ["prettier-plugin-jsdoc", "prettier-plugin-tailwindcss"],
 	"tailwindStylesheet": "./src/styles/index.css"
 }
