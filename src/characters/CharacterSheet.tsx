@@ -3,6 +3,7 @@ import { EditableNumber } from "~/components/EditableNumber.tsx"
 import { EditableTextField } from "~/components/EditableTextField.tsx"
 import { Field } from "~/components/ui/Field.tsx"
 import { SelectField } from "~/components/ui/SelectField.tsx"
+import { useLocalStorageState } from "~/hooks/storage.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
 import type {
 	CharacterSheetBlockSchema,
@@ -126,9 +127,9 @@ function CharacterSheetBlockElement({
 
 	if (block.type === "tabs") {
 		return (
-			<Ariakit.TabProvider
-			// selectedId={selectedTabId ?? tabs[0].name}
-			// setSelectedId={setSelectedTabId}
+			<CharacterSheetTabProvider
+				blockId={block.id}
+				defaultTabId={block.tabs[0].id}
 			>
 				<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
 					{block.tabs.map((tab) => (
@@ -156,11 +157,35 @@ function CharacterSheetBlockElement({
 						</div>
 					</Ariakit.TabPanel>
 				))}
-			</Ariakit.TabProvider>
+			</CharacterSheetTabProvider>
 		)
 	}
 
 	return <p>(field type "{block.type}" not supported)</p>
+}
+
+function CharacterSheetTabProvider({
+	blockId,
+	defaultTabId,
+	children,
+}: {
+	blockId: string
+	defaultTabId: string | undefined | null
+	children: React.ReactNode
+}) {
+	const [selectedId, setSelectedId] = useLocalStorageState(
+		`CharacterSheetTabProvider:selectedId:${blockId}`,
+		defaultTabId,
+		(input) => (typeof input === "string" ? input : undefined),
+	)
+	return (
+		<Ariakit.TabProvider
+			selectedId={selectedId ?? defaultTabId}
+			setSelectedId={setSelectedId}
+		>
+			{children}
+		</Ariakit.TabProvider>
+	)
 }
 
 function getDefaultBlockName(fieldId: string) {
