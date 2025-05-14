@@ -52,6 +52,7 @@ export function TextArea({
 					id={id}
 					className={`${baseClasses} ${stateClasses}`}
 					readOnly={readOnly}
+					rows={2}
 					{...props}
 				/>
 				{suffix}

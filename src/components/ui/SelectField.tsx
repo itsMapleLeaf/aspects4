@@ -1,50 +1,62 @@
-import { ComponentProps, ReactNode, useId } from "react"
+import * as Ariakit from "@ariakit/react"
+import { ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
-import { Field } from "~/components/ui/Field.tsx"
 
 export function SelectField({
 	className,
 	label,
-	options,
-	...props
-}: ComponentProps<typeof Select> & {
-	label: ReactNode
-}) {
-	const id = useId()
-	return (
-		<Field className={className} label={label} htmlFor={id}>
-			<Select id={id} options={options} {...props} />
-			<div className="mt-1 text-sm font-medium empty:hidden">
-				{options.find((opt) => opt.value === props.value)?.description}
-			</div>
-		</Field>
-	)
-}
-
-export function Select({
-	className,
+	description,
 	options,
 	placeholder,
 	value,
-	onChange,
-	...props
-}: ComponentProps<"select"> & {
-	placeholder: string
+	onChangeValue,
+}: {
+	className?: string
+	label: ReactNode
+	description?: ReactNode
+	placeholder: ReactNode
 	options: Array<{ value: string; label: string; description?: ReactNode }>
+	value: string
+	onChangeValue: (value: string) => void
 }) {
 	return (
-		<select
-			className={twMerge("control", className)}
-			value={value || ""}
-			onChange={onChange}
-			{...props}
+		<Ariakit.SelectProvider
+			value={value}
+			setValue={onChangeValue}
+			setValueOnMove
 		>
-			<option value="">{placeholder}</option>
-			{options.map((option) => (
-				<option key={option.value} value={option.value}>
-					{option.label}
-				</option>
-			))}
-		</select>
+			<div className={twMerge("flex flex-col gap-0.5", className)}>
+				<Ariakit.SelectLabel className="text-sm font-semibold">
+					{label}
+				</Ariakit.SelectLabel>
+				<p className="text-xs">{description}</p>
+				<Ariakit.Select className="flex control items-center justify-between">
+					<Ariakit.SelectValue>
+						{(value) =>
+							options.find((opt) => opt.value === value)?.label ?? placeholder
+						}
+					</Ariakit.SelectValue>
+					<Ariakit.SelectArrow />
+				</Ariakit.Select>
+			</div>
+
+			<Ariakit.SelectPopover
+				className="menu-panel"
+				unmountOnHide
+				fixed
+				gutter={8}
+			>
+				{options.map((option) => (
+					<Ariakit.SelectItem
+						key={option.value}
+						value={option.value}
+						className="menu-item flex flex-col items-start gap-0"
+					>
+						<div>{option.label}</div>
+						<div className="text-sm text-gray-300">{option.description}</div>
+					</Ariakit.SelectItem>
+				))}
+			</Ariakit.SelectPopover>
+		</Ariakit.SelectProvider>
 	)
 }

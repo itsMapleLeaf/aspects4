@@ -9,28 +9,18 @@ import schema from "./schema.ts"
 export type NormalizedCharacter = ReturnType<typeof normalizeCharacter>
 
 function normalizeCharacter(doc: Doc<"characters">) {
-	return {
-		name: "",
-		data: {},
-		bonds: [],
-		items: [],
-		...doc,
-	}
+	return { name: "", data: {}, bonds: [], items: [], ...doc }
 }
 
 export const get = query({
-	args: {
-		characterId: v.id("characters"),
-	},
+	args: { characterId: v.id("characters") },
 	async handler(ctx, { characterId }) {
 		return await ctx.db.get(characterId)
 	},
 })
 
 export const listByRoom = query({
-	args: {
-		roomId: v.id("rooms"),
-	},
+	args: { roomId: v.id("rooms") },
 	async handler(ctx, { roomId }) {
 		const roomCharacters = await ctx.db
 			.query("roomCharacters")
@@ -68,11 +58,7 @@ export const create = mutation({
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new Error("Not logged in")
 
-		const data = {
-			name: "New Character",
-			...args,
-			ownerId: userId,
-		}
+		const data = { name: "New Character", ...args, ownerId: userId }
 
 		const id = await ctx.db.insert("characters", data)
 
@@ -91,19 +77,14 @@ export const update = mutation({
 })
 
 export const remove = mutation({
-	args: {
-		characterId: v.id("characters"),
-	},
+	args: { characterId: v.id("characters") },
 	async handler(ctx, { characterId }) {
 		await ctx.db.delete(characterId)
 	},
 })
 
 export const isInRoom = query({
-	args: {
-		characterId: v.id("characters"),
-		roomId: v.id("rooms"),
-	},
+	args: { characterId: v.id("characters"), roomId: v.id("rooms") },
 	async handler(ctx, { characterId, roomId }) {
 		const query = ctx.db
 			.query("roomCharacters")
@@ -120,20 +101,14 @@ export const isInRoom = query({
 })
 
 export const addToRoom = mutation({
-	args: {
-		characterId: v.id("characters"),
-		roomId: v.id("rooms"),
-	},
+	args: { characterId: v.id("characters"), roomId: v.id("rooms") },
 	async handler(ctx, { characterId, roomId }) {
 		await ctx.db.insert("roomCharacters", { characterId, roomId })
 	},
 })
 
 export const removeFromRoom = mutation({
-	args: {
-		characterId: v.id("characters"),
-		roomId: v.id("rooms"),
-	},
+	args: { characterId: v.id("characters"), roomId: v.id("rooms") },
 	async handler(ctx, { characterId, roomId }) {
 		const query = ctx.db
 			.query("roomCharacters")

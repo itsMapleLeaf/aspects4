@@ -2,11 +2,12 @@ import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { RefObject, type ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
+import { CharacterSheet } from "~/characters/CharacterSheet.tsx"
+import { aspectsPlayerCharacterSchema } from "~/characters/character.schema.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { panel } from "../styles/panel.ts"
-import { CharacterSheet } from "./CharacterSheet.tsx"
 import { ChatInputRef } from "./Chat.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { SmallIconButton } from "./ui/SmallIconButton.tsx"
@@ -21,9 +22,7 @@ export function CharacterManager({
 	const ownedCharacters = useQuery(api.characters.listOwned)
 	const ownedCharacterIds = new Set(ownedCharacters?.map((it) => it._id))
 
-	const roomCharacters = useQuery(api.characters.listByRoom, {
-		roomId,
-	})
+	const roomCharacters = useQuery(api.characters.listByRoom, { roomId })
 	const roomCharacterIds = new Set(roomCharacters?.map((it) => it._id))
 
 	const roomCharactersWithoutOwned = roomCharacters?.filter(
@@ -125,34 +124,47 @@ export function CharacterManager({
 						<Ariakit.TabPanel
 							id={character._id}
 							key={character._id}
-							className={panel("h-full w-148 flex-1 p-0")}
+							className={panel("h-full w-148 flex-1 overflow-y-auto p-3")}
 							unmountOnHide
 						>
 							<CharacterSheet
-								character={character}
-								chatInputRef={chatInputRef}
-								onChange={(patch) => {
+								schema={aspectsPlayerCharacterSchema}
+								character={{ name: character.name, values: character.data }}
+								onChangeName={(name) => {
 									updateCharacter({
 										characterId: character._id,
-										data: patch,
+										data: { name },
 									})
 								}}
-								sharing={{
-									isShared: roomCharacterIds.has(character._id),
-									onChange: async (shouldShare) => {
-										if (shouldShare) {
-											await addToRoom({
-												characterId: character._id,
-												roomId,
-											})
-										} else {
-											await removeFromRoom({
-												characterId: character._id,
-												roomId,
-											})
-										}
-									},
+								onSaveValue={(key, value) => {
+									updateCharacter({
+										characterId: character._id,
+										data: { data: { ...character.data, [key]: value } },
+									})
 								}}
+								// chatInputRef={chatInputRef}
+								// onChange={(patch) => {
+								// 	updateCharacter({
+								// 		characterId: character._id,
+								// 		data: patch,
+								// 	})
+								// }}
+								// sharing={{
+								// 	isShared: roomCharacterIds.has(character._id),
+								// 	onChange: async (shouldShare) => {
+								// 		if (shouldShare) {
+								// 			await addToRoom({
+								// 				characterId: character._id,
+								// 				roomId,
+								// 			})
+								// 		} else {
+								// 			await removeFromRoom({
+								// 				characterId: character._id,
+								// 				roomId,
+								// 			})
+								// 		}
+								// 	},
+								// }}
 							/>
 						</Ariakit.TabPanel>
 					))}
@@ -164,10 +176,11 @@ export function CharacterManager({
 							className={panel("h-full w-148 flex-1 p-0")}
 						>
 							<CharacterSheet
-								className="p-4"
-								character={character}
-								chatInputRef={chatInputRef}
-								onChange={() => {}}
+								schema={aspectsPlayerCharacterSchema}
+								character={{ name: character.name, values: character.data }}
+								// chatInputRef={chatInputRef}
+								onChangeName={() => {}}
+								onSaveValue={() => {}}
 							/>
 						</Ariakit.TabPanel>
 					))}

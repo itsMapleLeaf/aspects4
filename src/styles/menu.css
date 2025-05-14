@@ -5,5 +5,5 @@
 }
 
 @utility menu-item {
-	@apply flex shrink-0 cursor-default items-center gap-2 rounded-sm px-3 py-2 transition hover:bg-primary-800/25;
+	@apply flex shrink-0 cursor-default items-center gap-2 rounded-xs px-3 py-2 transition hover:bg-primary-800/25 data-focus-visible:bg-primary-800/25;
 }
