@@ -1,4 +1,3 @@
-- tab blocks
 - list blocks
 - side label option for number inputs
 - silo characters in rooms (instead of sharing them across all rooms)

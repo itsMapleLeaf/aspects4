@@ -1,3 +1,4 @@
+import * as Ariakit from "@ariakit/react"
 import { EditableNumber } from "~/components/EditableNumber.tsx"
 import { EditableTextField } from "~/components/EditableTextField.tsx"
 import { Field } from "~/components/ui/Field.tsx"
@@ -82,7 +83,7 @@ function CharacterSheetBlockElement({
 	if (block.type === "text") {
 		return (
 			<EditableTextField
-				label={block.displayName || getDefaultFieldLabel(block.id)}
+				label={block.displayName || getDefaultBlockName(block.id)}
 				multiline={block.multiline}
 				placeholder={block.hint}
 				value={String(character.values[block.id] || "")}
@@ -93,7 +94,7 @@ function CharacterSheetBlockElement({
 
 	if (block.type === "number") {
 		return (
-			<Field label={block.displayName || getDefaultFieldLabel(block.id)}>
+			<Field label={block.displayName || getDefaultBlockName(block.id)}>
 				<EditableNumber
 					min={block.min}
 					max={block.max}
@@ -107,7 +108,7 @@ function CharacterSheetBlockElement({
 	if (block.type === "select") {
 		return (
 			<SelectField
-				label={block.displayName || getDefaultFieldLabel(block.id)}
+				label={block.displayName || getDefaultBlockName(block.id)}
 				description={block.hint}
 				placeholder="Choose one"
 				value={String(character.values[block.id] || "")}
@@ -123,10 +124,46 @@ function CharacterSheetBlockElement({
 		)
 	}
 
+	if (block.type === "tabs") {
+		return (
+			<Ariakit.TabProvider
+			// selectedId={selectedTabId ?? tabs[0].name}
+			// setSelectedId={setSelectedTabId}
+			>
+				<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
+					{block.tabs.map((tab) => (
+						<Ariakit.Tab
+							key={tab.id}
+							id={tab.id}
+							className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+						>
+							{tab.name || getDefaultBlockName(tab.id)}
+						</Ariakit.Tab>
+					))}
+				</Ariakit.TabList>
+
+				{block.tabs.map((tab) => (
+					<Ariakit.TabPanel key={tab.id} id={tab.id}>
+						<div className="grid gap-3">
+							{tab.children.map((child) => (
+								<CharacterSheetBlockElement
+									key={child.id}
+									block={child}
+									character={character}
+									onSaveValue={onSaveValue}
+								/>
+							))}
+						</div>
+					</Ariakit.TabPanel>
+				))}
+			</Ariakit.TabProvider>
+		)
+	}
+
 	return <p>(field type "{block.type}" not supported)</p>
 }
 
-function getDefaultFieldLabel(fieldId: string) {
+function getDefaultBlockName(fieldId: string) {
 	return [...fieldId.matchAll(/[A-Z]?[a-z]+/g)]
 		.map(
 			([word]) => word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase(),

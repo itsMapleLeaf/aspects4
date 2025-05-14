@@ -1,15 +1,24 @@
-export type CharacterSheetLayout = {
+export type CharacterSheetLayout = Readonly<{
 	id: string
 	systemName: string
 	name: string
-	blocks: CharacterSheetBlockSchema[]
-}
+	blocks: readonly CharacterSheetBlockSchema[]
+}>
 
-export type CharacterSheetBlockSchema =
+export type CharacterSheetBlockSchema = Readonly<
 	| {
 			id: string
 			type: "row" | "column"
-			children: CharacterSheetBlockSchema[]
+			children: readonly CharacterSheetBlockSchema[]
+	  }
+	| {
+			id: string
+			type: "tabs"
+			tabs: ReadonlyArray<{
+				id: string
+				name?: string
+				children: readonly CharacterSheetBlockSchema[]
+			}>
 	  }
 	| {
 			id: string
@@ -36,7 +45,7 @@ export type CharacterSheetBlockSchema =
 			displayName?: string
 			hint?: string
 			type: "select"
-			choices: CharacterSchemaSelectChoice[]
+			choices: readonly CharacterSchemaSelectChoice[]
 			optional?: boolean
 	  }
 	| {
@@ -44,20 +53,21 @@ export type CharacterSheetBlockSchema =
 			displayName?: string
 			hint?: string
 			type: "list"
-			itemFields: CharacterSheetBlockSchema[]
+			itemFields: readonly CharacterSheetBlockSchema[]
 	  }
+>
 
-export type CharacterSchemaSelectChoice = {
+export type CharacterSchemaSelectChoice = Readonly<{
 	id: string
 	displayName?: string
 	/** Short description displayed under the label of each choice */
 	hint?: string
 	/** A longer description displayed while this choice is selected */
 	description?: string
-}
+}>
 
 let nextId = 0
-const uniqueId = () => String(nextId++)
+const createId = () => String(nextId++)
 
 export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 	id: "aspectsPlayerCharacter",
@@ -65,77 +75,15 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 	name: "Player Character",
 	blocks: [
 		{
-			id: uniqueId(),
+			id: createId(),
 			type: "row",
 			children: [
 				{ id: "damageLimit", type: "number" },
 				{ id: "fatigueLimit", type: "number" },
-				{ id: "aspectExperience", displayName: "Aspect EXP", type: "number" },
 				{ id: "skillPoints", type: "number" },
 			],
 		},
 
-		{ id: "conditions", type: "text", multiline: true },
-
-		{
-			id: uniqueId(),
-			type: "row",
-			children: [
-				{ id: "strength", type: "number" },
-				{ id: "sense", type: "number" },
-				{ id: "dexterity", type: "number" },
-				{ id: "intellect", type: "number" },
-				{ id: "presence", type: "number" },
-			],
-		},
-		{
-			id: uniqueId(),
-			type: "row",
-			children: [
-				{ id: "fire", type: "number" },
-				{ id: "water", type: "number" },
-				{ id: "wind", type: "number" },
-				{ id: "light", type: "number" },
-				{ id: "darkness", type: "number" },
-			],
-		},
-
-		// {
-		// 	id: uniqueId(),
-		// 	type: "row",
-		// 	children: [
-		// 		{
-		// 			id: uniqueId(),
-		// 			type: "column",
-		// 			children: [
-		// 				{ id: "strength", type: "number" },
-		// 				{ id: "sense", type: "number" },
-		// 				{ id: "dexterity", type: "number" },
-		// 				{ id: "intellect", type: "number" },
-		// 				{ id: "presence", type: "number" },
-		// 			],
-		// 		},
-		// 		{
-		// 			id: uniqueId(),
-		// 			type: "column",
-		// 			children: [
-		// 				{ id: "fire", type: "number" },
-		// 				{ id: "water", type: "number" },
-		// 				{ id: "wind", type: "number" },
-		// 				{ id: "light", type: "number" },
-		// 				{ id: "darkness", type: "number" },
-		// 			],
-		// 		},
-		// 	],
-		// },
-
-		{ id: "skillPointAssignments", type: "text", multiline: true },
-		{ id: "aspectSkills", type: "text", multiline: true },
-
-		{ id: "lineage", type: "text", multiline: true },
-		{ id: "bonds", type: "text", multiline: true },
-
-		{ id: "items", type: "text", multiline: true },
 		{
 			id: "budget",
 			type: "select",
@@ -175,6 +123,73 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 			],
 		},
 
-		{ id: "details", type: "text", multiline: true },
+		{ id: "conditions", type: "text", multiline: true },
+
+		{
+			id: createId(),
+			type: "tabs",
+			tabs: [
+				{
+					id: "character",
+					children: [
+						{ id: "lineage", type: "text", multiline: true },
+						{ id: "details", type: "text", multiline: true },
+					],
+				},
+				{
+					id: "stats",
+					children: [
+						{
+							id: createId(),
+							type: "row",
+							children: [
+								{ id: "strength", type: "number" },
+								{ id: "sense", type: "number" },
+								{ id: "dexterity", type: "number" },
+								{ id: "intellect", type: "number" },
+								{ id: "presence", type: "number" },
+							],
+						},
+						{
+							id: createId(),
+							type: "row",
+							children: [
+								{ id: "fire", type: "number" },
+								{ id: "water", type: "number" },
+								{ id: "wind", type: "number" },
+								{ id: "light", type: "number" },
+								{ id: "darkness", type: "number" },
+							],
+						},
+					],
+				},
+				{
+					id: "skills",
+					children: [
+						{
+							id: "aspectExperience",
+							displayName: "Aspect EXP",
+							type: "number",
+						},
+						{
+							id: createId(),
+							type: "row",
+							children: [
+								{ id: "skillPointAssignments", type: "text", multiline: true },
+								{ id: "aspectSkills", type: "text", multiline: true },
+							],
+						},
+					],
+				},
+				{
+					id: "items",
+					children: [{ id: "items", type: "text", multiline: true }],
+				},
+				{
+					id: "bonds",
+					children: [{ id: "bonds", type: "text", multiline: true }],
+				},
+			],
+		},
 	],
 }
