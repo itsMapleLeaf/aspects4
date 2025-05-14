@@ -137,7 +137,7 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 
 		{ id: "items", type: "text", multiline: true },
 		{
-			id: "expenseTier",
+			id: "budget",
 			type: "select",
 			hint: "What's the most expensive thing you can afford? You can freely buy things two tiers down.",
 			choices: [
