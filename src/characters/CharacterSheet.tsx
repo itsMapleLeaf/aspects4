@@ -94,16 +94,26 @@ function CharacterSheetBlockElement({
 	}
 
 	if (block.type === "number") {
-		return (
-			<Field label={block.displayName || getDefaultBlockName(block.id)}>
-				<EditableNumber
-					min={block.min}
-					max={block.max}
-					value={safeParseNumber(character.values[block.id]) ?? 0}
-					onChange={(value) => onSaveValue(block.id, value)}
-				/>
-			</Field>
-		)
+		const label = block.displayName || getDefaultBlockName(block.id)
+		return block.labelPlacement === "left" ?
+				<div className="flex items-center">
+					<div className="flex-1 font-semibold">{label}</div>
+					<EditableNumber
+						className="w-16"
+						min={block.min}
+						max={block.max}
+						value={safeParseNumber(character.values[block.id]) ?? 0}
+						onChange={(value) => onSaveValue(block.id, value)}
+					/>
+				</div>
+			:	<Field label={block.displayName || getDefaultBlockName(block.id)}>
+					<EditableNumber
+						min={block.min}
+						max={block.max}
+						value={safeParseNumber(character.values[block.id]) ?? 0}
+						onChange={(value) => onSaveValue(block.id, value)}
+					/>
+				</Field>
 	}
 
 	if (block.type === "select") {

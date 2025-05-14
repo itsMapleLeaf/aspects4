@@ -1,4 +1,4 @@
-import type { NonEmptyTuple } from "type-fest"
+import type { Except, NonEmptyTuple } from "type-fest"
 
 export type CharacterSheetLayout = Readonly<{
 	id: string
@@ -13,15 +13,7 @@ export type CharacterSheetBlockSchema = Readonly<
 			type: "row" | "column"
 			children: readonly CharacterSheetBlockSchema[]
 	  }
-	| {
-			id: string
-			type: "tabs"
-			tabs: NonEmptyTuple<{
-				id: string
-				name?: string
-				children: readonly CharacterSheetBlockSchema[]
-			}>
-	  }
+	| { id: string; type: "tabs"; tabs: NonEmptyTuple<CharacterSheetTabSchema> }
 	| {
 			id: string
 			displayName?: string
@@ -31,17 +23,7 @@ export type CharacterSheetBlockSchema = Readonly<
 			/** @default 50_000 */
 			maxLength?: number
 	  }
-	| {
-			id: string
-			displayName?: string
-			hint?: string
-			type: "number"
-			/** @default 0 */
-			min?: number
-			/** @default Number.POSITIVE_INFINITY */
-			max?: number
-			optional?: boolean
-	  }
+	| CharacterSheetNumberSchema
 	| {
 			id: string
 			displayName?: string
@@ -59,6 +41,12 @@ export type CharacterSheetBlockSchema = Readonly<
 	  }
 >
 
+export type CharacterSheetTabSchema = {
+	id: string
+	name?: string
+	children: readonly CharacterSheetBlockSchema[]
+}
+
 export type CharacterSchemaSelectChoice = Readonly<{
 	id: string
 	displayName?: string
@@ -71,127 +59,84 @@ export type CharacterSchemaSelectChoice = Readonly<{
 let nextId = 0
 const createId = () => String(nextId++)
 
-export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
-	id: "aspectsPlayerCharacter",
-	systemName: "Aspects of Nature",
-	name: "Player Character",
-	blocks: [
-		{
-			id: createId(),
-			type: "row",
-			children: [
-				{ id: "damageLimit", type: "number" },
-				{ id: "fatigueLimit", type: "number" },
-				{ id: "skillPoints", type: "number" },
-			],
-		},
+export function row(
+	...children: CharacterSheetBlockSchema[]
+): CharacterSheetBlockSchema {
+	return { id: createId(), type: "row", children }
+}
 
-		{
-			id: "budget",
-			type: "select",
-			hint: "What's the most expensive thing you can afford? You can freely buy things two tiers down.",
-			choices: [
-				{
-					id: "dirt",
-					displayName: "1. Dirt",
-					hint: "Water and other freely-available resources",
-				},
-				{
-					id: "cheap",
-					displayName: "2. Cheap",
-					hint: "Common meals, simple clothing",
-				},
-				{
-					id: "inexpensive",
-					displayName: "3. Inexpensive",
-					hint: "Five-star meals, basic tools and weapons, reasonable lodging",
-				},
-				{
-					id: "steep",
-					displayName: "4. Steep",
-					hint: "Premium tools and weapons, extravagant clothing, comfortable lodging",
-				},
-				{
-					id: "expensive",
-					displayName: "5. Expensive",
-					hint: "A house, luxurious lodging",
-				},
-				{ id: "valuable", displayName: "6. Valuable", hint: "A mansion" },
-				{
-					id: "priceless",
-					displayName: "7. Priceless",
-					hint: "An extremely rare, precious, powerful artifact",
-				},
-			],
-		},
+export function column(
+	...children: CharacterSheetBlockSchema[]
+): CharacterSheetBlockSchema {
+	return { id: createId(), type: "column", children }
+}
 
-		{ id: "conditions", type: "text", multiline: true },
+export function tab(
+	id: string,
+	children: CharacterSheetBlockSchema[],
+	options: { name?: string } = {},
+): { id: string; name?: string; children: CharacterSheetBlockSchema[] } {
+	return { id, name: options.name, children }
+}
 
-		{
-			id: createId(),
-			type: "tabs",
-			tabs: [
-				{
-					id: "character",
-					children: [
-						{ id: "lineage", type: "text", multiline: true },
-						{ id: "details", type: "text", multiline: true },
-					],
-				},
-				{
-					id: "stats",
-					children: [
-						{
-							id: createId(),
-							type: "row",
-							children: [
-								{ id: "strength", type: "number" },
-								{ id: "sense", type: "number" },
-								{ id: "dexterity", type: "number" },
-								{ id: "intellect", type: "number" },
-								{ id: "presence", type: "number" },
-							],
-						},
-						{
-							id: createId(),
-							type: "row",
-							children: [
-								{ id: "fire", type: "number" },
-								{ id: "water", type: "number" },
-								{ id: "wind", type: "number" },
-								{ id: "light", type: "number" },
-								{ id: "darkness", type: "number" },
-							],
-						},
-					],
-				},
-				{
-					id: "skills",
-					children: [
-						{
-							id: "aspectExperience",
-							displayName: "Aspect EXP",
-							type: "number",
-						},
-						{
-							id: createId(),
-							type: "row",
-							children: [
-								{ id: "skillPointAssignments", type: "text", multiline: true },
-								{ id: "aspectSkills", type: "text", multiline: true },
-							],
-						},
-					],
-				},
-				{
-					id: "items",
-					children: [{ id: "items", type: "text", multiline: true }],
-				},
-				{
-					id: "bonds",
-					children: [{ id: "bonds", type: "text", multiline: true }],
-				},
-			],
-		},
-	],
+export function tabs(
+	...tabConfigs: NonEmptyTuple<{
+		id: string
+		name?: string
+		children: readonly CharacterSheetBlockSchema[]
+	}>
+): CharacterSheetBlockSchema {
+	return { id: createId(), type: "tabs", tabs: tabConfigs }
+}
+
+export function text(
+	id: string,
+	options: {
+		displayName?: string
+		hint?: string
+		multiline?: boolean
+		maxLength?: number
+	} = {},
+): CharacterSheetBlockSchema {
+	return { id, type: "text", ...options }
+}
+
+export type CharacterSheetNumberSchema = {
+	id: string
+	displayName?: string
+	hint?: string
+	type: "number"
+	/** @default 0 */
+	min?: number
+	/** @default Number.POSITIVE_INFINITY */
+	max?: number
+	optional?: boolean
+	labelPlacement?: "default" | "left"
+}
+
+export function number(
+	id: string,
+	options: Except<CharacterSheetNumberSchema, "id" | "type"> = {},
+): CharacterSheetBlockSchema {
+	return { ...options, id, type: "number" }
+}
+
+export function select(
+	id: string,
+	choices: CharacterSchemaSelectChoice[],
+	options: { displayName?: string; hint?: string; optional?: boolean } = {},
+): CharacterSheetBlockSchema {
+	return { id, type: "select", choices, ...options }
+}
+
+select.choice = function (
+	id: string,
+	options: { displayName?: string; hint?: string; description?: string } = {},
+): CharacterSchemaSelectChoice {
+	return {
+		id,
+		displayName: options.displayName,
+		hint: options.hint,
+		description: options.description,
+	}
 }
