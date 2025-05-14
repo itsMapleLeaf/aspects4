@@ -3,3 +3,5 @@
 - side label option for number inputs
 - silo characters in rooms (instead of sharing them across all rooms)
 - visibility toggle (same former purpose-ish as share toggle)
+- text autocomplete options
+- "grow" option for blocks in containers (?)
