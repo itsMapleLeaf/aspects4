@@ -115,7 +115,46 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 					],
 				},
 			]),
-			tab("bonds", [text("bonds", { multiline: true })]),
+			tab("bonds", [
+				{
+					id: "bonds",
+					type: "list",
+					itemFields: [
+						row(
+							text("name", { defaultValue: "New Bond" }),
+							row(number("strength", { min: 1 })),
+						),
+						select("aura", [
+							{
+								id: "Fire",
+								description: `indicates an adversarial, heated, conflict-heavy relationship.`,
+								hint: `indicates an adversarial, heated, conflict-heavy relationship.`,
+							},
+							{
+								id: "Water",
+								description: `comes from notions of comfort, peace, and protection.`,
+								hint: `comes from notions of comfort, peace, and protection.`,
+							},
+							{
+								id: "Wind",
+								description: `exhibits in turbulent relationships full of excitement and change.`,
+								hint: `exhibits in turbulent relationships full of excitement and change.`,
+							},
+							{
+								id: "Light",
+								description: `represents diplomatic relationships built on fairness and respect.`,
+								hint: `represents diplomatic relationships built on fairness and respect.`,
+							},
+							{
+								id: "Darkness",
+								description: `manifests from tension, mistrust, and uncertainty.`,
+								hint: `manifests from tension, mistrust, and uncertainty.`,
+							},
+						]),
+						text("description", { multiline: true }),
+					],
+				},
+			]),
 		),
 	],
 }
