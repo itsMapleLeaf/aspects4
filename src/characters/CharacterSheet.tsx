@@ -120,21 +120,27 @@ function CharacterSheetBlockElement({
 	}
 
 	if (block.type === "select") {
+		const value = String(values[block.id] ?? block.defaultValue ?? "")
 		return (
-			<SelectField
-				label={block.displayName || toTitleCase(block.id)}
-				description={block.hint}
-				placeholder="Choose one"
-				value={String(values[block.id] ?? block.defaultValue ?? "")}
-				onChangeValue={(value) => {
-					onSaveValue(block.id, value)
-				}}
-				options={block.choices.map((choice) => ({
-					value: choice.id,
-					label: choice.displayName || toTitleCase(choice.id),
-					description: choice.hint,
-				}))}
-			/>
+			<div>
+				<SelectField
+					label={block.displayName || toTitleCase(block.id)}
+					description={block.hint}
+					placeholder="Choose one"
+					value={value}
+					onChangeValue={(value) => {
+						onSaveValue(block.id, value)
+					}}
+					options={block.choices.map((choice) => ({
+						value: choice.id,
+						label: choice.displayName || toTitleCase(choice.id),
+						description: choice.hint,
+					}))}
+				/>
+				<p className="mt-1 text-sm text-gray-300 empty:hidden">
+					{block.choices.find((choice) => choice.id === value)?.description}
+				</p>
+			</div>
 		)
 	}
 
