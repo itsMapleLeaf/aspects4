@@ -4,7 +4,7 @@ import { Field } from "~/components/ui/Field.tsx"
 import { SelectField } from "~/components/ui/SelectField.tsx"
 import { safeParseNumber } from "~/lib/utils.ts"
 import type {
-	CharacterSheetBlock,
+	CharacterSheetBlockSchema,
 	CharacterSheetLayout,
 } from "./character.schema.ts"
 
@@ -45,12 +45,12 @@ function CharacterSheetBlockElement({
 	character,
 	onSaveValue,
 }: {
-	block: CharacterSheetBlock
+	block: CharacterSheetBlockSchema
 	character: Character
 	onSaveValue: (key: string, value: string | number) => void
 }) {
-	return (
-		block.type === "row" ?
+	if (block.type === "row") {
+		return (
 			<div className="grid auto-cols-fr grid-flow-col gap-3">
 				{block.children.map((child) => (
 					<CharacterSheetBlockElement
@@ -61,7 +61,11 @@ function CharacterSheetBlockElement({
 					/>
 				))}
 			</div>
-		: block.type === "column" ?
+		)
+	}
+
+	if (block.type === "column") {
+		return (
 			<div className="grid gap-3">
 				{block.children.map((child) => (
 					<CharacterSheetBlockElement
@@ -72,7 +76,11 @@ function CharacterSheetBlockElement({
 					/>
 				))}
 			</div>
-		: block.type === "text" ?
+		)
+	}
+
+	if (block.type === "text") {
+		return (
 			<EditableTextField
 				label={block.displayName || getDefaultFieldLabel(block.id)}
 				multiline={block.multiline}
@@ -80,7 +88,11 @@ function CharacterSheetBlockElement({
 				value={String(character.values[block.id] || "")}
 				onChange={(value) => onSaveValue(block.id, value)}
 			/>
-		: block.type === "number" ?
+		)
+	}
+
+	if (block.type === "number") {
+		return (
 			<Field label={block.displayName || getDefaultFieldLabel(block.id)}>
 				<EditableNumber
 					min={block.min}
@@ -89,11 +101,15 @@ function CharacterSheetBlockElement({
 					onChange={(value) => onSaveValue(block.id, value)}
 				/>
 			</Field>
-		: block.type === "select" ?
+		)
+	}
+
+	if (block.type === "select") {
+		return (
 			<SelectField
 				label={block.displayName || getDefaultFieldLabel(block.id)}
 				description={block.hint}
-				placeholder={block.hint ?? "Choose one"}
+				placeholder="Choose one"
 				value={String(character.values[block.id] || "")}
 				onChangeValue={(value) => {
 					onSaveValue(block.id, value)
@@ -104,8 +120,10 @@ function CharacterSheetBlockElement({
 					description: choice.hint,
 				}))}
 			/>
-		:	<p>(field type "{block.type}" not supported)</p>
-	)
+		)
+	}
+
+	return <p>(field type "{block.type}" not supported)</p>
 }
 
 function getDefaultFieldLabel(fieldId: string) {

@@ -2,25 +2,28 @@ export type CharacterSheetLayout = {
 	id: string
 	systemName: string
 	name: string
-	blocks: CharacterSheetBlock[]
+	blocks: CharacterSheetBlockSchema[]
 }
 
-export type CharacterSheetBlock =
-	| { id: string; type: "row" | "column"; children: CharacterSheetBlock[] }
-	| CharacterSheetField
-
-export type CharacterSheetField = {
-	id: string
-	displayName?: string
-	hint?: string
-} & (
+export type CharacterSheetBlockSchema =
 	| {
+			id: string
+			type: "row" | "column"
+			children: CharacterSheetBlockSchema[]
+	  }
+	| {
+			id: string
+			displayName?: string
+			hint?: string
 			type: "text"
 			multiline?: boolean
 			/** @default 50_000 */
 			maxLength?: number
 	  }
 	| {
+			id: string
+			displayName?: string
+			hint?: string
 			type: "number"
 			/** @default 0 */
 			min?: number
@@ -29,12 +32,20 @@ export type CharacterSheetField = {
 			optional?: boolean
 	  }
 	| {
+			id: string
+			displayName?: string
+			hint?: string
 			type: "select"
 			choices: CharacterSchemaSelectChoice[]
 			optional?: boolean
 	  }
-	| { type: "list"; itemFields: CharacterSheetField[] }
-)
+	| {
+			id: string
+			displayName?: string
+			hint?: string
+			type: "list"
+			itemFields: CharacterSheetBlockSchema[]
+	  }
 
 export type CharacterSchemaSelectChoice = {
 	id: string
@@ -59,7 +70,8 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 			children: [
 				{ id: "damageLimit", type: "number" },
 				{ id: "fatigueLimit", type: "number" },
-				{ id: "aspectExperience", type: "number" },
+				{ id: "aspectExperience", displayName: "Aspect EXP", type: "number" },
+				{ id: "skillPoints", type: "number" },
 			],
 		},
 
@@ -117,7 +129,6 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 		// 	],
 		// },
 
-		{ id: "skillPoints", type: "number" },
 		{ id: "skillPointAssignments", type: "text", multiline: true },
 		{ id: "aspectSkills", type: "text", multiline: true },
 
