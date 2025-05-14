@@ -63,11 +63,11 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 			tab("stats", [
 				row(
 					column(
-						number("strength", { labelPlacement: "left" }),
-						number("sense", { labelPlacement: "left" }),
-						number("dexterity", { labelPlacement: "left" }),
-						number("intellect", { labelPlacement: "left" }),
-						number("presence", { labelPlacement: "left" }),
+						number("strength", { labelPlacement: "left", min: 1 }),
+						number("sense", { labelPlacement: "left", min: 1 }),
+						number("dexterity", { labelPlacement: "left", min: 1 }),
+						number("intellect", { labelPlacement: "left", min: 1 }),
+						number("presence", { labelPlacement: "left", min: 1 }),
 					),
 					column(
 						number("fire", { labelPlacement: "left" }),
@@ -85,7 +85,36 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 					text("aspectSkills", { multiline: true }),
 				),
 			]),
-			tab("items", [text("items", { multiline: true })]),
+			tab("items", [
+				{
+					id: "items",
+					type: "list",
+					itemFields: [
+						row(
+							text("name", { defaultValue: "New Item" }),
+							row(
+								select(
+									"type",
+									[
+										select.choice("consumable", {
+											hint: "Goes away when there are no more uses",
+										}),
+										select.choice("tool", {
+											hint: "Can be used and reused while held",
+										}),
+										select.choice("wearable", {
+											hint: "Can be worn for a persistent effect",
+										}),
+									],
+									{ defaultValue: "tool" },
+								),
+								row(number("size", { min: 1 }), number("uses", {})),
+							),
+						),
+						text("description", { multiline: true }),
+					],
+				},
+			]),
 			tab("bonds", [text("bonds", { multiline: true })]),
 		),
 	],

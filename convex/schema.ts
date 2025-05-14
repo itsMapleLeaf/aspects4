@@ -8,7 +8,7 @@ export default defineSchema({
 
 	characters: defineTable({
 		name: v.optional(v.string()),
-		data: v.optional(v.record(v.string(), v.union(v.string(), v.number()))),
+		data: v.optional(v.record(v.string(), v.any())),
 		bonds: v.optional(
 			v.array(
 				v.object({
@@ -20,12 +20,7 @@ export default defineSchema({
 			),
 		),
 		items: v.optional(
-			v.array(
-				v.object({
-					name: v.string(),
-					description: v.string(),
-				}),
-			),
+			v.array(v.object({ name: v.string(), description: v.string() })),
 		),
 		ownerId: v.id("users"),
 	}).index("ownerId", ["ownerId", "name"]),
