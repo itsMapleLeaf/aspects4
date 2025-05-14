@@ -1,3 +1,5 @@
+import type { NonEmptyTuple } from "type-fest"
+
 export type CharacterSheetLayout = Readonly<{
 	id: string
 	systemName: string
@@ -14,7 +16,7 @@ export type CharacterSheetBlockSchema = Readonly<
 	| {
 			id: string
 			type: "tabs"
-			tabs: ReadonlyArray<{
+			tabs: NonEmptyTuple<{
 				id: string
 				name?: string
 				children: readonly CharacterSheetBlockSchema[]
