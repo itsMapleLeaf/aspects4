@@ -7,7 +7,7 @@ import { safeParseNumber } from "~/lib/utils.ts"
 export function EditableNumber({
 	id,
 	className,
-	value,
+	value: valueProp,
 	min = 0,
 	max = Number.POSITIVE_INFINITY,
 	onChange,
@@ -19,6 +19,7 @@ export function EditableNumber({
 	value: number
 	onChange: (value: number) => void
 }) {
+	const value = clamp(valueProp, min, max)
 	const [editing, setEditing] = useState(false)
 
 	const wheelHandlerRef = (element: HTMLElement | null) => {
