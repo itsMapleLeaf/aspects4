@@ -29,14 +29,16 @@ export function SelectField({
 				<Ariakit.SelectLabel className="text-sm font-semibold">
 					{label}
 				</Ariakit.SelectLabel>
-				<p className="text-xs">{description}</p>
-				<Ariakit.Select className="flex control items-center justify-between">
+				<p className="text-xs empty:hidden">{description}</p>
+				<Ariakit.Select className="relative flex control items-center justify-between">
 					<Ariakit.SelectValue>
 						{(value) =>
 							options.find((opt) => opt.value === value)?.label ?? placeholder
 						}
 					</Ariakit.SelectValue>
-					<Ariakit.SelectArrow />
+					<div className="absolute right-1">
+						<Ariakit.SelectArrow />
+					</div>
 				</Ariakit.Select>
 			</div>
 
