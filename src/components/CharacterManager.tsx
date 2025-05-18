@@ -2,8 +2,8 @@ import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { RefObject, type ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
-import { CharacterSheet } from "~/characters/CharacterSheet.tsx"
-import { aspectsPlayerCharacterSchema } from "~/characters/aspects.ts"
+import { CharacterEditor } from "~/characters/CharacterEditor.tsx"
+import { aspectsCharacterSheet } from "~/characters/aspects.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"
@@ -127,8 +127,8 @@ export function CharacterManager({
 							className={panel("h-full w-148 flex-1 overflow-y-auto p-3")}
 							unmountOnHide
 						>
-							<CharacterSheet
-								schema={aspectsPlayerCharacterSchema}
+							<CharacterEditor
+								schema={aspectsCharacterSheet}
 								character={{ name: character.name, values: character.data }}
 								onChangeName={(name) => {
 									updateCharacter({
@@ -175,8 +175,8 @@ export function CharacterManager({
 							key={character._id}
 							className={panel("h-full w-148 flex-1 p-0")}
 						>
-							<CharacterSheet
-								schema={aspectsPlayerCharacterSchema}
+							<CharacterEditor
+								schema={aspectsCharacterSheet}
 								character={{ name: character.name, values: character.data }}
 								// chatInputRef={chatInputRef}
 								onChangeName={() => {}}

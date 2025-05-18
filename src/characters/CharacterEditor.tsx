@@ -8,21 +8,18 @@ import { Icon } from "~/components/ui/Icon.tsx"
 import { SelectField } from "~/components/ui/SelectField.tsx"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { safeParseNumber } from "~/lib/utils.ts"
-import type {
-	CharacterSheetBlockSchema,
-	CharacterSheetLayout,
-} from "./character.schema.ts"
+import type { CharacterSheet, CharacterSheetBlock } from "./character.schema.ts"
 
 type Character = { name: string; values: Record<string, unknown> }
 
-export function CharacterSheet({
+export function CharacterEditor({
 	character,
 	schema,
 	onChangeName,
 	onSaveValue,
 }: {
 	character: Character
-	schema: CharacterSheetLayout
+	schema: CharacterSheet
 	onChangeName: (name: string) => void
 	onSaveValue: (key: string, value: unknown) => void
 }) {
@@ -50,7 +47,7 @@ function CharacterSheetBlockElement({
 	values,
 	onSaveValue,
 }: {
-	block: CharacterSheetBlockSchema
+	block: CharacterSheetBlock
 	values: Record<string, unknown>
 	onSaveValue: (key: string, value: unknown) => void
 }) {

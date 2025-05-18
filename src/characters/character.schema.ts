@@ -1,77 +1,48 @@
 import type { Except, NonEmptyTuple } from "type-fest"
 
-export type CharacterSheetLayout = Readonly<{
+export type CharacterSheet = Readonly<{
 	id: string
 	systemName: string
 	name: string
-	blocks: readonly CharacterSheetBlockSchema[]
+	blocks: readonly CharacterSheetBlock[]
 }>
 
-export type CharacterSheetBlockSchema = Readonly<
-	| CharacterSheetContainerSchema
-	| CharacterSheetTabViewSchema
-	| CharacterSheetTextFieldSchema
-	| CharacterSheetNumberFieldSchema
-	| CharacterSheetSelectSchema
-	| CharacterSheetListSchema
+export type CharacterSheetBlock = Readonly<
+	| CharacterSheetContainer
+	| CharacterSheetTabNavigator
+	| CharacterSheetTextField
+	| CharacterSheetNumberField
+	| CharacterSheetSelectField
+	| CharacterSheetListField
 >
 
-export type CharacterSheetFieldSchema = Readonly<{
+export type CharacterSheetField = Readonly<{
 	id: string
 	displayName?: string
 	hint?: string
 	className?: string
 }>
 
-let nextId = 0
-const createId = () => String(nextId++)
-
-export type CharacterSheetContainerSchema = Readonly<{
+export type CharacterSheetContainer = Readonly<{
 	id: string
 	type: "row" | "column"
-	children: readonly CharacterSheetBlockSchema[]
+	children: readonly CharacterSheetBlock[]
 }>
 
-export function row(
-	...children: CharacterSheetBlockSchema[]
-): CharacterSheetBlockSchema {
-	return { id: createId(), type: "row", children }
-}
-
-export function column(
-	...children: CharacterSheetBlockSchema[]
-): CharacterSheetBlockSchema {
-	return { id: createId(), type: "column", children }
-}
-
-export type CharacterSheetTabViewSchema = Readonly<{
+export type CharacterSheetTabNavigator = Readonly<{
 	id: string
 	type: "tabs"
-	tabs: NonEmptyTuple<CharacterSheetTabSchema>
+	tabs: NonEmptyTuple<CharacterSheetTab>
 }>
 
-export function tabs(
-	...tabs: NonEmptyTuple<CharacterSheetTabSchema>
-): CharacterSheetBlockSchema {
-	return { id: createId(), type: "tabs", tabs }
-}
-
-export type CharacterSheetTabSchema = Readonly<{
+export type CharacterSheetTab = Readonly<{
 	id: string
-	children: readonly CharacterSheetBlockSchema[]
+	children: readonly CharacterSheetBlock[]
 	name?: string
 }>
 
-export function tab(
-	id: string,
-	children: CharacterSheetBlockSchema[],
-	options: Except<CharacterSheetTabSchema, "id" | "children"> = {},
-): { id: string; name?: string; children: CharacterSheetBlockSchema[] } {
-	return { id, name: options.name, children }
-}
-
-export type CharacterSheetTextFieldSchema = Readonly<
-	CharacterSheetFieldSchema & {
+export type CharacterSheetTextField = Readonly<
+	CharacterSheetField & {
 		type: "text"
 		multiline?: boolean
 		/** @default 50_000 */
@@ -80,14 +51,7 @@ export type CharacterSheetTextFieldSchema = Readonly<
 	}
 >
 
-export function text(
-	id: string,
-	options: Except<CharacterSheetTextFieldSchema, "id" | "type"> = {},
-): CharacterSheetBlockSchema {
-	return { ...options, id, type: "text" }
-}
-
-export type CharacterSheetNumberFieldSchema = {
+export type CharacterSheetNumberField = {
 	type: "number"
 	id: string
 	displayName?: string
@@ -102,15 +66,8 @@ export type CharacterSheetNumberFieldSchema = {
 	labelPlacement?: "default" | "left"
 }
 
-export function number(
-	id: string,
-	options: Except<CharacterSheetNumberFieldSchema, "id" | "type"> = {},
-): CharacterSheetBlockSchema {
-	return { ...options, id, type: "number" }
-}
-
-export type CharacterSheetSelectSchema = Readonly<
-	CharacterSheetFieldSchema & {
+export type CharacterSheetSelectField = Readonly<
+	CharacterSheetField & {
 		type: "select"
 		choices: readonly CharacterSchemaSelectChoiceSchema[]
 		optional?: boolean
@@ -127,12 +84,59 @@ export type CharacterSchemaSelectChoiceSchema = Readonly<{
 	description?: string
 }>
 
+export type CharacterSheetListField = Readonly<
+	CharacterSheetField & {
+		type: "list"
+		itemFields: readonly CharacterSheetBlock[]
+	}
+>
+
+let nextId = 0
+const createId = () => String(nextId++)
+
+export function row(...children: CharacterSheetBlock[]): CharacterSheetBlock {
+	return { id: createId(), type: "row", children }
+}
+
+export function column(
+	...children: CharacterSheetBlock[]
+): CharacterSheetBlock {
+	return { id: createId(), type: "column", children }
+}
+
+export function tabs(
+	...tabs: NonEmptyTuple<CharacterSheetTab>
+): CharacterSheetBlock {
+	return { id: createId(), type: "tabs", tabs }
+}
+
+export function tab(
+	id: string,
+	children: CharacterSheetBlock[],
+	options: Except<CharacterSheetTab, "id" | "children"> = {},
+): { id: string; name?: string; children: CharacterSheetBlock[] } {
+	return { id, name: options.name, children }
+}
+
+export function text(
+	id: string,
+	options: Except<CharacterSheetTextField, "id" | "type"> = {},
+): CharacterSheetBlock {
+	return { ...options, id, type: "text" }
+}
+
+export function number(
+	id: string,
+	options: Except<CharacterSheetNumberField, "id" | "type"> = {},
+): CharacterSheetBlock {
+	return { ...options, id, type: "number" }
+}
+
 export function select(
 	id: string,
-	choices: CharacterSchemaSelectChoiceSchema[],
-	options: Except<CharacterSheetSelectSchema, "id" | "type" | "choices"> = {},
-): CharacterSheetBlockSchema {
-	return { ...options, id, type: "select", choices }
+	options: Except<CharacterSheetSelectField, "id" | "type">,
+): CharacterSheetBlock {
+	return { ...options, id, type: "select" }
 }
 
 select.choice = function (
@@ -147,9 +151,13 @@ select.choice = function (
 	}
 }
 
-export type CharacterSheetListSchema = Readonly<
-	CharacterSheetFieldSchema & {
-		type: "list"
-		itemFields: readonly CharacterSheetBlockSchema[]
-	}
->
+export function list(
+	id: string,
+	optionsInput:
+		| CharacterSheetBlock[]
+		| Except<CharacterSheetListField, "id" | "type">,
+): CharacterSheetListField {
+	const options =
+		Array.isArray(optionsInput) ? { itemFields: optionsInput } : optionsInput
+	return { ...options, id, type: "list" }
+}

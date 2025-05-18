@@ -1,6 +1,7 @@
 import {
-	type CharacterSheetLayout,
+	type CharacterSheet,
 	column,
+	list,
 	number,
 	row,
 	select,
@@ -9,16 +10,16 @@ import {
 	text,
 } from "./character.schema.ts"
 
-export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
+export const aspectsCharacterSheet: CharacterSheet = {
 	id: "aspectsPlayerCharacter",
 	systemName: "Aspects of Nature",
 	name: "Player Character",
 	blocks: [
 		row(number("damageLimit"), number("fatigueLimit"), number("skillPoints")),
 
-		select(
-			"budget",
-			[
+		select("budget", {
+			hint: "What's the most expensive thing you can afford? You can freely buy things two tiers down.",
+			choices: [
 				select.choice("dirt", {
 					displayName: "1. Dirt",
 					hint: "Water and other freely-available resources",
@@ -48,10 +49,7 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 					hint: "An extremely rare, precious, powerful artifact",
 				}),
 			],
-			{
-				hint: "What's the most expensive thing you can afford? You can freely buy things two tiers down.",
-			},
-		),
+		}),
 
 		text("conditions", { multiline: true }),
 
@@ -86,34 +84,29 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 				),
 			]),
 			tab("items", [
-				{
-					id: "items",
-					type: "list",
-					itemFields: [
+				list("items", [
+					row(
+						text("name", { defaultValue: "New Item" }),
 						row(
-							text("name", { defaultValue: "New Item" }),
-							row(
-								select(
-									"type",
-									[
-										select.choice("consumable", {
-											hint: "Goes away when there are no more uses",
-										}),
-										select.choice("tool", {
-											hint: "Can be used and reused while held",
-										}),
-										select.choice("wearable", {
-											hint: "Can be worn for a persistent effect",
-										}),
-									],
-									{ defaultValue: "tool" },
-								),
-								row(number("size", { min: 1 }), number("uses", {})),
-							),
+							select("type", {
+								defaultValue: "tool",
+								choices: [
+									select.choice("consumable", {
+										hint: "Goes away when there are no more uses",
+									}),
+									select.choice("tool", {
+										hint: "Can be used and reused while held",
+									}),
+									select.choice("wearable", {
+										hint: "Can be worn for a persistent effect",
+									}),
+								],
+							}),
+							row(number("size", { min: 1 }), number("uses", {})),
 						),
-						text("description", { multiline: true }),
-					],
-				},
+					),
+					text("description", { multiline: true }),
+				]),
 			]),
 			tab("bonds", [
 				{
@@ -124,33 +117,35 @@ export const aspectsPlayerCharacterSchema: CharacterSheetLayout = {
 							text("name", { defaultValue: "New Bond" }),
 							row(number("strength", { min: 1 })),
 						),
-						select("aura", [
-							{
-								id: "Fire",
-								description: `indicates an adversarial, heated, conflict-heavy relationship.`,
-								hint: `indicates an adversarial, heated, conflict-heavy relationship.`,
-							},
-							{
-								id: "Water",
-								description: `comes from notions of comfort, peace, and protection.`,
-								hint: `comes from notions of comfort, peace, and protection.`,
-							},
-							{
-								id: "Wind",
-								description: `exhibits in turbulent relationships full of excitement and change.`,
-								hint: `exhibits in turbulent relationships full of excitement and change.`,
-							},
-							{
-								id: "Light",
-								description: `represents diplomatic relationships built on fairness and respect.`,
-								hint: `represents diplomatic relationships built on fairness and respect.`,
-							},
-							{
-								id: "Darkness",
-								description: `manifests from tension, mistrust, and uncertainty.`,
-								hint: `manifests from tension, mistrust, and uncertainty.`,
-							},
-						]),
+						select("aura", {
+							choices: [
+								{
+									id: "Fire",
+									description: `indicates an adversarial, heated, conflict-heavy relationship.`,
+									hint: `indicates an adversarial, heated, conflict-heavy relationship.`,
+								},
+								{
+									id: "Water",
+									description: `comes from notions of comfort, peace, and protection.`,
+									hint: `comes from notions of comfort, peace, and protection.`,
+								},
+								{
+									id: "Wind",
+									description: `exhibits in turbulent relationships full of excitement and change.`,
+									hint: `exhibits in turbulent relationships full of excitement and change.`,
+								},
+								{
+									id: "Light",
+									description: `represents diplomatic relationships built on fairness and respect.`,
+									hint: `represents diplomatic relationships built on fairness and respect.`,
+								},
+								{
+									id: "Darkness",
+									description: `manifests from tension, mistrust, and uncertainty.`,
+									hint: `manifests from tension, mistrust, and uncertainty.`,
+								},
+							],
+						}),
 						text("description", { multiline: true }),
 					],
 				},
