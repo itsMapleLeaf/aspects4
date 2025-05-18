@@ -3,7 +3,7 @@ import type { JsonValue } from "type-fest"
 
 export function useLocalStorageState<T>(
 	key: string,
-	defaultValue: T,
+	defaultValue: T, // TODO: remove this argument, as this can be accomplished with `load()`
 	load: (input: JsonValue) => T,
 ) {
 	// not SSR-safe but we don't care about that rn
