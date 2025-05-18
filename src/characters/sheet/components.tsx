@@ -79,13 +79,18 @@ export function SheetSelectField({
 	ComponentProps<typeof SelectField>
 >) {
 	return (
-		<SelectField
-			{...props}
-			label={props.label ?? toTitleCase(field.id)}
-			value={field.value}
-			options={field.options}
-			placeholder={props.placeholder ?? `Select ${toTitleCase(field.id)}`}
-			onChangeValue={(value) => field.context.updateValue(field.id, value)}
-		/>
+		<div>
+			<SelectField
+				{...props}
+				label={props.label ?? toTitleCase(field.id)}
+				value={field.value}
+				options={field.options}
+				placeholder={props.placeholder ?? `Select ${toTitleCase(field.id)}`}
+				onChangeValue={(value) => field.context.updateValue(field.id, value)}
+			/>
+			<p className="mt-0.5 text-sm text-gray-300">
+				{field.options?.find((opt) => opt.value === field.value)?.description}
+			</p>
+		</div>
 	)
 }

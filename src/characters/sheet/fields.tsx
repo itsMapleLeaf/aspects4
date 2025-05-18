@@ -42,7 +42,12 @@ export function resolveSelectField(
 	options: {
 		id: string
 		defaultValue?: string
-		options: Array<{ value: string; label: string; description?: string }>
+		options: Array<{
+			value: string
+			label: string
+			hint?: string
+			description?: string
+		}>
 	},
 ) {
 	return {

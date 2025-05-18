@@ -263,14 +263,6 @@ export function CharacterEditor({
 												})}
 												className="flex-1"
 											/>
-											<SheetSelectField
-												resolved={resolveSelectField(itemContext, {
-													id: "type",
-													defaultValue: "tool",
-													options: itemTypeOptions,
-												})}
-												className="w-36"
-											/>
 											<SheetNumberField
 												resolved={resolveNumberField(itemContext, {
 													id: "size",
@@ -285,6 +277,15 @@ export function CharacterEditor({
 												className="w-16"
 											/>
 										</div>
+
+										<SheetSelectField
+											resolved={resolveSelectField(itemContext, {
+												id: "type",
+												defaultValue: "tool",
+												options: itemTypeOptions,
+											})}
+										/>
+
 										<SheetTextField
 											resolved={resolveTextField(itemContext, {
 												id: "description",
