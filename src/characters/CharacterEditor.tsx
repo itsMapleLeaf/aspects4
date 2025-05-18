@@ -7,10 +7,8 @@ import { Field } from "~/components/ui/Field.tsx"
 import { Icon } from "~/components/ui/Icon.tsx"
 import { SelectField } from "~/components/ui/SelectField.tsx"
 import { useLocalStorageState } from "~/hooks/storage.ts"
-import { safeParseNumber } from "~/lib/utils.ts"
-import type { CharacterSheet, CharacterSheetBlock } from "./character.schema.ts"
-
-type Character = { name: string; values: Record<string, unknown> }
+import type { Character } from "./character.ts"
+import type { CharacterSheet, CharacterSheetBlock } from "./sheet.ts"
 
 export function CharacterEditor({
 	character,
@@ -30,7 +28,7 @@ export function CharacterEditor({
 				value={character.name}
 				onChange={onChangeName}
 			/>
-			{schema.blocks.map((block) => (
+			{schema.render(character).map((block) => (
 				<CharacterSheetBlockElement
 					key={block.id}
 					block={block}
@@ -85,8 +83,8 @@ function CharacterSheetBlockElement({
 		return (
 			<EditableTextField
 				label={block.displayName || toTitleCase(block.id)}
+				description={block.hint}
 				multiline={block.multiline}
-				placeholder={block.hint}
 				value={String(values[block.id] ?? block.defaultValue ?? "")}
 				onChange={(value) => onSaveValue(block.id, value)}
 			/>
@@ -102,7 +100,7 @@ function CharacterSheetBlockElement({
 						className="w-16"
 						min={block.min}
 						max={block.max}
-						value={safeParseNumber(values[block.id]) ?? block.defaultValue ?? 0}
+						value={block.get(values)}
 						onChange={(value) => onSaveValue(block.id, value)}
 					/>
 				</div>
@@ -110,7 +108,7 @@ function CharacterSheetBlockElement({
 					<EditableNumber
 						min={block.min}
 						max={block.max}
-						value={safeParseNumber(values[block.id]) ?? block.defaultValue ?? 0}
+						value={block.get(values)}
 						onChange={(value) => onSaveValue(block.id, value)}
 					/>
 				</Field>
