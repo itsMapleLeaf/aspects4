@@ -40,7 +40,7 @@ export function SheetListFieldMinimal({
 					})
 
 					return (
-						<div className="flex items-end gap-2">
+						<div className="flex items-end gap-2" key={index}>
 							<div className="min-w-0 flex-1">
 								{children(itemContext, index)}
 							</div>

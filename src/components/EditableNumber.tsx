@@ -29,12 +29,12 @@ export function EditableNumber({
 		element?.addEventListener(
 			"wheel",
 			(event) => {
+				event.preventDefault()
+
 				if (event.deltaY < 0) tweak(1)
 				if (event.deltaY > 0) tweak(-1)
 
 				function tweak(delta: number) {
-					event.preventDefault()
-
 					const currentValue = parseNumberSafe(editingValue) ?? value
 					const newValue = clamp(currentValue + delta, min, max)
 
@@ -49,7 +49,7 @@ export function EditableNumber({
 	}
 
 	return (
-		<div ref={wheelHandlerRef} className="contents">
+		<>
 			{editingValue != null ?
 				<Input
 					id={id}
@@ -58,6 +58,7 @@ export function EditableNumber({
 					inputMode="numeric"
 					value={editingValue}
 					autoFocus
+					ref={wheelHandlerRef}
 					onFocus={(event) => {
 						event.currentTarget.select()
 					}}
@@ -102,11 +103,12 @@ export function EditableNumber({
 					onFocus={() => setEditingValue(String(value))}
 					align="center"
 					className={className}
+					ref={wheelHandlerRef}
 				>
 					{value}
 				</Button>
 			}
-		</div>
+		</>
 	)
 }
 

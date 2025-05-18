@@ -148,11 +148,14 @@ export function CharacterEditor({
 					value={character.name}
 					onChange={onNameChanged}
 				/>
-
-				<SheetNumberField
-					resolved={resolveNumberField(sheet, { id: "skillPoints" })}
-				/>
-
+				<div className="grid grid-cols-2 gap-2">
+					<SheetNumberField
+						resolved={resolveNumberField(sheet, { id: "skillPoints" })}
+					/>
+					<SheetNumberField
+						resolved={resolveNumberField(sheet, { id: "aspectExperience" })}
+					/>
+				</div>
 				<SheetSelectField
 					resolved={resolveSelectField(sheet, {
 						id: "budget",
@@ -191,7 +194,6 @@ export function CharacterEditor({
 												<SheetNumberField
 													resolved={resolveNumberField(itemContext, {
 														id: "intensity",
-														min: 1,
 													})}
 													className="w-20"
 													label={
@@ -235,12 +237,6 @@ export function CharacterEditor({
 							name: "Skills",
 							content: (
 								<div className="grid gap-3">
-									<SheetNumberField
-										resolved={resolveNumberField(sheet, {
-											id: "aspectExperience",
-										})}
-										label="Aspect EXP"
-									/>
 									<div className="grid grid-cols-2 gap-4">
 										<SheetTextField
 											resolved={resolveTextField(sheet, { id: "coreSkills" })}
