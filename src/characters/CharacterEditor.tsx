@@ -97,7 +97,7 @@ function CharacterSheetBlockElement({
 		const label = block.displayName || toTitleCase(block.id)
 		return block.labelPlacement === "left" ?
 				<div className="flex items-center">
-					<div className="flex-1 font-semibold">{label}</div>
+					<div className="flex-1 px-3 font-semibold">{label}</div>
 					<EditableNumber
 						className="w-16"
 						min={block.min}
