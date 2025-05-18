@@ -1,14 +1,14 @@
 import * as Ariakit from "@ariakit/react"
 import { Fragment } from "react/jsx-runtime"
-import { EditableNumber } from "~/components/EditableNumber.tsx"
 import { EditableTextField } from "~/components/EditableTextField.tsx"
 import { Button } from "~/components/ui/Button.tsx"
 import { Field } from "~/components/ui/Field.tsx"
 import { Icon } from "~/components/ui/Icon.tsx"
 import { SelectField } from "~/components/ui/SelectField.tsx"
 import { useLocalStorageState } from "~/hooks/storage.ts"
+import { toTitleCase } from "~/lib/utils.ts"
 import type { Character } from "./character.ts"
-import type { CharacterSheet, CharacterSheetBlock } from "./sheet.ts"
+import type { CharacterSheet, CharacterSheetBlock } from "./sheet.tsx"
 
 export function CharacterEditor({
 	character,
@@ -92,26 +92,7 @@ function CharacterSheetBlockElement({
 	}
 
 	if (block.type === "number") {
-		const label = block.displayName || toTitleCase(block.id)
-		return block.labelPlacement === "left" ?
-				<div className="flex items-center">
-					<div className="flex-1 px-3 font-semibold">{label}</div>
-					<EditableNumber
-						className="w-16"
-						min={block.min}
-						max={block.max}
-						value={block.value}
-						onChange={(value) => onSaveValue(block.id, value)}
-					/>
-				</div>
-			:	<Field label={block.displayName || toTitleCase(block.id)}>
-					<EditableNumber
-						min={block.min}
-						max={block.max}
-						value={block.value}
-						onChange={(value) => onSaveValue(block.id, value)}
-					/>
-				</Field>
+		return block.render({ onSaveValue })
 	}
 
 	if (block.type === "select") {
@@ -279,12 +260,4 @@ function CharacterSheetTabProvider({
 			{children}
 		</Ariakit.TabProvider>
 	)
-}
-
-function toTitleCase(fieldId: string) {
-	return [...fieldId.matchAll(/[A-Z]?[a-z]+/g)]
-		.map(
-			([word]) => word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase(),
-		)
-		.join(" ")
 }

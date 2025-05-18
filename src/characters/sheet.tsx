@@ -1,6 +1,8 @@
 import { clamp } from "es-toolkit"
 import type { Except, NonEmptyTuple } from "type-fest"
-import { parseNumberSafe } from "~/lib/utils.ts"
+import { EditableNumber } from "~/components/EditableNumber.tsx"
+import { Field } from "~/components/ui/Field.tsx"
+import { parseNumberSafe, toTitleCase } from "~/lib/utils.ts"
 import { type Character } from "./character.ts"
 
 export type CharacterSheet = Readonly<{
@@ -141,6 +143,28 @@ export function numberField(
 		get value(): number {
 			const value = parseNumberSafe(character.values[id])
 			return clamp(value ?? this.defaultValue ?? 0, this.min, this.max)
+		},
+		render: (props: { onSaveValue: (name: string, value: number) => void }) => {
+			const label = field.displayName || toTitleCase(field.id)
+			return field.labelPlacement === "left" ?
+					<div className="flex items-center">
+						<div className="flex-1 px-3 font-semibold">{label}</div>
+						<EditableNumber
+							className="w-16"
+							min={field.min}
+							max={field.max}
+							value={field.value}
+							onChange={(value) => props.onSaveValue(field.id, value)}
+						/>
+					</div>
+				:	<Field label={field.displayName || toTitleCase(field.id)}>
+						<EditableNumber
+							min={field.min}
+							max={field.max}
+							value={field.value}
+							onChange={(value) => props.onSaveValue(field.id, value)}
+						/>
+					</Field>
 		},
 	}
 	return field

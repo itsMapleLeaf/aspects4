@@ -8,7 +8,7 @@ import {
 	tab,
 	tabs,
 	text,
-} from "./sheet.ts"
+} from "./sheet.tsx"
 
 export const aspectsCharacterSheet: CharacterSheet = {
 	id: "aspectsPlayerCharacter",

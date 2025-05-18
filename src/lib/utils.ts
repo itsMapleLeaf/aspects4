@@ -42,3 +42,11 @@ export function parseNumberSafe(input: unknown) {
 	const value = Number(input)
 	return Number.isNaN(value) ? undefined : value
 }
+
+export function toTitleCase(fieldId: string) {
+	return [...fieldId.matchAll(/[A-Z]?[a-z]+/g)]
+		.map(
+			([word]) => word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase(),
+		)
+		.join(" ")
+}
