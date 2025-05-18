@@ -47,6 +47,10 @@ export function SelectField({
 				unmountOnHide
 				fixed
 				gutter={8}
+				portal
+				backdrop={
+					<div className="fixed inset-0 bg-black/25 opacity-0 transition data-enter:opacity-100" />
+				}
 			>
 				{options.map((option) => (
 					<Ariakit.SelectItem

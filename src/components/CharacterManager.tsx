@@ -3,7 +3,6 @@ import { useMutation, useQuery } from "convex/react"
 import { RefObject, type ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
 import { CharacterEditor } from "~/characters/CharacterEditor.tsx"
-import { aspectsCharacterSheet } from "~/characters/aspects.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"
@@ -128,15 +127,14 @@ export function CharacterManager({
 							unmountOnHide
 						>
 							<CharacterEditor
-								schema={aspectsCharacterSheet}
 								character={{ name: character.name, values: character.data }}
-								onChangeName={(name) => {
+								onNameChanged={(name) => {
 									updateCharacter({
 										characterId: character._id,
 										data: { name },
 									})
 								}}
-								onSaveValue={(key, value) => {
+								onValueChanged={(key, value) => {
 									updateCharacter({
 										characterId: character._id,
 										data: { data: { ...character.data, [key]: value } },
@@ -176,11 +174,10 @@ export function CharacterManager({
 							className={panel("h-full w-148 flex-1 p-0")}
 						>
 							<CharacterEditor
-								schema={aspectsCharacterSheet}
 								character={{ name: character.name, values: character.data }}
 								// chatInputRef={chatInputRef}
-								onChangeName={() => {}}
-								onSaveValue={() => {}}
+								onNameChanged={() => {}}
+								onValueChanged={() => {}}
 							/>
 						</Ariakit.TabPanel>
 					))}

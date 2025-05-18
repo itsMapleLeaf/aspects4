@@ -1,6 +1,5 @@
 # required
 
-- computed values
 - prefill chat on click
 - cooler dice rolls
 - simple list format (single-row items, triple-dot on right of each item for delete/duplicate)

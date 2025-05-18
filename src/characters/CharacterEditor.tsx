@@ -1,263 +1,383 @@
 import * as Ariakit from "@ariakit/react"
-import { Fragment } from "react/jsx-runtime"
-import { EditableTextField } from "~/components/EditableTextField.tsx"
-import { Button } from "~/components/ui/Button.tsx"
-import { Field } from "~/components/ui/Field.tsx"
-import { Icon } from "~/components/ui/Icon.tsx"
-import { SelectField } from "~/components/ui/SelectField.tsx"
+import { useId, type ReactNode } from "react"
+import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
+import { EditableTextField } from "../components/EditableTextField.tsx"
 import type { Character } from "./character.ts"
-import type { CharacterSheet, CharacterSheetBlock } from "./sheet.tsx"
+import {
+	SheetNumberField,
+	SheetSelectField,
+	SheetStatField,
+	SheetTextField,
+} from "./sheet/components.tsx"
+import {
+	createFieldContext,
+	resolveNumberField,
+	resolveSelectField,
+	resolveTextField,
+} from "./sheet/fields.tsx"
+import { SheetListField } from "./sheet/SheetListField.tsx"
+import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
 
 export function CharacterEditor({
 	character,
-	schema,
-	onChangeName,
-	onSaveValue,
+	onNameChanged,
+	onValueChanged,
 }: {
 	character: Character
-	schema: CharacterSheet
-	onChangeName: (name: string) => void
-	onSaveValue: (key: string, value: unknown) => void
+	onNameChanged: (name: string) => void
+	onValueChanged: (key: string, value: unknown) => void
 }) {
+	const sheet = createFieldContext(character.values, onValueChanged)
+
+	const attributeFields = {
+		strength: resolveNumberField(sheet, { id: "strength", min: 1 }),
+		sense: resolveNumberField(sheet, { id: "sense", min: 1 }),
+		dexterity: resolveNumberField(sheet, { id: "dexterity", min: 1 }),
+		intellect: resolveNumberField(sheet, { id: "intellect", min: 1 }),
+		presence: resolveNumberField(sheet, { id: "presence", min: 1 }),
+	}
+
+	const aspectFields = {
+		fire: resolveNumberField(sheet, { id: "fire" }),
+		water: resolveNumberField(sheet, { id: "water" }),
+		wind: resolveNumberField(sheet, { id: "wind" }),
+		light: resolveNumberField(sheet, { id: "light" }),
+		darkness: resolveNumberField(sheet, { id: "darkness" }),
+	}
+
+	const damageLimit =
+		attributeFields.strength.value + attributeFields.dexterity.value
+
+	const fatigueLimit =
+		attributeFields.sense.value +
+		attributeFields.intellect.value +
+		attributeFields.presence.value
+
+	const budgetOptions = [
+		{
+			value: "dirt",
+			label: "1. Dirt",
+			description: "Water and other freely-available resources",
+		},
+		{
+			value: "cheap",
+			label: "2. Cheap",
+			description: "Common meals, simple clothing",
+		},
+		{
+			value: "inexpensive",
+			label: "3. Inexpensive",
+			description:
+				"Five-star meals, basic tools and weapons, reasonable lodging",
+		},
+		{
+			value: "steep",
+			label: "4. Steep",
+			description:
+				"Premium tools and weapons, extravagant clothing, comfortable lodging",
+		},
+		{
+			value: "expensive",
+			label: "5. Expensive",
+			description: "A house, luxurious lodging",
+		},
+		{ value: "valuable", label: "6. Valuable", description: "A mansion" },
+		{
+			value: "priceless",
+			label: "7. Priceless",
+			description: "An extremely rare, precious, powerful artifact",
+		},
+	]
+
+	const itemTypeOptions = [
+		{
+			value: "consumable",
+			label: "Consumable",
+			description: "Goes away when there are no more uses",
+		},
+		{
+			value: "tool",
+			label: "Tool",
+			description: "Can be used and reused while held",
+		},
+		{
+			value: "wearable",
+			label: "Wearable",
+			description: "Can be worn for a persistent effect",
+		},
+	]
+
+	const auraOptions = [
+		{
+			value: "Fire",
+			label: "Fire",
+			description:
+				"Indicates an adversarial, heated, conflict-heavy relationship.",
+		},
+		{
+			value: "Water",
+			label: "Water",
+			description: "Comes from notions of comfort, peace, and protection.",
+		},
+		{
+			value: "Wind",
+			label: "Wind",
+			description:
+				"Exhibits in turbulent relationships full of excitement and change.",
+		},
+		{
+			value: "Light",
+			label: "Light",
+			description:
+				"Represents diplomatic relationships built on fairness and respect.",
+		},
+		{
+			value: "Darkness",
+			label: "Darkness",
+			description: "Manifests from tension, mistrust, and uncertainty.",
+		},
+	]
+
 	return (
 		<div className="grid gap-3">
 			<EditableTextField
 				label="Name"
 				value={character.name}
-				onChange={onChangeName}
+				onChange={onNameChanged}
 			/>
-			{schema.render(character).map((block) => (
-				<CharacterSheetBlockElement
-					key={block.id}
-					block={block}
-					values={character.values}
-					onSaveValue={onSaveValue}
-				/>
-			))}
+
+			<SheetNumberField
+				resolved={resolveNumberField(sheet, { id: "skillPoints" })}
+			/>
+
+			<SheetSelectField
+				resolved={resolveSelectField(sheet, {
+					id: "budget",
+					options: budgetOptions,
+					defaultValue: "dirt",
+				})}
+				description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
+			/>
+
+			<CharacterEditorTabs>
+				{[
+					{
+						name: "Character",
+						content: (
+							<div className="grid gap-3">
+								<SheetListFieldMinimal
+									context={sheet}
+									id="conditions"
+									description={`Damage limit: ${damageLimit}\nFatigue limit: ${fatigueLimit}`}
+								>
+									{(itemContext, index) => (
+										<div className="flex gap-2" key={index}>
+											<SheetTextField
+												resolved={resolveTextField(itemContext, { id: "name" })}
+												className="flex-1"
+												label={
+													index > 0 ?
+														<span className="sr-only">Condition</span>
+													:	"Condition"
+												}
+											/>
+											<SheetNumberField
+												resolved={resolveNumberField(itemContext, {
+													id: "intensity",
+													min: 1,
+												})}
+												className="w-20"
+												label={
+													index > 0 ?
+														<span className="sr-only">Intensity</span>
+													:	undefined
+												}
+											/>
+										</div>
+									)}
+								</SheetListFieldMinimal>
+								<SheetTextField
+									resolved={resolveTextField(sheet, { id: "lineage" })}
+									multiline
+								/>
+								<SheetTextField
+									resolved={resolveTextField(sheet, { id: "details" })}
+									multiline
+								/>
+							</div>
+						),
+					},
+					{
+						name: "Stats",
+						content: (
+							<div className="grid grid-cols-2 gap-x-4">
+								<div className="grid gap-3">
+									{Object.values(attributeFields).map((field) => (
+										<SheetStatField key={field.id} resolved={field} />
+									))}
+								</div>
+								<div className="grid gap-3">
+									{Object.values(aspectFields).map((field) => (
+										<SheetStatField key={field.id} resolved={field} />
+									))}
+								</div>
+							</div>
+						),
+					},
+					{
+						name: "Skills",
+						content: (
+							<div className="grid gap-3">
+								<SheetNumberField
+									resolved={resolveNumberField(sheet, {
+										id: "aspectExperience",
+									})}
+									label="Aspect EXP"
+								/>
+								<div className="grid grid-cols-2 gap-4">
+									<SheetTextField
+										resolved={resolveTextField(sheet, { id: "coreSkills" })}
+										multiline
+									/>
+									<SheetTextField
+										resolved={resolveTextField(sheet, { id: "aspectSkills" })}
+										multiline
+									/>
+								</div>
+							</div>
+						),
+					},
+					{
+						name: "Items",
+						content: (
+							<SheetListField context={sheet} id="items">
+								{(itemContext) => (
+									<div className="grid gap-2">
+										<div className="flex gap-2">
+											<SheetTextField
+												resolved={resolveTextField(itemContext, {
+													id: "name",
+													defaultValue: "New Item",
+												})}
+												className="flex-1"
+											/>
+											<SheetSelectField
+												resolved={resolveSelectField(itemContext, {
+													id: "type",
+													defaultValue: "tool",
+													options: itemTypeOptions,
+												})}
+												className="w-36"
+											/>
+											<SheetNumberField
+												resolved={resolveNumberField(itemContext, {
+													id: "size",
+													min: 1,
+												})}
+												className="w-16"
+											/>
+											<SheetNumberField
+												resolved={resolveNumberField(itemContext, {
+													id: "uses",
+												})}
+												className="w-16"
+											/>
+										</div>
+										<SheetTextField
+											resolved={resolveTextField(itemContext, {
+												id: "description",
+											})}
+											multiline
+										/>
+									</div>
+								)}
+							</SheetListField>
+						),
+					},
+					{
+						name: "Bonds",
+						content: (
+							<SheetListField context={sheet} id="bonds">
+								{(bondContext) => (
+									<div className="grid gap-2">
+										<div className="flex gap-2">
+											<SheetTextField
+												resolved={resolveTextField(bondContext, {
+													id: "name",
+													defaultValue: "New Bond",
+												})}
+												className="flex-1"
+											/>
+											<SheetNumberField
+												resolved={resolveNumberField(bondContext, {
+													id: "strength",
+													min: 1,
+												})}
+												className="w-24"
+											/>
+										</div>
+										<SheetSelectField
+											resolved={resolveSelectField(bondContext, {
+												id: "aura",
+												options: auraOptions,
+											})}
+										/>
+										<SheetTextField
+											resolved={resolveTextField(bondContext, {
+												id: "description",
+											})}
+											multiline
+										/>
+									</div>
+								)}
+							</SheetListField>
+						),
+					},
+				]}
+			</CharacterEditorTabs>
 		</div>
 	)
 }
 
-function CharacterSheetBlockElement({
-	block,
-	values,
-	onSaveValue,
-}: {
-	block: CharacterSheetBlock
-	values: Record<string, unknown>
-	onSaveValue: (key: string, value: unknown) => void
-}) {
-	if (block.type === "row") {
-		return (
-			<div className="grid auto-cols-fr grid-flow-col gap-3">
-				{block.children.map((child) => (
-					<CharacterSheetBlockElement
-						key={child.id}
-						block={child}
-						values={values}
-						onSaveValue={onSaveValue}
-					/>
-				))}
-			</div>
-		)
-	}
-
-	if (block.type === "column") {
-		return (
-			<div className="grid gap-3">
-				{block.children.map((child) => (
-					<CharacterSheetBlockElement
-						key={child.id}
-						block={child}
-						values={values}
-						onSaveValue={onSaveValue}
-					/>
-				))}
-			</div>
-		)
-	}
-
-	if (block.type === "text") {
-		return (
-			<EditableTextField
-				label={block.displayName || toTitleCase(block.id)}
-				description={block.hint}
-				multiline={block.multiline}
-				value={String(values[block.id] ?? block.defaultValue ?? "")}
-				onChange={(value) => onSaveValue(block.id, value)}
-			/>
-		)
-	}
-
-	if (block.type === "number") {
-		return block.render({ onSaveValue })
-	}
-
-	if (block.type === "select") {
-		const value = String(values[block.id] ?? block.defaultValue ?? "")
-		return (
-			<div>
-				<SelectField
-					label={block.displayName || toTitleCase(block.id)}
-					description={block.hint}
-					placeholder="Choose one"
-					value={value}
-					onChangeValue={(value) => {
-						onSaveValue(block.id, value)
-					}}
-					options={block.choices.map((choice) => ({
-						value: choice.id,
-						label: choice.displayName || toTitleCase(choice.id),
-						description: choice.hint,
-					}))}
-				/>
-				<p className="mt-1 text-sm text-gray-300 empty:hidden">
-					{block.choices.find((choice) => choice.id === value)?.description}
-				</p>
-			</div>
-		)
-	}
-
-	if (block.type === "tabs") {
-		return (
-			<CharacterSheetTabProvider
-				blockId={block.id}
-				defaultTabId={block.tabs[0].id}
-			>
-				<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
-					{block.tabs.map((tab) => (
-						<Ariakit.Tab
-							key={tab.id}
-							id={tab.id}
-							className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
-						>
-							{tab.name || toTitleCase(tab.id)}
-						</Ariakit.Tab>
-					))}
-				</Ariakit.TabList>
-
-				{block.tabs.map((tab) => (
-					<Ariakit.TabPanel key={tab.id} id={tab.id}>
-						<div className="grid gap-3">
-							{tab.children.map((child) => (
-								<CharacterSheetBlockElement
-									key={child.id}
-									block={child}
-									values={values}
-									onSaveValue={onSaveValue}
-								/>
-							))}
-						</div>
-					</Ariakit.TabPanel>
-				))}
-			</CharacterSheetTabProvider>
-		)
-	}
-
-	if (block.type === "list") {
-		const unsafeItems = values[block.id]
-
-		const items =
-			!Array.isArray(unsafeItems) ?
-				[]
-			:	unsafeItems.flatMap((item) =>
-					typeof item === "object" && item != null ?
-						[item as Record<string, unknown>]
-					:	[],
-				)
-
-		return (
-			<Ariakit.HeadingLevel>
-				<Field
-					label={
-						<Ariakit.Heading className="mb-2.5 heading-2xl">
-							{block.displayName ?? toTitleCase(block.id)}
-						</Ariakit.Heading>
-					}
-				>
-					<div className="grid gap-3">
-						{items.map((item, index) => (
-							<Fragment key={index}>
-								<div className="grid gap-2">
-									{block.itemFields.map((field) => (
-										<CharacterSheetBlockElement
-											key={field.id}
-											block={field}
-											values={item}
-											onSaveValue={(key, value) => {
-												onSaveValue(
-													block.id,
-													items.with(index, { ...item, [key]: value }),
-												)
-											}}
-										/>
-									))}
-									<div className="flex gap-2">
-										<Button
-											icon={<Icon icon="mingcute:close-fill" />}
-											onClick={() => {
-												onSaveValue(block.id, items.toSpliced(index, 1))
-											}}
-										>
-											Remove
-										</Button>
-										<Button
-											icon={<Icon icon="mingcute:copy-2-fill" />}
-											onClick={() => {
-												onSaveValue(
-													block.id,
-													items.toSpliced(index + 1, 0, item),
-												)
-											}}
-										>
-											Duplicate
-										</Button>
-									</div>
-								</div>
-								<div className="my-1.5 border-b border-gray-800" />
-							</Fragment>
-						))}
-						<div>
-							<Button
-								icon={<Icon icon="mingcute:plus-fill" />}
-								onClick={() => {
-									onSaveValue(block.id, [...items, {}])
-								}}
-							>
-								Add New
-							</Button>
-						</div>
-					</div>
-				</Field>
-			</Ariakit.HeadingLevel>
-		)
-	}
-
-	return <p>(field type "{block.type}" not supported)</p>
-}
-
-function CharacterSheetTabProvider({
-	blockId,
-	defaultTabId,
+function CharacterEditorTabs({
 	children,
+	defaultTabName = children[0].name,
 }: {
-	blockId: string
-	defaultTabId: string | undefined | null
-	children: React.ReactNode
+	children: NonEmptyTuple<{ name: string; content: ReactNode }>
+	defaultTabName?: string
 }) {
+	const id = useId()
+
 	const [selectedId, setSelectedId] = useLocalStorageState(
-		`CharacterSheetTabProvider:selectedId:${blockId}`,
-		defaultTabId,
-		(input) => (typeof input === "string" ? input : defaultTabId),
+		`CharacterSheetTabProvider:${id}:selectedId`,
+		defaultTabName,
+		(input) => (typeof input === "string" ? input : defaultTabName),
 	)
+
 	return (
 		<Ariakit.TabProvider
-			selectedId={selectedId ?? defaultTabId}
-			setSelectedId={setSelectedId}
+			selectedId={selectedId}
+			setSelectedId={(id) => id != null && setSelectedId(id)}
 		>
-			{children}
+			<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
+				{children.map((tab) => (
+					<Ariakit.Tab
+						key={tab.name}
+						id={tab.name}
+						className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+					>
+						{tab.name || toTitleCase(tab.name)}
+					</Ariakit.Tab>
+				))}
+			</Ariakit.TabList>
+
+			{children.map((tab) => (
+				<Ariakit.TabPanel key={tab.name} id={tab.name} className="grid gap-3">
+					{tab.content}
+				</Ariakit.TabPanel>
+			))}
 		</Ariakit.TabProvider>
 	)
 }
