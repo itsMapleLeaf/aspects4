@@ -45,8 +45,13 @@ export function resolveSelectField(
 		options: Array<{
 			value: string
 			label: string
-			hint?: string
+			/** Displays beneath the select while this option is selected */
 			description?: string
+			/**
+			 * Displays beneath the select label on the popover; if not provided, uses
+			 * description instead
+			 */
+			hint?: string
 		}>
 	},
 ) {

@@ -84,7 +84,10 @@ export function SheetSelectField({
 				{...props}
 				label={props.label ?? toTitleCase(field.id)}
 				value={field.value}
-				options={field.options}
+				options={field.options.map((opt) => ({
+					...opt,
+					description: opt.hint ?? opt.description,
+				}))}
 				placeholder={props.placeholder ?? `Select ${toTitleCase(field.id)}`}
 				onChangeValue={(value) => field.context.updateValue(field.id, value)}
 			/>
