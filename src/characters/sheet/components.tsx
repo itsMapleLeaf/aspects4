@@ -91,7 +91,7 @@ export function SheetSelectField({
 				placeholder={props.placeholder ?? `Select ${toTitleCase(field.id)}`}
 				onChangeValue={(value) => field.context.updateValue(field.id, value)}
 			/>
-			<p className="mt-0.5 text-sm text-gray-300">
+			<p className="mt-0.5 mb-1 text-sm text-gray-300 empty:hidden">
 				{field.options?.find((opt) => opt.value === field.value)?.description}
 			</p>
 		</div>

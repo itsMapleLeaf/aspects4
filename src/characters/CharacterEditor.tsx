@@ -141,203 +141,209 @@ export function CharacterEditor({
 	]
 
 	return (
-		<div className="grid gap-3">
-			<EditableTextField
-				label="Name"
-				value={character.name}
-				onChange={onNameChanged}
-			/>
+		<div className="grid gap-8">
+			<div className="grid gap-3">
+				<EditableTextField
+					label="Name"
+					value={character.name}
+					onChange={onNameChanged}
+				/>
 
-			<SheetNumberField
-				resolved={resolveNumberField(sheet, { id: "skillPoints" })}
-			/>
+				<SheetNumberField
+					resolved={resolveNumberField(sheet, { id: "skillPoints" })}
+				/>
 
-			<SheetSelectField
-				resolved={resolveSelectField(sheet, {
-					id: "budget",
-					options: budgetOptions,
-					defaultValue: "dirt",
-				})}
-				description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
-			/>
+				<SheetSelectField
+					resolved={resolveSelectField(sheet, {
+						id: "budget",
+						options: budgetOptions,
+						defaultValue: "dirt",
+					})}
+					description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
+				/>
+			</div>
 
-			<CharacterEditorTabs>
-				{[
-					{
-						name: "Character",
-						content: (
-							<div className="grid gap-3">
-								<SheetListFieldMinimal
-									context={sheet}
-									id="conditions"
-									description={`Damage limit: ${damageLimit}\nFatigue limit: ${fatigueLimit}`}
-								>
-									{(itemContext, index) => (
-										<div className="flex gap-2" key={index}>
-											<SheetTextField
-												resolved={resolveTextField(itemContext, { id: "name" })}
-												className="flex-1"
-												label={
-													index > 0 ?
-														<span className="sr-only">Condition</span>
-													:	"Condition"
-												}
-											/>
-											<SheetNumberField
-												resolved={resolveNumberField(itemContext, {
-													id: "intensity",
-													min: 1,
+			<div className="grid gap-3">
+				<CharacterEditorTabs>
+					{[
+						{
+							name: "Character",
+							content: (
+								<div className="grid gap-3">
+									<SheetListFieldMinimal
+										context={sheet}
+										id="conditions"
+										description={`Damage limit: ${damageLimit}\nFatigue limit: ${fatigueLimit}`}
+									>
+										{(itemContext, index) => (
+											<div className="flex gap-2" key={index}>
+												<SheetTextField
+													resolved={resolveTextField(itemContext, {
+														id: "name",
+													})}
+													className="flex-1"
+													label={
+														index > 0 ?
+															<span className="sr-only">Condition</span>
+														:	"Condition"
+													}
+												/>
+												<SheetNumberField
+													resolved={resolveNumberField(itemContext, {
+														id: "intensity",
+														min: 1,
+													})}
+													className="w-20"
+													label={
+														index > 0 ?
+															<span className="sr-only">Intensity</span>
+														:	undefined
+													}
+												/>
+											</div>
+										)}
+									</SheetListFieldMinimal>
+									<SheetTextField
+										resolved={resolveTextField(sheet, { id: "lineage" })}
+										multiline
+									/>
+									<SheetTextField
+										resolved={resolveTextField(sheet, { id: "details" })}
+										multiline
+									/>
+								</div>
+							),
+						},
+						{
+							name: "Stats",
+							content: (
+								<div className="grid grid-cols-2 gap-x-4">
+									<div className="grid gap-3">
+										{Object.values(attributeFields).map((field) => (
+											<SheetStatField key={field.id} resolved={field} />
+										))}
+									</div>
+									<div className="grid gap-3">
+										{Object.values(aspectFields).map((field) => (
+											<SheetStatField key={field.id} resolved={field} />
+										))}
+									</div>
+								</div>
+							),
+						},
+						{
+							name: "Skills",
+							content: (
+								<div className="grid gap-3">
+									<SheetNumberField
+										resolved={resolveNumberField(sheet, {
+											id: "aspectExperience",
+										})}
+										label="Aspect EXP"
+									/>
+									<div className="grid grid-cols-2 gap-4">
+										<SheetTextField
+											resolved={resolveTextField(sheet, { id: "coreSkills" })}
+											multiline
+										/>
+										<SheetTextField
+											resolved={resolveTextField(sheet, { id: "aspectSkills" })}
+											multiline
+										/>
+									</div>
+								</div>
+							),
+						},
+						{
+							name: "Items",
+							content: (
+								<SheetListField context={sheet} id="items">
+									{(itemContext) => (
+										<div className="grid gap-2">
+											<div className="flex gap-2">
+												<SheetTextField
+													resolved={resolveTextField(itemContext, {
+														id: "name",
+														defaultValue: "New Item",
+													})}
+													className="flex-1"
+												/>
+												<SheetNumberField
+													resolved={resolveNumberField(itemContext, {
+														id: "size",
+														min: 1,
+													})}
+													className="w-16"
+												/>
+												<SheetNumberField
+													resolved={resolveNumberField(itemContext, {
+														id: "uses",
+													})}
+													className="w-16"
+												/>
+											</div>
+
+											<SheetSelectField
+												resolved={resolveSelectField(itemContext, {
+													id: "type",
+													defaultValue: "tool",
+													options: itemTypeOptions,
 												})}
-												className="w-20"
-												label={
-													index > 0 ?
-														<span className="sr-only">Intensity</span>
-													:	undefined
-												}
+											/>
+
+											<SheetTextField
+												resolved={resolveTextField(itemContext, {
+													id: "description",
+												})}
+												multiline
 											/>
 										</div>
 									)}
-								</SheetListFieldMinimal>
-								<SheetTextField
-									resolved={resolveTextField(sheet, { id: "lineage" })}
-									multiline
-								/>
-								<SheetTextField
-									resolved={resolveTextField(sheet, { id: "details" })}
-									multiline
-								/>
-							</div>
-						),
-					},
-					{
-						name: "Stats",
-						content: (
-							<div className="grid grid-cols-2 gap-x-4">
-								<div className="grid gap-3">
-									{Object.values(attributeFields).map((field) => (
-										<SheetStatField key={field.id} resolved={field} />
-									))}
-								</div>
-								<div className="grid gap-3">
-									{Object.values(aspectFields).map((field) => (
-										<SheetStatField key={field.id} resolved={field} />
-									))}
-								</div>
-							</div>
-						),
-					},
-					{
-						name: "Skills",
-						content: (
-							<div className="grid gap-3">
-								<SheetNumberField
-									resolved={resolveNumberField(sheet, {
-										id: "aspectExperience",
-									})}
-									label="Aspect EXP"
-								/>
-								<div className="grid grid-cols-2 gap-4">
-									<SheetTextField
-										resolved={resolveTextField(sheet, { id: "coreSkills" })}
-										multiline
-									/>
-									<SheetTextField
-										resolved={resolveTextField(sheet, { id: "aspectSkills" })}
-										multiline
-									/>
-								</div>
-							</div>
-						),
-					},
-					{
-						name: "Items",
-						content: (
-							<SheetListField context={sheet} id="items">
-								{(itemContext) => (
-									<div className="grid gap-2">
-										<div className="flex gap-2">
-											<SheetTextField
-												resolved={resolveTextField(itemContext, {
-													id: "name",
-													defaultValue: "New Item",
+								</SheetListField>
+							),
+						},
+						{
+							name: "Bonds",
+							content: (
+								<SheetListField context={sheet} id="bonds">
+									{(bondContext) => (
+										<div className="grid gap-2">
+											<div className="flex gap-2">
+												<SheetTextField
+													resolved={resolveTextField(bondContext, {
+														id: "name",
+														defaultValue: "New Bond",
+													})}
+													className="flex-1"
+												/>
+												<SheetNumberField
+													resolved={resolveNumberField(bondContext, {
+														id: "strength",
+														min: 1,
+													})}
+													className="w-24"
+												/>
+											</div>
+											<SheetSelectField
+												resolved={resolveSelectField(bondContext, {
+													id: "aura",
+													options: auraOptions,
 												})}
-												className="flex-1"
 											/>
-											<SheetNumberField
-												resolved={resolveNumberField(itemContext, {
-													id: "size",
-													min: 1,
-												})}
-												className="w-16"
-											/>
-											<SheetNumberField
-												resolved={resolveNumberField(itemContext, {
-													id: "uses",
-												})}
-												className="w-16"
-											/>
-										</div>
-
-										<SheetSelectField
-											resolved={resolveSelectField(itemContext, {
-												id: "type",
-												defaultValue: "tool",
-												options: itemTypeOptions,
-											})}
-										/>
-
-										<SheetTextField
-											resolved={resolveTextField(itemContext, {
-												id: "description",
-											})}
-											multiline
-										/>
-									</div>
-								)}
-							</SheetListField>
-						),
-					},
-					{
-						name: "Bonds",
-						content: (
-							<SheetListField context={sheet} id="bonds">
-								{(bondContext) => (
-									<div className="grid gap-2">
-										<div className="flex gap-2">
 											<SheetTextField
 												resolved={resolveTextField(bondContext, {
-													id: "name",
-													defaultValue: "New Bond",
+													id: "description",
 												})}
-												className="flex-1"
-											/>
-											<SheetNumberField
-												resolved={resolveNumberField(bondContext, {
-													id: "strength",
-													min: 1,
-												})}
-												className="w-24"
+												multiline
 											/>
 										</div>
-										<SheetSelectField
-											resolved={resolveSelectField(bondContext, {
-												id: "aura",
-												options: auraOptions,
-											})}
-										/>
-										<SheetTextField
-											resolved={resolveTextField(bondContext, {
-												id: "description",
-											})}
-											multiline
-										/>
-									</div>
-								)}
-							</SheetListField>
-						),
-					},
-				]}
-			</CharacterEditorTabs>
+									)}
+								</SheetListField>
+							),
+						},
+					]}
+				</CharacterEditorTabs>
+			</div>
 		</div>
 	)
 }
