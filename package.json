@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "netlify dev",
-		"dev-setup": "bunx convex dev --until-success && bunx run-p --print-label 'dev:*'",
+		"netlify:dev": "bunx convex dev --until-success && bunx run-p --print-label 'dev:*'",
 		"dev:vite": "vite",
 		"dev:convex": "convex dev --tail-logs",
 		"build": "vite build",
