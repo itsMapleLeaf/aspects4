@@ -18,7 +18,7 @@ import {
 	getAttributes,
 	type CharacterBond,
 } from "~/lib/character.ts"
-import { safeParseNumber } from "~/lib/utils.ts"
+import { parseNumberSafe } from "~/lib/utils.ts"
 import aspectSkillList from "../data/list-of-aspect-skills.json"
 import lineageList from "../data/list-of-lineages.json"
 import personaList from "../data/list-of-personas.json"
@@ -46,10 +46,7 @@ export function CharacterSheet({
 	chatInputRef: RefObject<ChatInputRef | null>
 	onChange: (patch: Partial<Character>) => void
 	className?: string
-	sharing?: {
-		isShared: boolean
-		onChange: (isShared: boolean) => void
-	}
+	sharing?: { isShared: boolean; onChange: (isShared: boolean) => void }
 }) {
 	const model = createCharacterModel(character)
 
@@ -73,7 +70,7 @@ export function CharacterSheet({
 	})
 
 	const bindNumber = (key: keyof Character["data"], fallback = 0) => ({
-		value: safeParseNumber(character.data[key]) ?? fallback,
+		value: parseNumberSafe(character.data[key]) ?? fallback,
 		onChange: (value: number) => handleDataChange({ [key]: value }),
 	})
 
@@ -91,7 +88,7 @@ export function CharacterSheet({
 		// Use the modified aspect score that includes persona/lineage bonuses
 		const aspectValue = model.getAspectScore(aspectName) ?? 0
 		const skillValue =
-			safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+			parseNumberSafe(character.data[`skill:${skillName}`]) ?? 0
 		const total = aspectValue + skillValue
 
 		if (total > 0) {
@@ -180,7 +177,7 @@ export function CharacterSheet({
 						<div className={"flex flex-col gap-2"}>
 							{getAttributes().map((item) => {
 								const baseValue =
-									safeParseNumber(
+									parseNumberSafe(
 										character.data[`attribute:${item.attribute}`],
 									) ?? 1
 
@@ -213,7 +210,7 @@ export function CharacterSheet({
 						<div className={"flex flex-col gap-2"}>
 							{getAspects().map((item) => {
 								const baseValue =
-									safeParseNumber(character.data[`aspect:${item.name}`]) ?? 0
+									parseNumberSafe(character.data[`aspect:${item.name}`]) ?? 0
 
 								const modifiedValue =
 									model.modifiedAspectScores.get(item.name) ?? baseValue
@@ -260,7 +257,7 @@ export function CharacterSheet({
 								const attributeValue =
 									model.modifiedAttributeScores.get(skill.attribute) ?? 0
 								const skillValue =
-									safeParseNumber(character.data[`skill:${skill.skill}`]) ?? 0
+									parseNumberSafe(character.data[`skill:${skill.skill}`]) ?? 0
 								const total = attributeValue + skillValue
 
 								// Create tooltip content
@@ -296,7 +293,7 @@ export function CharacterSheet({
 								const aspectValue =
 									model.modifiedAspectScores.get(skill.aspect) ?? 0
 								const skillValue =
-									safeParseNumber(character.data[`skill:${skill.modifier}`]) ??
+									parseNumberSafe(character.data[`skill:${skill.modifier}`]) ??
 									0
 								const total = aspectValue + skillValue
 
@@ -393,7 +390,7 @@ export function CharacterSheet({
 
 							<CharacterRestButton
 								onSubmit={(hourCount) => {
-									let fatigue = safeParseNumber(character.data.fatigue) ?? 0
+									let fatigue = parseNumberSafe(character.data.fatigue) ?? 0
 									if (hourCount >= 8) {
 										fatigue = 0
 									} else {

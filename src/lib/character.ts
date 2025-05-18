@@ -4,7 +4,7 @@ import aspectSkillList from "../data/list-of-aspect-skills.json"
 import aspectList from "../data/list-of-aspects.json"
 import attributeList from "../data/list-of-attributes.json"
 import skillList from "../data/list-of-skills.json"
-import { safeParseNumber } from "./utils.ts"
+import { parseNumberSafe } from "./utils.ts"
 
 type AttributeName = (typeof attributeNames)[number]
 const attributeNames = [
@@ -49,19 +49,19 @@ const aspectSkillAspects = new Map(
 
 export function createCharacterModel(character: Character) {
 	const attributeScores = {
-		Strength: safeParseNumber(character.data[`attribute:Strength`]) ?? 1,
-		Sense: safeParseNumber(character.data[`attribute:Sense`]) ?? 1,
-		Dexterity: safeParseNumber(character.data[`attribute:Dexterity`]) ?? 1,
-		Intellect: safeParseNumber(character.data[`attribute:Intellect`]) ?? 1,
-		Presence: safeParseNumber(character.data[`attribute:Presence`]) ?? 1,
+		Strength: parseNumberSafe(character.data[`attribute:Strength`]) ?? 1,
+		Sense: parseNumberSafe(character.data[`attribute:Sense`]) ?? 1,
+		Dexterity: parseNumberSafe(character.data[`attribute:Dexterity`]) ?? 1,
+		Intellect: parseNumberSafe(character.data[`attribute:Intellect`]) ?? 1,
+		Presence: parseNumberSafe(character.data[`attribute:Presence`]) ?? 1,
 	}
 
 	const aspectScores = {
-		Fire: safeParseNumber(character.data[`aspect:Fire`]) ?? 0,
-		Water: safeParseNumber(character.data[`aspect:Water`]) ?? 0,
-		Wind: safeParseNumber(character.data[`aspect:Wind`]) ?? 0,
-		Light: safeParseNumber(character.data[`aspect:Light`]) ?? 0,
-		Darkness: safeParseNumber(character.data[`aspect:Darkness`]) ?? 0,
+		Fire: parseNumberSafe(character.data[`aspect:Fire`]) ?? 0,
+		Water: parseNumberSafe(character.data[`aspect:Water`]) ?? 0,
+		Wind: parseNumberSafe(character.data[`aspect:Wind`]) ?? 0,
+		Light: parseNumberSafe(character.data[`aspect:Light`]) ?? 0,
+		Darkness: parseNumberSafe(character.data[`aspect:Darkness`]) ?? 0,
 	}
 
 	const modifiedAttributeScores = new Map<string, number>(
@@ -77,14 +77,14 @@ export function createCharacterModel(character: Character) {
 	const skillPointsAssigned = sum(
 		Object.entries(character.data)
 			.filter((entry) => entry[0].startsWith("skill"))
-			.map((entry) => safeParseNumber(entry[1]) ?? 0),
+			.map((entry) => parseNumberSafe(entry[1]) ?? 0),
 	)
 
 	const persona = character.data["persona"] || ""
 	const lineage = character.data["lineage"] || ""
 
-	let hitsBonus = safeParseNumber(character.data.hitsMax) ?? 0
-	let fatigueBonus = safeParseNumber(character.data.fatigueMax) ?? 0
+	let hitsBonus = parseNumberSafe(character.data.hitsMax) ?? 0
+	let fatigueBonus = parseNumberSafe(character.data.fatigueMax) ?? 0
 
 	switch (persona) {
 		case "Manipulator": {
@@ -189,7 +189,7 @@ export function createCharacterModel(character: Character) {
 		},
 
 		getSkillPoints(skillName: string) {
-			return safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+			return parseNumberSafe(character.data[`skill:${skillName}`]) ?? 0
 		},
 
 		getSkillScore(skillName: string) {
@@ -200,7 +200,7 @@ export function createCharacterModel(character: Character) {
 		},
 
 		getAspectSkillPoints(skillName: string) {
-			return safeParseNumber(character.data[`skill:${skillName}`]) ?? 0
+			return parseNumberSafe(character.data[`skill:${skillName}`]) ?? 0
 		},
 
 		getAspectSkillScore(skillName: string) {

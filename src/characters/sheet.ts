@@ -1,6 +1,6 @@
 import { clamp } from "es-toolkit"
 import type { Except, NonEmptyTuple } from "type-fest"
-import { safeParseNumber } from "~/lib/utils.ts"
+import { parseNumberSafe } from "~/lib/utils.ts"
 import { type Character, type CharacterValues } from "./character.ts"
 
 export type CharacterSheet = Readonly<{
@@ -138,7 +138,7 @@ export function numberField(
 		min: options.min ?? 0,
 		max: options.max ?? Number.POSITIVE_INFINITY,
 		get: (values: CharacterValues) => {
-			const value = safeParseNumber(values[id])
+			const value = parseNumberSafe(values[id])
 			return clamp(value ?? field.defaultValue ?? 0, field.min, field.max)
 		},
 	}

@@ -4,7 +4,7 @@ import { useState } from "react"
 import type { Except } from "type-fest"
 import { Button } from "~/components/ui/Button.tsx"
 import { Icon } from "~/components/ui/Icon.tsx"
-import { safeParseNumber } from "~/lib/utils.ts"
+import { parseNumberSafe } from "~/lib/utils.ts"
 import { panel } from "~/styles/panel.ts"
 import { InputField } from "./ui/InputField.tsx"
 
@@ -52,7 +52,7 @@ export function CharacterRestButton({
 						value={hourCount}
 						onChange={(event) =>
 							setHourCount(
-								Math.max(safeParseNumber(event.target.value) ?? 1, 1),
+								Math.max(parseNumberSafe(event.target.value) ?? 1, 1),
 							)
 						}
 					/>

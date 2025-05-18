@@ -38,8 +38,7 @@ export function compactJoin(
 	return values.filter(Boolean).join(separator)
 }
 
-// todo: rename to "parseNumberSafe" so it's easier to find
-export function safeParseNumber(input: unknown) {
+export function parseNumberSafe(input: unknown) {
 	const value = Number(input)
 	return Number.isNaN(value) ? undefined : value
 }

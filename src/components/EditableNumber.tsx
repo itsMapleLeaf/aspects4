@@ -2,7 +2,7 @@ import { clamp } from "es-toolkit"
 import { useState } from "react"
 import { Button } from "~/components/ui/Button.tsx"
 import { Input } from "~/components/ui/Input.tsx"
-import { safeParseNumber } from "~/lib/utils.ts"
+import { parseNumberSafe } from "~/lib/utils.ts"
 
 export function EditableNumber({
 	id,
@@ -33,7 +33,7 @@ export function EditableNumber({
 
 					const currentValue =
 						event.target instanceof HTMLInputElement ?
-							(safeParseNumber(event.target.value) ?? 0)
+							(parseNumberSafe(event.target.value) ?? 0)
 						:	value
 
 					const newValue = clamp(currentValue + delta, min, max)
