@@ -16,32 +16,46 @@ export const aspectsCharacterSheet: CharacterSheet = {
 	name: "Player Character",
 	render: (character) => {
 		const attributeScoreFields = {
-			strength: numberField("strength", { labelPlacement: "left", min: 1 }),
-			sense: numberField("sense", { labelPlacement: "left", min: 1 }),
-			dexterity: numberField("dexterity", { labelPlacement: "left", min: 1 }),
-			intellect: numberField("intellect", { labelPlacement: "left", min: 1 }),
-			presence: numberField("presence", { labelPlacement: "left", min: 1 }),
+			strength: numberField(character, "strength", {
+				labelPlacement: "left",
+				min: 1,
+			}),
+			sense: numberField(character, "sense", {
+				labelPlacement: "left",
+				min: 1,
+			}),
+			dexterity: numberField(character, "dexterity", {
+				labelPlacement: "left",
+				min: 1,
+			}),
+			intellect: numberField(character, "intellect", {
+				labelPlacement: "left",
+				min: 1,
+			}),
+			presence: numberField(character, "presence", {
+				labelPlacement: "left",
+				min: 1,
+			}),
 		}
 
 		const aspectScoreFields = {
-			fire: numberField("fire", { labelPlacement: "left" }),
-			water: numberField("water", { labelPlacement: "left" }),
-			wind: numberField("wind", { labelPlacement: "left" }),
-			light: numberField("light", { labelPlacement: "left" }),
-			darkness: numberField("darkness", { labelPlacement: "left" }),
+			fire: numberField(character, "fire", { labelPlacement: "left" }),
+			water: numberField(character, "water", { labelPlacement: "left" }),
+			wind: numberField(character, "wind", { labelPlacement: "left" }),
+			light: numberField(character, "light", { labelPlacement: "left" }),
+			darkness: numberField(character, "darkness", { labelPlacement: "left" }),
 		}
 
 		const damageLimit =
-			attributeScoreFields.strength.get(character.values) +
-			attributeScoreFields.dexterity.get(character.values)
+			attributeScoreFields.strength.value + attributeScoreFields.dexterity.value
 
 		const fatigueLimit =
-			attributeScoreFields.sense.get(character.values) +
-			attributeScoreFields.intellect.get(character.values) +
-			attributeScoreFields.presence.get(character.values)
+			attributeScoreFields.sense.value +
+			attributeScoreFields.intellect.value +
+			attributeScoreFields.presence.value
 
 		return [
-			row("skillPointsContainer", numberField("skillPoints")),
+			row("skillPointsContainer", numberField(character, "skillPoints")),
 
 			select("budget", {
 				hint: "What's the most expensive thing you can afford? You can freely buy things two tiers down.",
@@ -99,7 +113,9 @@ export const aspectsCharacterSheet: CharacterSheet = {
 					),
 				]),
 				tab("skills", [
-					numberField("aspectExperience", { displayName: "Aspect EXP" }),
+					numberField(character, "aspectExperience", {
+						displayName: "Aspect EXP",
+					}),
 					row(
 						"skillsLists",
 						text("coreSkills", { multiline: true }),
@@ -129,8 +145,8 @@ export const aspectsCharacterSheet: CharacterSheet = {
 								}),
 								row(
 									"itemStats",
-									numberField("size", { min: 1 }),
-									numberField("uses", {}),
+									numberField(character, "size", { min: 1 }),
+									numberField(character, "uses", {}),
 								),
 							),
 						),
@@ -142,7 +158,10 @@ export const aspectsCharacterSheet: CharacterSheet = {
 						row(
 							"bondsContainer1",
 							text("name", { defaultValue: "New Bond" }),
-							row("bondStrengthContainer", numberField("strength", { min: 1 })),
+							row(
+								"bondStrengthContainer",
+								numberField(character, "strength", { min: 1 }),
+							),
 						),
 						select("aura", {
 							choices: [

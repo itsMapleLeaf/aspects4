@@ -100,7 +100,7 @@ function CharacterSheetBlockElement({
 						className="w-16"
 						min={block.min}
 						max={block.max}
-						value={block.get(values)}
+						value={block.value}
 						onChange={(value) => onSaveValue(block.id, value)}
 					/>
 				</div>
@@ -108,7 +108,7 @@ function CharacterSheetBlockElement({
 					<EditableNumber
 						min={block.min}
 						max={block.max}
-						value={block.get(values)}
+						value={block.value}
 						onChange={(value) => onSaveValue(block.id, value)}
 					/>
 				</Field>

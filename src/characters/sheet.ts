@@ -1,7 +1,7 @@
 import { clamp } from "es-toolkit"
 import type { Except, NonEmptyTuple } from "type-fest"
 import { parseNumberSafe } from "~/lib/utils.ts"
-import { type Character, type CharacterValues } from "./character.ts"
+import { type Character } from "./character.ts"
 
 export type CharacterSheet = Readonly<{
 	id: string
@@ -118,6 +118,7 @@ export function text(
 export type CharacterSheetNumberField = ReturnType<typeof numberField>
 
 export function numberField(
+	character: Character,
 	id: string,
 	options: {
 		displayName?: string
@@ -137,9 +138,9 @@ export function numberField(
 		id,
 		min: options.min ?? 0,
 		max: options.max ?? Number.POSITIVE_INFINITY,
-		get: (values: CharacterValues) => {
-			const value = parseNumberSafe(values[id])
-			return clamp(value ?? field.defaultValue ?? 0, field.min, field.max)
+		get value(): number {
+			const value = parseNumberSafe(character.values[id])
+			return clamp(value ?? this.defaultValue ?? 0, this.min, this.max)
 		},
 	}
 	return field
