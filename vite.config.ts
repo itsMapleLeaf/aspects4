@@ -18,4 +18,12 @@ export default defineConfig({
 		globals: true,
 		setupFiles: ["./vitest.setup.ts"],
 	},
+	server: {
+		watch: {
+			ignored: (input) =>
+				input.includes("/docs/") ||
+				input.includes("/convex/") ||
+				input.includes("/scripts/"),
+		},
+	},
 })
