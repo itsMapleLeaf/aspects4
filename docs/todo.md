@@ -1,6 +1,7 @@
 ## aspects sheet features
 
-- lineage select + corresponding resource
+- lineage select
+- show corresponding resource beside selected lineage?
 - attribute roll prefills
 - aspect roll prefills
 - list of milestone selections

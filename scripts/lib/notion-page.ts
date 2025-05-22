@@ -81,6 +81,10 @@ export async function flattenPageProperty(
 		return await getRelationTitle(notion, property)
 	}
 
+	if (property.type === "number") {
+		return String(property.number ?? "")
+	}
+
 	console.warn(`Unsupported database property:`, property)
 	return JSON.stringify(property)
 }
