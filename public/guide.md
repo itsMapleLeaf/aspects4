@@ -1,6 +1,8 @@
 # Aspects of Nature: Guidebook
 
-# Rules
+## Rules
+
+### Story First
 
 In **Aspects of Nature**, the narrative drives everything—mechanics serve the story, not the other way around. When players want to accomplish something, they describe their intended actions in detail, and the **narrator** (the facilitator of the game, a.k.a the “game master”) determines what [rolls](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b1b0b885c0e80e1a1afd501f2cb10d5) (if any) are needed based on the narrative context. For example, if a character wants to leap across a chasm while avoiding enemy fire, the narrator might call for a [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9) roll for the acrobatic movement.
 
@@ -10,7 +12,7 @@ When using [aspect art](https://www.notion.so/1b8b0b885c0e80809c18c6e0ccc7ab05#1
 
 This story-first approach means that, while the game has clear rules and mechanics, they exist to _enhance_ the narrative experience rather than restrict it. The goal is to create compelling stories together, where the dice add elements of uncertainty.
 
-# Character-Centric Storytelling
+#### Character-Centric Storytelling
 
 **Aspects of Nature** was created to facilitate stories with **character-centric** elements:
 
@@ -28,6 +30,8 @@ This story-first approach means that, while the game has clear rules and mechani
 
 </aside>
 
+### Scenes
+
 Gameplay is divided into chunks of interaction, or **scenes**. A scene begins when characters enter a location and the narrator allows characters to interact.
 
 Scenes usually end when characters move to another location, but the narrator may end the scene at any time.
@@ -35,6 +39,8 @@ Scenes usually end when characters move to another location, but the narrator ma
 When the current scene ends, a new scene begins.
 
 _Example: A group of friends enters the popular Avians’ Rest cafe in Rosenfeld. The cafe's light aspect crystals cast a warm glow as they settle into a cozy corner booth. A waitress with white feathered wings takes their orders, while nearby, a young dragon-lineage student practices small fire aspect techniques to heat their coffee. When the group decides to head to the shopping district to browse for food and equipment, that scene ends, and a new scene begins at the market square._
+
+### Conditions
 
 The **conditions** listed on your character sheet represent your changing state over time. This includes various forms of physical and mental stress, or boons that amplify your abilities.
 
@@ -74,6 +80,8 @@ Language for modifying conditions is loose; to “take 2 fatigue” would mean t
 
 _Example: a character could have Damage 5 and Fatigue 3 conditions. This would mean that they’ve taken a decent bit of damage, as well as having physically exhausted themselves. Taking 2 damage from an attack would increase the intensity of their existing Damage condition to 7._
 
+### Stress
+
 The **Damage** and **Fatigue** [conditions](https://www.notion.so/1e5b0b885c0e801da514d402a2a15a37) both represent forms of **stress**.
 
 The **limits** of stress conditions are numbers which depend on your [attribute scores](https://www.notion.so/1b1b0b885c0e80bd9d24c363bc9a1c01):
@@ -104,7 +112,7 @@ If you have Damage 3, then you take 2 damage, the intensity of your damage condi
 
 </aside>
 
-# Overload
+#### Overload
 
 <aside>
 
@@ -170,9 +178,13 @@ You are now unconscious and no longer overloaded.
 
 </aside>
 
+### Resting
+
 You may heal 1 fatigue per 1 in-game hour spent resting. If you rest for 8 consecutive hours, heal all fatigue.
 
 Resting for any amount of time will also restore 1 [bond activation](https://www.notion.so/1bdb0b885c0e80a88e37d34e61d7f01f), to a max of 3.
+
+### Positioning, Movement & Distance
 
 Positions of entities (characters or objects) and distances from one another are determined on a logical, narrative basis. An entity can be **nearby** another entity, or **far away** from them.
 
@@ -186,6 +198,8 @@ Obstacles that would impede movement should be handled situationally:
 
 _Example: You’re playing as a member of a group of assassins, and you infiltrate a warehouse to find your target. Your target hired bodyguards to patrol the place and keep watch. Your allies and bodyguards on the ground floor close to the entrance would be nearby, and others elsewhere would be far away._
 
+### Attributes
+
 Attributes represent your character's capabilities in different domains. Characters have a score in each attribute ranging from 1 to 5.
 
 | Attribute | Description                                         |
@@ -195,6 +209,8 @@ Attributes represent your character's capabilities in different domains. Charact
 | Dexterity | Precision and acrobatics                            |
 | Sense     | Finding and picking up on things through the senses |
 | Strength  | Applying force and heavy hits                       |
+
+### Actions
 
 Characters interact with the world and others through **actions**, an attempt at affecting the world in some way: to make progress, gain information, assert leverage over another, and so on. Some actions include:
 
@@ -214,7 +230,7 @@ If the action is trivial in nature without any real change of failure or complic
 
 If the action has some chance of failure or complication, that’s where **action rolls** come in.
 
-# Action Rolls
+#### Action Rolls
 
 To make an action roll, choose the most appropriate [attribute](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b1b0b885c0e80bd9d24c363bc9a1c01) for the action, then roll a number of six-sided dice equal to the character’s score for that attribute.
 
@@ -255,17 +271,19 @@ If the roll’s result meets the requirement, the action succeeds without any co
 
 _Some tier requirements can’t even be met unless you roll a certain number of dice. For example: you can’t meet a task of Challenging difficulty with only 1 die, which can only give you a max of 3. As the narrator, you may consider such a roll for this task as an automatic failure and eschew the actual dice roll. Alternatively, you may let them make the roll and avoid some amount of complication with a higher result, even if they can’t meet the requirement._
 
-## Push Yourself
+##### Push Yourself
 
 After you make a roll, once per roll, you may take 2 fatigue to **push yourself** and reroll it, then take the new result if it’s higher than the previous.
 
-## Contested Rolls
+##### Contested Rolls
 
 Use contested rolls to determine the victor of an adversarial situation. Both characters make a roll using the most appropriate attribute for their action. The character with more successes wins the contest.
 
 If there's a tie in successes, the character with the higher attribute score wins. If there's still a tie, both characters may choose to either back down or make another roll.
 
 _Example: A thief tries to pickpocket a merchant in a crowded marketplace. The thief rolls _[_Dexterity_](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995)_ to attempt the theft stealthily, while the merchant rolls _[_Sense_](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10)_ to notice the attempt. If the thief rolls higher, they successfully steal the item without being noticed. If the merchant rolls higher, they catch the thief in the act._
+
+### Skills
 
 Your character’s skillset is informed by the **skill points** assigned to each **skill**. When making an action roll, certain skills may give bonuses to the roll when relevant. For example: when making an action roll to break a window, the [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381) skill would be applicable.
 
@@ -293,6 +311,8 @@ Players start with 5 skill points, and skills may only have up to 5 points assig
 | Block      | Strength  | Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1. | _Guard against an incoming attack_                                                                        | Reaction   |
 | Strike     | Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                    | _Attack a character with your fist or a weapon_                                                           |            |
 
+### Unarmed Combat
+
 At any time, you may make the following [actions](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4), each with the dice bonus from its associated [skill](https://www.notion.so/1b8b0b885c0e802e837ef397dbac439a):
 
 - [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381): Make an action roll. Deal damage equal to the result to a nearby target.
@@ -302,6 +322,8 @@ At any time, you may make the following [actions](https://www.notion.so/1b1b0b88
 - [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be): As a reaction, before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage.
 
 _Example: You currently have no weapon, and you want to punch another nearby character. You would make the unarmed _[_Strike_](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381)_ action. If you have skill points assigned to the _[_Strike_](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381)_ skill, add that many dice to your action roll._
+
+### Items
 
 You may possess a number of **items** which are used in various ways to various ends.
 
@@ -343,6 +365,8 @@ Use this list of items as a reference for your own custom items.
 | Binoculars          | {"id":"%5D%3B%7DJ","type":"number","number":null} | 3. Inexpensive | Tool       | {"id":"kf\_%7B","type":"number","number":1} | Helps to see things far away                                                                                                                                                             |
 | Canteen of Water    | {"id":"%5D%3B%7DJ","type":"number","number":12}   | 3. Inexpensive | Consumable | {"id":"kf\_%7B","type":"number","number":2} | A container which holds up to 12 servings of drinking water (or any liquid)                                                                                                              |
 
+### Aspects
+
 Characters manipulate elements of nature called **aspects** to their will, through a practice called **aspect art**.
 
 Characters have a score from 1 to 5 for each aspect representing their level of skill with the aspect.
@@ -357,7 +381,7 @@ You may only use aspects in which you have a score of 1 or higher, or if an effe
 | Water    | Liquids, vapor, ice                    |
 | Fire     | Flame, heat, tectonics                 |
 
-# Aspect Art
+#### Aspect Art
 
 Aspect art actions allow you to compose several parts to define the mechanical impact of an aspect art. Aspect art actions may be used as [reactions](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1b8b0b885c0e808fb835e607c32816dc).
 
@@ -501,11 +525,11 @@ As you’re only aiming to move yourself, the narrator could allow you to succee
 
 </aside>
 
-## Aspect Art Modifiers
+##### Aspect Art Modifiers
 
 Aspect arts are modified by the aspects used in them in various ways, such as adding additional side effects or having certain requirements and drawbacks.
 
-### [Fire](https://www.notion.so/1b1b0b885c0e8067a288dfe795fb6849)
+###### [Fire](https://www.notion.so/1b1b0b885c0e8067a288dfe795fb6849)
 
 - Inflicts a Burn 1 condition on damaged targets.
 
@@ -515,7 +539,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 - Cannot use while inflicted with Cold, or in a cold environment (below freezing).
 
-### [Water](https://www.notion.so/1b1b0b885c0e80d7b371d75b75b3ac1e)
+###### [Water](https://www.notion.so/1b1b0b885c0e80d7b371d75b75b3ac1e)
 
 - Gives +2 impact to existing Shield properties.
 
@@ -527,7 +551,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
   _High humidity in a small room counts as a bucket-sized source, as well as rain, clouds, and similar dispersed volumes. Workable volume limits depend on the size of the source._
 
-### [Wind](https://www.notion.so/1b1b0b885c0e80db8f1bcbee1368dc31)
+###### [Wind](https://www.notion.so/1b1b0b885c0e80db8f1bcbee1368dc31)
 
 - Projectile and environmental arts always have the Shift property.
 
@@ -537,7 +561,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 - Cannot use in vacuum zones.
 
-### [Light](https://www.notion.so/1b1b0b885c0e808c85f5e09905d8a87e)
+###### [Light](https://www.notion.so/1b1b0b885c0e808c85f5e09905d8a87e)
 
 - Gives +1 impact to existing Healing and Enhance properties.
 
@@ -545,7 +569,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 - Non-enchantments have -1 impact point in dark spaces.
 
-### [Darkness](https://www.notion.so/1b1b0b885c0e8011bb89e175042f5180)
+###### [Darkness](https://www.notion.so/1b1b0b885c0e8011bb89e175042f5180)
 
 - Gives +1 impact to existing Weaken and Exhaust properties.
 
@@ -553,7 +577,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 - Non-enchantments have -1 impact point in well-lit spaces.
 
-## Minor Aspect Art
+##### Minor Aspect Art
 
 **Minor aspect arts** are narrative-only, do not require action rolls or taking fatigue, and cannot have properties or conditions applied to them. Some examples:
 
@@ -567,11 +591,11 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 [Darkness](https://www.notion.so/1b1b0b885c0e8011bb89e175042f5180) - dimming the light in a small room corner, a palm-sized illusion or distortion, or inducing a fleeting sense of unease in a target
 
-# Aspect Skills
+#### Aspect Skills
 
 **Aspect skills** are predefined [aspect art](https://www.notion.so/1b8b0b885c0e80809c18c6e0ccc7ab05#1b8b0b885c0e8080b28fc4202b7263fd) compositions defined by players in collaboration with the narrator. Aspect skills represent effective, well-trained techniques, and may receive [skill points](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1c8b0b885c0e8015812fda2be0aa71ba).
 
-## Learning Aspect Skills: Aspect Experience
+##### Learning Aspect Skills: Aspect Experience
 
 Aspect skills are learned through **aspect experience**. When making an action roll for aspect art, **you earn one aspect experience point for every die with a value of 3.**
 
@@ -583,7 +607,7 @@ Once you’ve decided on all of the details, add your new skill under your list 
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 ## Skill Points: 5
@@ -597,13 +621,13 @@ Thunderclap (+1) (Wind, Construct, Damage + Weaken + Blast) - Create a loud, thu
 
 After adding and committing to the new aspect skill, you may only change its details (or that of any number of previous skills) at the start or end of sessions—_not_ in the middle.
 
-## Using Aspect Skills
+##### Using Aspect Skills
 
 When using an aspect skill, the procedure is the same as performing an aspect art, except that your impact points _must_ go towards the predefined components of the aspect skill. If you roll fewer impact points than would be needed to fulfil every component, you may choose which components from the skill to use.
 
 **You do not take fatigue for impact points spent on the aspect skill’s components**. You _do_ take fatigue for any extra components, and you still take 1 per aspect used.
 
-## Example Aspect Skills
+##### Example Aspect Skills
 
 Instead of making up a new skill from scratch, feel free to pick from this list of examples, or you can use it as inspiration for creating your own.
 
@@ -649,7 +673,7 @@ Instead of making up a new skill from scratch, feel free to pick from this list 
 
 - **Sphere of Darkness** _(Darkness, Construct)_ – Envelop an area in impenetrable shadow which consumes all physical light.
 
-# Aspect Auras
+#### Aspect Auras
 
 Aspects each have their own **aura**. Eisenkind find themselves more attuned with aspects whose auras match their mental and/or emotional state.
 
@@ -668,6 +692,8 @@ Aspects each have their own **aura**. Eisenkind find themselves more attuned wit
 🚧 TODO: do Auras have some other purpose or place in the system?
 
 </aside>
+
+### Bonds
 
 Characters define a set of **bonds** representing any relationships they might have, including, but not limited to, relatives, romantic partners, friends, or colleagues.
 
@@ -693,7 +719,7 @@ A bond’s strength and aura are defined at the time of its creation, and may ch
 
 </aside>
 
-## Initial Bonds
+##### Initial Bonds
 
 When defining the initial bonds for your character, **the strength of them should add to 7**. You could define two bonds strengths of 2 and 5, or three bonds with strengths of 1, 4, and 2, and so on.
 
@@ -719,7 +745,7 @@ To help define your bonds, as well as add depth and intrigue, consider these que
 
 - What underlying tension exists between them?
 
-## Bond Generator
+##### Bond Generator
 
 Fleshing out a character’s background from a blank slate can be difficult. Use this roll table to generate them randomly.
 
@@ -742,7 +768,7 @@ After determining the bond, optionally name the other person of the bond and add
 | 11  | Educational (Classmate / Teacher / Student)      | _(reroll)_ | _(reroll)_                                                         |
 | 12  | Romantic Partner (Current or Former)             | _(reroll)_ | _(reroll)_                                                         |
 
-## Creating Bonds
+##### Creating Bonds
 
 Over time, you’ll meet certain people in the world who you’ll spend a significant amount of time with, getting to know them better and sharing meaningful experiences. These meaningful experiences or events shared with these people will create new bonds for your character. This also includes negative experiences after repeated interactions with an adversary.
 
@@ -758,7 +784,7 @@ Examples of these events would include:
 
 After such an event, add a new bond to your list of bonds in the same format as the existing ones. Said events will be determined situationally by the narrator.
 
-## Changing Bonds
+##### Changing Bonds
 
 Shared experiences and interactions between you and your bonds will strengthen them over time. Such significant events will increase the strength of the bond, change its aura, or both, as determined by the narrator.
 
@@ -776,7 +802,7 @@ Example: you’re framed for a crime. Unable to prove your innocence, a loved on
 
 </aside>
 
-## Activating Bonds
+##### Activating Bonds
 
 When making an [aspect art](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b8b0b885c0e8080b28fc4202b7263fd) roll, you may choose to activate a bond with a matching aura to add dice to it. Activating a matching bond represents tapping into its emotional energy—its aura—and grants a number of dice equal to the bond’s strength.
 
@@ -795,6 +821,8 @@ You witness said loved one slip and start to fall from a high-up mountainside.
 Your desperation to save them allows you to activate the bond, gaining 4 additional dice on a [Wind](https://www.notion.so/1b1b0b885c0e80db8f1bcbee1368dc31) aspect roll to break their fall.
 
 </aside>
+
+### Expenses
 
 [Items](https://www.notion.so/1b8b0b885c0e801ba751e644e7841a85) belong to one of many **expense tiers**, which determine how much is needed to purchase and trade them in the world.
 
@@ -862,6 +890,8 @@ A player could _theoretically_ try to buy 100 daggers at tier 5, but the shop mi
 
 </aside>
 
+### Combat
+
 Combat in **Aspects of Nature** isn’t handled in any special way. However, as an optional rule to make things fair and reduce confusion, you may want to establish a fixed turn order:
 
 - The character who instigated the conflict is the one who goes first
@@ -886,6 +916,8 @@ Using a [consumable item](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c
 
 Wearing or holding [equipment](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e809281b9c25d3608bd5f) does _not_ use an action, but you may only switch your equipped or wielded item once per turn.
 
+### Lineage
+
 Your lineage determines many of your character’s physical characteristics and traits. Each lineage represents a broad umbrella of member species within, and comes with a unique special ability.
 
 _Click each entry below for more details!_
@@ -898,6 +930,8 @@ _Click each entry below for more details!_
 | Aquatic     | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the action roll.                                                         | _fish, dolphins, other water-bound creatures_                |
 | Scalebearer | **Reflection** - When you take damage, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to an action roll.                                                                                                                           | _dragons, lizard, snake, alligator, crocodile_               |
 | Furbearer   | **Adaptation** - After you fail an action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                                      | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  |
+
+### Character Creation
 
 To create a player character, copy this template on paper or into a text editor:
 
@@ -952,7 +986,7 @@ Darkness:
 
 Now complete the following steps in any order.
 
-## Choose a [lineage](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b1b0b885c0e80a3bc26d28534526e85).
+##### Choose a [lineage](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b1b0b885c0e80a3bc26d28534526e85).
 
 Update the lineage section heading and also specify your member species, then copy the lineage ability to the body of that section.
 
@@ -967,7 +1001,7 @@ Update the lineage section heading and also specify your member species, then co
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 ## Lineage: Scalebearer - Dragon
@@ -977,7 +1011,7 @@ Hardened Scales - Increase your max hits by 3.
 
 </aside>
 
-## Define your [bonds](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1bdb0b885c0e80a88e37d34e61d7f01f).
+##### Define your [bonds](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1bdb0b885c0e80a88e37d34e61d7f01f).
 
 When defining the initial bonds for your character, **the strength of them should add to 7**. You could define two bonds strengths of 2 and 5, or three bonds with strengths of 1, 4, and 2, and so on.
 
@@ -1017,7 +1051,7 @@ The **aura** of a bond represents the nature of the bond, corresponding with [as
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 ## Bonds
@@ -1029,7 +1063,7 @@ Violetta "Vi", Fire, 1 - A woman I caught and fought with in the midst of a crim
 
 </aside>
 
-### Bond Generator
+###### Bond Generator
 
 Fleshing out a character’s background from a blank slate can be difficult. Use this roll table to generate them randomly.
 
@@ -1052,7 +1086,7 @@ After determining the bond, optionally name the other person of the bond and add
 | 11  | Educational (Classmate / Teacher / Student)      | _(reroll)_ | _(reroll)_                                                         |
 | 12  | Romantic Partner (Current or Former)             | _(reroll)_ | _(reroll)_                                                         |
 
-## Distribute 15 points among [attribute](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b4b0b885c0e80dc8145daef577d2bc2) scores.
+##### Distribute 15 points among [attribute](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b4b0b885c0e80dc8145daef577d2bc2) scores.
 
 - Each attribute should have a score from 1 to 5.
 
@@ -1070,7 +1104,7 @@ After determining the bond, optionally name the other person of the bond and add
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 ## Attribute Scores
@@ -1084,7 +1118,7 @@ Presence: 1
 
 </aside>
 
-## Distribute 10 points among [aspect](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b4b0b885c0e80acb29dc5fc1161d7d6) scores.
+##### Distribute 10 points among [aspect](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b4b0b885c0e80acb29dc5fc1161d7d6) scores.
 
 - Each aspect should have a score from 0 to 5.
 
@@ -1102,7 +1136,7 @@ Presence: 1
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 ## Aspect Scores
@@ -1126,7 +1160,7 @@ Darkness: 3
 
 </aside>
 
-## Assign [skill points](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e8015812fda2be0aa71ba).
+##### Assign [skill points](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e8015812fda2be0aa71ba).
 
 Your character’s skillset is informed by the **skill points** assigned to each **skill**. When making an action roll, certain skills may give bonuses to the roll when relevant. For example: when making an action roll to break a window, the [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381) skill would be applicable.
 
@@ -1134,7 +1168,7 @@ Players start with 5 skill points, and skills may only have up to 5 points assig
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 ## Skill Points: 5
@@ -1168,7 +1202,7 @@ Surge: +1
 | Strength  | Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1. | _Guard against an incoming attack_                                                                        | Block      | Reaction   |
 | Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                    | _Attack a character with your fist or a weapon_                                                           | Strike     |            |
 
-## Choose your starting [items](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b8b0b885c0e801ba751e644e7841a85).
+##### Choose your starting [items](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b8b0b885c0e801ba751e644e7841a85).
 
 First, calculate and write down your carrying capacity, which is equal to:
 
@@ -1186,7 +1220,7 @@ Starting items must fit within your carrying capacity. Consult the narrator for 
 
 <aside>
 
-### Example
+###### Example
 
 Using our [previously chosen scores](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b6b0b885c0e80e9a0ddd966003466a8) and [skill points](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1bbb0b885c0e8056a32bc51fb8a175ef), our capacity would be:
 
@@ -1202,7 +1236,7 @@ Using our [previously chosen scores](https://www.notion.so/1b1b0b885c0e803d8566f
 
 </aside>
 
-## Finishing touches
+##### Finishing touches
 
 - Give your character a [name](https://www.notion.so/1bab0b885c0e802f93a5e0db3eb54bad)!
 
@@ -1218,7 +1252,7 @@ Once you’ve done everything else, calculate your limits:
 
 <aside>
 
-### Example
+###### Example
 
 Starting with our [previously chosen scores](https://www.notion.so/1b1b0b885c0e802d8985db013034b37b#1bbb0b885c0e804190eaeb99ba5edf35):
 
@@ -1230,6 +1264,8 @@ Fatigue limit: 7
 </aside>
 
 And you’re done!
+
+### 🚧 Non-Player Characters
 
 Non-player characters (or NPCs) are created and played by the narrator to make the world feel more alive with additional actors.
 
@@ -1257,6 +1293,8 @@ These values are only a guide; you may deviate from this guide and choose **any*
 
 Additionally, narrators may determine the impact of an NPC action narratively and use a constant number, rather than relying solely on dice. For example, a master assassin should feel deadly, and if the dice don't support that narrative, the story should take precedence.
 
+### Milestones
+
 **Milestones** are events where you and your group reach a major stepping stone in the story. After a milestone, you may upgrade your character in one of a few ways:
 
 - Gain 3 skill points
@@ -1267,7 +1305,7 @@ When choosing an upgrade, add a new “Milestones” section on your character s
 
 <aside>
 
-### Example
+###### Example
 
 ```markdown
 # Milestones
@@ -1280,11 +1318,13 @@ When choosing an upgrade, add a new “Milestones” section on your character s
 
 After you’ve done that, apply the corresponding update. For example, if you chose to gain skill points, update your “Skill Points” section to the correct number of points you should have, then specify new or skills to receive points.
 
-# World Lore
+## World Lore
+
+### Eisenkind
 
 Eisenwald is populated by human-like people, or **Eisenkind**, with features of animals, such as dogs, cats, foxes, and birds, as well as other fantasy races like dragons and demons. Eisenkind exist alongside animals of their lineages, as well as a breadth of other fanatical creatures and mixes thereof.
 
-# Names
+#### Names
 
 Eisenkind receive elaborate single names at birth, most of which can be categorized in a few ways:
 
@@ -1316,13 +1356,17 @@ Longer names are sometimes accompanied by a shorter nickname used in casual conv
 
 While Eisenkind do not use family names in the traditional sense, relatives often share naming elements or patterns to signify their connection. Siblings might have names beginning with the same prefix or ending with similar sounds. For example, siblings named "Lumina 'Mina'" and "Lunaria 'Luna'" share the "Lu-" prefix, while cousins "Fernspire 'Fern'" and "Stormspire 'Storm'" share the "-spire" suffix.
 
-<!-- unsupported block type: child_page -->
+### 🚧 Occupations
 
-<!-- unsupported block type: child_page -->
+### 🚧 Regions
+
+### 🚧 Economy
 
 - currency: Quartz
 
 - 1Q ≅ 1USD
+
+### 🚧 Astronomy
 
 - two moons
 
@@ -1330,9 +1374,13 @@ While Eisenkind do not use family names in the traditional sense, relatives ofte
 
 - calendar stuff
 
+### 🚧 Technology
+
 - medieval-level tech
 
 - modern feel accomplished by weaving aspect art into various parts of society
+
+### 🚧 Education
 
 - academies: primary/secondary school equivalent, grades 1 through 12
 

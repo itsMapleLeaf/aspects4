@@ -8,7 +8,7 @@ import {
 } from "@notionhq/client"
 import { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints"
 import { invariant, sortBy } from "es-toolkit"
-import { flattenPageProperties } from "./notion-page.ts"
+import { flattenPageProperties, formatPage } from "./notion-page.ts"
 import { formatRichText } from "./notion-rich-text.ts"
 import { compactJoin, prettify } from "./utils.ts"
 
@@ -16,16 +16,22 @@ export async function formatBlockChildren(
 	notion: Client,
 	blockId: string,
 	linePrefix: string,
+	baseHeadingLevel = 1,
 ): Promise<string> {
-	const content = []
-
 	console.info("Fetching block children:", blockId)
-	for await (const child of iteratePaginatedAPI(notion.blocks.children.list, {
-		block_id: blockId,
-	})) {
-		invariant(isFullBlock(child), `expected full block: ${prettify(child)}`)
-		content.push(await formatBlock(notion, child))
-	}
+
+	const children = await Array.fromAsync(
+		iteratePaginatedAPI(notion.blocks.children.list, {
+			block_id: blockId,
+		}),
+	)
+
+	const content = await Promise.all(
+		children.map((child) => {
+			invariant(isFullBlock(child), `expected full block: ${prettify(child)}`)
+			return formatBlock(notion, child, baseHeadingLevel)
+		}),
+	)
 
 	return content
 		.map((chunk) =>
@@ -40,44 +46,49 @@ export async function formatBlockChildren(
 export async function formatBlock(
 	notion: Client,
 	block: BlockObjectResponse,
+	baseHeadingLevel = 1,
 ): Promise<string> {
 	if (block.type === "heading_1") {
-		return `# ${formatRichText(block.heading_1.rich_text)}`
+		return `${"#".repeat(baseHeadingLevel)} ${formatRichText(block.heading_1.rich_text)}`
 	}
 
 	if (block.type === "heading_2") {
-		return `## ${formatRichText(block.heading_2.rich_text)}`
+		return `${"#".repeat(baseHeadingLevel + 1)} ${formatRichText(block.heading_2.rich_text)}`
 	}
 
 	if (block.type === "heading_3") {
-		return `### ${formatRichText(block.heading_3.rich_text)}`
+		return `${"#".repeat(baseHeadingLevel + 2)} ${formatRichText(block.heading_3.rich_text)}`
 	}
 
 	if (block.type === "paragraph") {
 		return compactJoin("\n\n", [
 			formatRichText(block.paragraph.rich_text),
-			block.has_children && (await formatBlockChildren(notion, block.id, "  ")),
+			block.has_children &&
+				(await formatBlockChildren(notion, block.id, "  ", baseHeadingLevel)),
 		])
 	}
 
 	if (block.type === "bulleted_list_item") {
 		return compactJoin("\n\n", [
 			`- ${formatRichText(block.bulleted_list_item.rich_text)}`,
-			block.has_children && (await formatBlockChildren(notion, block.id, "  ")),
+			block.has_children &&
+				(await formatBlockChildren(notion, block.id, "  ", baseHeadingLevel)),
 		])
 	}
 
 	if (block.type === "numbered_list_item") {
 		return compactJoin("\n\n", [
 			`1. ${formatRichText(block.numbered_list_item.rich_text)}`,
-			block.has_children && (await formatBlockChildren(notion, block.id, "  ")),
+			block.has_children &&
+				(await formatBlockChildren(notion, block.id, "  ", baseHeadingLevel)),
 		])
 	}
 
 	if (block.type === "quote") {
 		return compactJoin("\n\n", [
 			`> ${formatRichText(block.quote.rich_text)}`,
-			block.has_children && (await formatBlockChildren(notion, block.id, "> ")),
+			block.has_children &&
+				(await formatBlockChildren(notion, block.id, "> ", baseHeadingLevel)),
 		])
 	}
 
@@ -87,7 +98,7 @@ export async function formatBlock(
 			compactJoin("\n", [
 				`\`\`\`${block.code.language}`,
 				formatRichText(block.code.rich_text),
-				await formatBlockChildren(notion, block.id, ""),
+				await formatBlockChildren(notion, block.id, "", baseHeadingLevel),
 				"```",
 			]),
 			caption && compactJoin("\n", ["<aside>", caption, "</aside>"]),
@@ -101,7 +112,8 @@ export async function formatBlock(
 				block.callout.icon?.type === "emoji" && block.callout.icon.emoji,
 				formatRichText(block.callout.rich_text),
 			]),
-			block.has_children && (await formatBlockChildren(notion, block.id, "")),
+			block.has_children &&
+				(await formatBlockChildren(notion, block.id, "", baseHeadingLevel)),
 			"</aside>",
 		])
 	}
@@ -114,9 +126,17 @@ export async function formatBlock(
 		let columnNames: string[] = []
 		const rows = []
 
-		for await (const child of iteratePaginatedAPI(notion.blocks.children.list, {
-			block_id: block.id,
-		})) {
+		const children = await Array.fromAsync(
+			iteratePaginatedAPI(notion.blocks.children.list, {
+				block_id: block.id,
+			}),
+			(child) => {
+				invariant(isFullBlock(child), `expected full block: ${prettify(child)}`)
+				return child
+			},
+		)
+
+		for (const child of children) {
 			invariant(isFullBlock(child), `expected full block: ${prettify(child)}`)
 
 			if (child.type !== "table_row") continue
@@ -133,7 +153,7 @@ export async function formatBlock(
 	}
 
 	if (block.type === "table_row") {
-		return await formatBlockChildren(notion, block.id, "")
+		return await formatBlockChildren(notion, block.id, "", baseHeadingLevel)
 	}
 
 	if (block.type === "child_database") {
@@ -172,9 +192,13 @@ export async function formatBlock(
 
 		const rows = []
 
-		for await (const item of iteratePaginatedAPI(notion.databases.query, {
-			database_id: block.id,
-		})) {
+		const rawItems = await Array.fromAsync(
+			iteratePaginatedAPI(notion.databases.query, {
+				database_id: block.id,
+			}),
+		)
+
+		for (const item of rawItems) {
 			if (isFullPage(item)) {
 				rows.push(await flattenPageProperties(notion, item))
 			} else {
@@ -193,10 +217,16 @@ export async function formatBlock(
 		)
 	}
 
+	if (block.type === "child_page") {
+		const page = await notion.pages.retrieve({ page_id: block.id })
+		invariant(isFullPage(page), `expected full page: ${prettify(page)}`)
+		return await formatPage(notion, page, baseHeadingLevel + 1)
+	}
+
 	// catch-all for generic "container" blocks, like synced blocks and columns
 	// also a decent fallback for unknown blocks--just render their children, which will probably have known blocks
 	if (block.has_children) {
-		return await formatBlockChildren(notion, block.id, "")
+		return await formatBlockChildren(notion, block.id, "", baseHeadingLevel)
 	}
 
 	console.warn(`Unsupported block type ${block.type}, skipping`)

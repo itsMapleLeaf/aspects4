@@ -46,12 +46,13 @@ function splitPageTitleProperty(page: PageObjectResponse) {
 export async function formatPage(
 	notion: Client,
 	page: PageObjectResponse,
+	baseHeadingLevel = 1,
 ): Promise<string> {
 	const { title, properties } = splitPageTitleProperty(page)
 	return compactJoin("\n", [
 		Object.keys(properties).length > 0 && `${yaml.stringify(properties)}---\n`,
-		`# ${title}\n`,
-		await formatBlockChildren(notion, page.id, ""),
+		`${"#".repeat(baseHeadingLevel)} ${title}\n`,
+		await formatBlockChildren(notion, page.id, "", baseHeadingLevel + 1),
 	])
 }
 
