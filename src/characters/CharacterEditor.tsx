@@ -1,5 +1,5 @@
 import * as Ariakit from "@ariakit/react"
-import { useId, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
@@ -167,7 +167,7 @@ export function CharacterEditor({
 			</div>
 
 			<div className="grid gap-3">
-				<CharacterEditorTabs>
+				<CharacterEditorTabs persistenceKey="mainTabs">
 					{[
 						{
 							name: "Character",
@@ -347,14 +347,14 @@ export function CharacterEditor({
 function CharacterEditorTabs({
 	children,
 	defaultTabName = children[0].name,
+	persistenceKey,
 }: {
 	children: NonEmptyTuple<{ name: string; content: ReactNode }>
 	defaultTabName?: string
+	persistenceKey: string
 }) {
-	const id = useId()
-
 	const [selectedId, setSelectedId] = useLocalStorageState(
-		`CharacterSheetTabProvider:${id}:selectedId`,
+		`CharacterSheetTabProvider:${persistenceKey}:selectedId`,
 		defaultTabName,
 		(input) => (typeof input === "string" ? input : defaultTabName),
 	)
