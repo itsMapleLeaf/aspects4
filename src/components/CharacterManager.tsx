@@ -123,7 +123,9 @@ export function CharacterManager({
 						<Ariakit.TabPanel
 							id={character._id}
 							key={character._id}
-							className={panel("h-full w-148 flex-1 overflow-y-auto p-3")}
+							className={panel(
+								"h-full w-148 flex-1 overflow-y-auto p-3 [scrollbar-gutter:stable]",
+							)}
 							unmountOnHide
 						>
 							<CharacterEditor
@@ -171,7 +173,9 @@ export function CharacterManager({
 						<Ariakit.TabPanel
 							id={character._id}
 							key={character._id}
-							className={panel("h-full w-148 flex-1 p-0")}
+							className={panel(
+								"h-full w-148 flex-1 overflow-y-auto p-3 [scrollbar-gutter:stable]",
+							)}
 						>
 							<CharacterEditor
 								character={{ name: character.name, values: character.data }}
