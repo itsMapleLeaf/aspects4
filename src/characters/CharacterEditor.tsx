@@ -4,6 +4,7 @@ import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
+import listOfLineages from "../data/list-of-lineages.json"
 import type { Character } from "./character.ts"
 import {
 	SheetNumberField,
@@ -143,11 +144,18 @@ export function CharacterEditor({
 	return (
 		<div className="grid gap-8">
 			<div className="grid gap-3">
-				<EditableTextField
-					label="Name"
-					value={character.name}
-					onChange={onNameChanged}
-				/>
+				<div className="flex gap-2">
+					<EditableTextField
+						label="Name"
+						value={character.name}
+						onChange={onNameChanged}
+						className="flex-1"
+					/>
+					<SheetNumberField
+						resolved={resolveNumberField(sheet, { id: "bondActivations" })}
+						className="w-32"
+					/>
+				</div>
 				<div className="grid grid-cols-2 gap-2">
 					<SheetNumberField
 						resolved={resolveNumberField(sheet, { id: "skillPoints" })}
@@ -205,9 +213,18 @@ export function CharacterEditor({
 											</div>
 										)}
 									</SheetListFieldMinimal>
-									<SheetTextField
-										resolved={resolveTextField(sheet, { id: "lineage" })}
-										multiline
+									<SheetSelectField
+										resolved={resolveSelectField(sheet, {
+											id: "lineage",
+											options: listOfLineages
+												.sort((a, b) => a.lineage.localeCompare(b.lineage))
+												.map((item) => ({
+													label: item.lineage,
+													value: item.lineage,
+													hint: item.memberCreatures,
+													description: item.ability,
+												})),
+										})}
 									/>
 									<SheetTextField
 										resolved={resolveTextField(sheet, { id: "details" })}

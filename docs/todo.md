@@ -1,15 +1,13 @@
 ## aspects sheet features
 
-- lineage select
-- show corresponding resource beside selected lineage?
-- attribute roll prefills
-- aspect roll prefills
+- show corresponding resource beside selected lineage
 - list of milestone selections
+- click attribute labels to prefill roll
+- click aspect labels to prefill roll
 - label showing spent/total skill points
 - core skill point assignments
 - aspect skills list
 - attribute/aspect point calculation + validation
-- bond activations
 - (stretch) flat stat buffs from items
 - (stretch) rest button
 
