@@ -15,7 +15,7 @@
   },
   {
     "attribute": "Intellect",
-    "effect": "Roll Intellect. Heal 1 hit per success from a target.",
+    "effect": "",
     "flavor": "Offer first aid to someone else",
     "skill": "Aid",
     "activation": ""
@@ -57,7 +57,7 @@
   },
   {
     "attribute": "Dexterity",
-    "effect": "Roll Dexterity, then deal 1 hit per success to a far away target.",
+    "effect": "Make an action roll. Deal damage equal to the result to a far away target.",
     "flavor": "Fire a weapon to strike at a range",
     "skill": "Shoot",
     "activation": ""
@@ -78,7 +78,7 @@
   },
   {
     "attribute": "Dexterity",
-    "effect": "Roll Dexterity. If you roll more successes than the action dealing hits, prevent all hits.",
+    "effect": "Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage.",
     "flavor": "Evade an incoming attack",
     "skill": "Dodge",
     "activation": "Reaction"
@@ -120,14 +120,14 @@
   },
   {
     "attribute": "Strength",
-    "effect": "Roll Strength, then prevent 1 hit per success on a nearby target, taking no less than 1 hit.",
+    "effect": "Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1.",
     "flavor": "Guard against an incoming attack",
     "skill": "Block",
     "activation": "Reaction"
   },
   {
     "attribute": "Strength",
-    "effect": "Roll Strength, then deal 1 hit per success to a nearby target.",
+    "effect": "Make an action roll. Deal damage equal to the result to a nearby target.",
     "flavor": "Attack a character with your fist or a weapon",
     "skill": "Strike",
     "activation": ""

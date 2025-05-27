@@ -1,5 +1,6 @@
 import {
 	Client,
+	collectPaginatedAPI,
 	isFullBlock,
 	isFullPage,
 	iteratePaginatedAPI,
@@ -15,6 +16,7 @@ import {
 	flattenPageProperties,
 	formatPage,
 	loadPage,
+	type PagePropertyValue,
 } from "./lib/notion-page.ts"
 import { prettify } from "./lib/utils.ts"
 
@@ -71,11 +73,39 @@ async function saveContent(page: PageObjectResponse) {
 
 async function saveDatabases(page: PageObjectResponse) {
 	const databases = new Map<string, Record<string, string>[]>()
+	await collectDatabases(page.id, databases)
+	for (const [title, rows] of databases) {
+		await writeFileNested(
+			resolve(dataFolder, `${title}.json`),
+			JSON.stringify(rows, null, 2),
+		)
+	}
+}
 
-	for await (const block of iteratePaginatedAPI(notion.blocks.children.list, {
-		block_id: page.id,
-	})) {
-		invariant(isFullBlock(block), `expected full block: ${prettify(block)}`)
+async function collectDatabases(
+	rootBlockId: string,
+	databases: Map<string, Record<string, PagePropertyValue>[]>,
+) {
+	const blocks = await Array.fromAsync(
+		iteratePaginatedAPI(notion.blocks.children.list, {
+			block_id: rootBlockId,
+		}),
+		(block) => {
+			invariant(isFullBlock(block), `expected full block: ${prettify(block)}`)
+			return block
+		},
+	)
+
+	for (const block of blocks) {
+		if (block.has_children) {
+			await collectDatabases(block.id, databases)
+			continue
+		}
+
+		if (block.type === "child_page") {
+			await collectDatabases(block.id, databases)
+			continue
+		}
 
 		if (block.type !== "child_database") {
 			continue
@@ -90,13 +120,13 @@ async function saveDatabases(page: PageObjectResponse) {
 			continue
 		}
 
-		const rows: Record<string, string>[] = []
+		const rows: Record<string, PagePropertyValue>[] = []
 		databases.set(title, rows)
 
 		console.info(`Fetching database ${block.child_database.title}...`)
 
 		try {
-			for await (const row of iteratePaginatedAPI(notion.databases.query, {
+			for (const row of await collectPaginatedAPI(notion.databases.query, {
 				database_id: block.id,
 			})) {
 				invariant(isFullPage(row), `expected full page: ${prettify(row)}`)
@@ -108,13 +138,6 @@ async function saveDatabases(page: PageObjectResponse) {
 		} catch (error) {
 			console.error(`Error fetching database: ${block.id}`, error)
 		}
-	}
-
-	for (const [title, rows] of databases) {
-		await writeFileNested(
-			resolve(dataFolder, `${title}.json`),
-			JSON.stringify(rows, null, 2),
-		)
 	}
 }
 

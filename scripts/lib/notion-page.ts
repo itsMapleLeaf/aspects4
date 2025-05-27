@@ -33,7 +33,7 @@ function getPageTitleProperty(page: PageObjectResponse) {
 	throw new Error(`Unexpected, page has no title property: ${prettify(page)}`)
 }
 
-function splitPageTitleProperty(page: PageObjectResponse) {
+export function splitPageTitleProperty(page: PageObjectResponse) {
 	const { key, property } = getPageTitleProperty(page)
 	const { [key]: _, ...rest } = page.properties
 
@@ -56,11 +56,13 @@ export async function formatPage(
 	])
 }
 
+export type PagePropertyValue = string | number | null
+
 export async function flattenPageProperty(
 	notion: Client,
 	property: PageObjectResponse["properties"][string],
 	options?: FormatRichTextItemOptions,
-): Promise<string> {
+): Promise<PagePropertyValue> {
 	if (property.type === "title") {
 		return formatRichText(property.title, options)
 	}
@@ -82,7 +84,7 @@ export async function flattenPageProperty(
 	}
 
 	if (property.type === "number") {
-		return String(property.number ?? "")
+		return property.number ?? null
 	}
 
 	console.warn(`Unsupported database property:`, property)
@@ -109,13 +111,12 @@ export async function flattenPageProperties(
 	notion: Client,
 	item: PageObjectResponse,
 	options?: FormatRichTextItemOptions,
-): Promise<Record<string, string>> {
+): Promise<Record<string, PagePropertyValue>> {
 	return Object.fromEntries(
 		await Array.fromAsync(
 			Object.entries(item.properties),
 			async ([name, property]) => [
 				name,
-
 				await flattenPageProperty(notion, property, options),
 			],
 		),

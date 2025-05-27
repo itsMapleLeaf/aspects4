@@ -1,0 +1,74 @@
+[
+  {
+    "uses": null,
+    "price": "5. Expensive",
+    "type": "Tool",
+    "size": 5,
+    "description": "A large, heavy hammer. Good for smashing things",
+    "item": "Sledgehammer"
+  },
+  {
+    "uses": 5,
+    "price": "3. Inexpensive",
+    "type": "Tool",
+    "size": 1,
+    "description": "A kit of medical supplies for treating physical injuries. Make an action with the Aid skill to heal damage equal to the result",
+    "item": "Medkit"
+  },
+  {
+    "uses": null,
+    "price": "3. Inexpensive",
+    "type": "Tool",
+    "size": 1,
+    "description": "A light, throwable blade, often used for offensive purposes, or for slicing bread",
+    "item": "Dagger"
+  },
+  {
+    "uses": 20,
+    "price": "4. Steep",
+    "type": "Tool",
+    "size": 2,
+    "description": "A shortbow and quiver of arrows. Make an action with the Shoot skill to fire and deal damage equal to the result",
+    "item": "Bow & Arrows"
+  },
+  {
+    "uses": null,
+    "price": "5. Expensive",
+    "type": "Wearable",
+    "size": 1,
+    "description": "Makes the wearer more visually attractive and charming when worn with nothing else. Or, it may be offputting outside of socially accepted settings, such as beaches and pools.",
+    "item": "Swimsuit"
+  },
+  {
+    "uses": 4,
+    "price": "2. Cheap",
+    "type": "Consumable",
+    "size": 1,
+    "description": "When made into tea, helps improve calmness and focus",
+    "item": "Pouch of Tea Leaves"
+  },
+  {
+    "uses": null,
+    "price": "3. Inexpensive",
+    "type": "Tool",
+    "size": 1,
+    "description": "Helps to see things in the dark",
+    "item": "Flashlight"
+  },
+  {
+    "uses": null,
+    "price": "3. Inexpensive",
+    "type": "Tool",
+    "size": 1,
+    "description": "Helps to see things far away",
+    "item": "Binoculars"
+  },
+  {
+    "uses": 12,
+    "price": "3. Inexpensive",
+    "type": "Consumable",
+    "size": 2,
+    "description": "A container which holds up to 12 servings of drinking water (or any liquid)",
+    "item": "Canteen of Water"
+  }
+]

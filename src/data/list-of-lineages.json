@@ -1,31 +1,31 @@
 [
   {
-    "ability": "One with Darkness - Your Darkness rolls have +1 dice.",
+    "ability": "Push the Odds - Once before making an action roll, you may take 1 fatigue to roll with exploding dice: when a die lands on 3, roll another die and add it to the result. Repeat for each new 3 that is rolled.",
     "memberCreatures": "demons, succubus/incubus, vampires",
     "lineage": "Umbral"
   },
   {
-    "ability": "Trillion Senses - Your Sense rolls have +1 dice.",
+    "ability": "Double-Edged Senses - Once per roll, you may add 3 dice to any Sense action roll. Take 1 fatigue for every die in that roll with a value of 3.",
     "memberCreatures": "insects, arachnids, bugs, most creatures with exoskeletons",
     "lineage": "Arthropod"
   },
   {
-    "ability": "One with the Wind - Your Wind rolls have +1 dice.",
+    "ability": "Momentum - After making an action with Dodge, Dash, or Maneuver, your following action roll gains 2 dice.",
     "memberCreatures": "eagles, ravens, penguins, flamingos, all other birds",
     "lineage": "Avian"
   },
   {
-    "ability": "Fluid Instinct - Your Water rolls have +1 dice.",
+    "ability": "Art of Theseus - When making an aspect art with exactly one aspect changed from your previous art, add 1 die to the action roll.",
     "memberCreatures": "fish, dolphins, other water-bound creatures",
     "lineage": "Aquatic"
   },
   {
-    "ability": "Hardened Scales - Increase your max hits by 3.",
+    "ability": "Reflection - When you take damage, gain one reflection point. At any time, spend any number of reflection points to add that many dice to an action roll.",
     "memberCreatures": "dragons, lizard, snake, alligator, crocodile",
     "lineage": "Scalebearer"
   },
   {
-    "ability": "Adaptable - Your Dexterity rolls have +1 dice.",
+    "ability": "Adaptation - After you fail an action roll, gain one adaptation point. At any time, spend any number of adaptation points to add that many dice to an action roll (except rolls that gave you those points).",
     "memberCreatures": "dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons",
     "lineage": "Furbearer"
   }

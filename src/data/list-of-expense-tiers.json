@@ -1,0 +1,30 @@
+[
+  {
+    "examples": "Water and other freely-available resources",
+    "name": "1. Dirt"
+  },
+  {
+    "examples": "Premium tools and weapons, extravagant clothing, comfortable lodging",
+    "name": "4. Steep"
+  },
+  {
+    "examples": "Common meals, simple clothing",
+    "name": "2. Cheap"
+  },
+  {
+    "examples": "A house, luxurious lodging",
+    "name": "5. Expensive"
+  },
+  {
+    "examples": "A mansion",
+    "name": "6. Valuable"
+  },
+  {
+    "examples": "An extremely rare, precious, powerful artifact",
+    "name": "7. Priceless"
+  },
+  {
+    "examples": "Five-star meals, basic tools and weapons, reasonable lodging",
+    "name": "3. Inexpensive"
+  }
+]
