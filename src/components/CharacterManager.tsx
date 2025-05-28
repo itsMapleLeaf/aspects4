@@ -1,23 +1,16 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
-import { RefObject, type ComponentProps } from "react"
+import { type ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
 import { CharacterEditor } from "~/characters/CharacterEditor.tsx"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { panel } from "../styles/panel.ts"
-import { ChatInputRef } from "./Chat.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { SmallIconButton } from "./ui/SmallIconButton.tsx"
 
-export function CharacterManager({
-	chatInputRef,
-	roomId,
-}: {
-	chatInputRef: RefObject<ChatInputRef | null>
-	roomId: Id<"rooms">
-}) {
+export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 	const ownedCharacters = useQuery(api.characters.listOwned)
 	const ownedCharacterIds = new Set(ownedCharacters?.map((it) => it._id))
 

@@ -12,7 +12,8 @@ import { panel } from "../styles/panel.ts"
 import { AppLogoLink } from "./AppLogoLink.tsx"
 import { AssetsPanel } from "./AssetsPanel.tsx"
 import { CharacterManager } from "./CharacterManager.tsx"
-import { Chat, ChatInputRef } from "./Chat.tsx"
+import { Chat } from "./Chat.tsx"
+import { ChatInputContext, ChatInputHandle } from "./ChatInputContext.tsx"
 import { DocumentTitle } from "./DocumentTitle.tsx"
 import { EditableText } from "./EditableText.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
@@ -26,7 +27,7 @@ import { UserButton } from "./UserButton.tsx"
 export function Room({ slug }: { slug: string }) {
 	const room = useQuery(api.rooms.getBySlug, { slug })
 	const updateRoom = useMutation(api.rooms.update)
-	const chatInputRef = useRef<ChatInputRef | null>(null)
+	const chatInputRef = useRef<ChatInputHandle | null>(null)
 
 	const [playerName, setPlayerName] = useLocalStorageState<string | null>(
 		"Room:playerName",
@@ -63,7 +64,9 @@ export function Room({ slug }: { slug: string }) {
 			name: "Characters",
 			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
 			content: (
-				<CharacterManager chatInputRef={chatInputRef} roomId={room._id} />
+				<ChatInputContext value={chatInputRef}>
+					<CharacterManager roomId={room._id} />
+				</ChatInputContext>
 			),
 		},
 		{

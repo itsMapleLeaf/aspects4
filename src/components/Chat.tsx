@@ -5,10 +5,7 @@ import { rollDice } from "~/lib/dice.ts"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
-
-export interface ChatInputRef {
-	prefill: (value: string) => void
-}
+import type { ChatInputHandle } from "./ChatInputContext.tsx"
 
 const shortTimeFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
@@ -35,7 +32,7 @@ export function Chat({
 }: {
 	roomId: Id<"rooms">
 	playerName: string
-	chatInputRef: React.RefObject<ChatInputRef | null>
+	chatInputRef: React.RefObject<ChatInputHandle | null>
 	className?: string
 }) {
 	const remoteMessages = useQuery(api.messages.list, { roomId })

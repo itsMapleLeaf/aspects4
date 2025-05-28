@@ -1,6 +1,7 @@
-import { ComponentProps, ReactNode, useId } from "react"
+import { ComponentProps, ReactNode, use, useId } from "react"
 import { twMerge } from "tailwind-merge"
 import { ResolvedNumberField } from "../../characters/sheet/fields.ts"
+import { ChatInputContext } from "../../components/ChatInputContext.tsx"
 import { Button } from "../../components/ui/Button.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
 import { Tooltip } from "../../components/ui/Tooltip.tsx"
@@ -12,7 +13,7 @@ export function SheetStatField({
 	label,
 	description,
 	tooltip: tooltipContent,
-	score,
+	score = 0,
 	...props
 }: {
 	resolved: ResolvedNumberField
@@ -21,6 +22,7 @@ export function SheetStatField({
 	tooltip?: ReactNode
 	score?: number
 } & ComponentProps<"div">) {
+	const chatInputRef = use(ChatInputContext)
 	const fieldId = useId()
 
 	const editable = useEditableNumber({
@@ -42,19 +44,22 @@ export function SheetStatField({
 					render={<label htmlFor={fieldId} />}
 					content={tooltipContent}
 					placement="top-start"
-					className="flex flex-1 flex-col px-2.5 py-1.5 leading-tight transition ring-inset hover:text-primary-300"
+					className="flex flex-1 flex-col px-2.5 py-1.5 leading-tight transition ring-inset"
 				>
 					<div className="font-semibold">{label ?? toTitleCase(field.id)}</div>
 					<div className="text-sm font-medium opacity-60 empty:hidden">
 						{description}
 					</div>
 				</Tooltip>
-				{score != null && (
+				{score > 0 && (
 					<Button
 						type="button"
 						appearance="ghost"
 						className="flex h-full w-14 rounded-none p-0"
 						align="center"
+						onClick={() => {
+							chatInputRef.current?.prefill(`/roll aspects ${score}`)
+						}}
 					>
 						<DiceScoreIcon score={score} />
 					</Button>
