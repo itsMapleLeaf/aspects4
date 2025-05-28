@@ -14,6 +14,7 @@ export function Tooltip({
 	content,
 	className,
 	children,
+	...props
 }: TooltipProps) {
 	const tooltip = Ariakit.useTooltipStore({ placement })
 
@@ -21,6 +22,7 @@ export function Tooltip({
 		<>
 			<Ariakit.TooltipAnchor
 				store={tooltip}
+				{...props}
 				className={twMerge(
 					"inline-block cursor-default rounded-md focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none",
 					className,
