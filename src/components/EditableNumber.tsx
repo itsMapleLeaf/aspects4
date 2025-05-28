@@ -1,106 +1,34 @@
-import { clamp } from "es-toolkit"
-import { useId, useState, type ComponentProps, type ReactNode } from "react"
+import { useId, type ComponentProps, type ReactNode } from "react"
+import { twMerge } from "tailwind-merge"
 import { Button } from "~/components/ui/Button.tsx"
 import { Field } from "~/components/ui/Field.tsx"
 import { Input } from "~/components/ui/Input.tsx"
-import { parseNumberSafe } from "~/lib/utils.ts"
+import {
+	useEditableNumber,
+	type EditableNumberConfig,
+} from "./useEditableNumber.ts"
+
+interface EditableNumberProps extends EditableNumberConfig {
+	id?: string
+	className?: string
+}
 
 export function EditableNumber({
 	id,
 	className,
 	value: valueProp,
-	min = 0,
-	max = Number.POSITIVE_INFINITY,
+	min,
+	max,
 	onChange,
-}: {
-	id?: string
-	className?: string
-	min?: number
-	max?: number
-	value: number
-	onChange: (value: number) => void
-}) {
-	const value = clamp(valueProp, min, max)
-	const [editingValue, setEditingValue] = useState<string>()
-
-	function submitNewValue(newValue: number) {
-		onChange(clamp(newValue, min, max))
-	}
-
-	function wheelHandlerRef(element: HTMLElement | null) {
-		const controller = new AbortController()
-
-		element?.addEventListener(
-			"wheel",
-			(event) => {
-				event.preventDefault()
-
-				if (event.deltaY < 0) tweak(1)
-				if (event.deltaY > 0) tweak(-1)
-
-				function tweak(delta: number) {
-					const currentValue = parseNumberSafe(editingValue) ?? value
-					submitNewValue(clamp(currentValue + delta, min, max))
-					setEditingValue(undefined)
-				}
-			},
-			{ signal: controller.signal, passive: false },
-		)
-
-		return () => controller.abort()
-	}
+}: EditableNumberProps) {
+	const { rootProps, isEditing, inputProps, buttonProps, value } =
+		useEditableNumber({ value: valueProp, min, max, onChange })
 
 	return (
-		<div ref={wheelHandlerRef} className={className}>
-			{editingValue != null ?
-				<Input
-					id={id}
-					align="center"
-					className="w-full"
-					inputMode="numeric"
-					value={editingValue}
-					autoFocus
-					onFocus={(event) => {
-						event.currentTarget.select()
-					}}
-					onChange={(event) => {
-						setEditingValue(event.currentTarget.value)
-					}}
-					onBlur={() => {
-						submitNewValue(parseNumberSafe(editingValue) ?? 0)
-						setEditingValue(undefined)
-					}}
-					onKeyDown={(event) => {
-						const editingValueNormalized = parseNumberSafe(editingValue) ?? 0
-
-						if (event.key === "Enter") {
-							event.preventDefault()
-							submitNewValue(editingValueNormalized)
-							setEditingValue(undefined)
-						}
-
-						if (event.key === "ArrowUp") {
-							event.preventDefault()
-							const newValue = editingValueNormalized + 1
-							submitNewValue(newValue)
-							setEditingValue(String(clamp(newValue, min, max)))
-						}
-
-						if (event.key === "ArrowDown") {
-							event.preventDefault()
-							const newValue = editingValueNormalized - 1
-							submitNewValue(newValue)
-							setEditingValue(String(clamp(newValue, min, max)))
-						}
-					}}
-				/>
-			:	<Button
-					id={id}
-					className="w-full"
-					onClick={() => setEditingValue(String(value))}
-					onFocus={() => setEditingValue(String(value))}
-					align="center"
-				>
+		<div {...rootProps()} className={twMerge("flex", className)}>
+			{isEditing ?
+				<Input {...inputProps()} id={id} className="w-full" align="center" />
+			:	<Button {...buttonProps()} id={id} className="w-full" align="center">
 					{value}
 				</Button>
 			}
