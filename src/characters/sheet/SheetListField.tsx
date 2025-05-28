@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/Button.tsx"
 import { Field } from "../../components/ui/Field.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
 import { toTitleCase } from "../../lib/utils.ts"
-import { createFieldContext, type FieldContext } from "./fields.tsx"
+import { createFieldContext, type FieldContext } from "./fields.ts"
 
 export function SheetListField({
 	context,

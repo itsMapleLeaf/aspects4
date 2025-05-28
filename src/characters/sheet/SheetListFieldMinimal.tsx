@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { Button } from "../../components/ui/Button.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
 import { Tooltip } from "../../components/ui/Tooltip.tsx"
-import { createFieldContext, type FieldContext } from "./fields.tsx"
+import { createFieldContext, type FieldContext } from "./fields.ts"
 
 export function SheetListFieldMinimal({
 	context,
