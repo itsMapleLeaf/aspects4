@@ -3,6 +3,7 @@ import { uniqBy } from "es-toolkit"
 import { Fragment, useState, type ReactNode } from "react"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
+import { EditableNumber } from "../components/EditableNumber.tsx"
 import { EditableTextField } from "../components/EditableTextField.tsx"
 import { Badge, BadgeColor } from "../components/ui/Badge.tsx"
 import { Button } from "../components/ui/Button.tsx"
@@ -330,7 +331,7 @@ function AspectSkillsList({ sheet }: { sheet: FieldContext }) {
 
 	return mode === "view" ?
 			<section>
-				<ul className="mb-3 grid gap-4 px-3 py-3">
+				<ul className="mb-3 grid gap-2 px-3 py-3">
 					{resolvedList.items.map((item, index) => {
 						const resolved = resolveListItemFields(
 							createResolvedListItemContext(item, resolvedList, index),
@@ -376,9 +377,21 @@ function AspectSkillsList({ sheet }: { sheet: FieldContext }) {
 							<Fragment key={index}>
 								<Ariakit.HeadingLevel>
 									<li>
-										<p>
-											<strong className="text-lg">{resolved.name.value}</strong>
-										</p>
+										<EditableNumber
+											className="float-right mt-1 w-12"
+											aria-label={`Skill Points for ${resolved.name.value}`}
+											min={0}
+											value={resolved.points.value}
+											onChange={(value) => {
+												resolved.points.context.updateValue(
+													resolved.points.id,
+													value,
+												)
+											}}
+										/>
+										<Ariakit.Heading className="text-lg font-semibold">
+											{resolved.name.value}
+										</Ariakit.Heading>
 										<p>{resolved.description.value}</p>
 										<ul className="mt-1 flex flex-wrap gap-1.5">
 											{uniqBy(tags, (it) => it.text).map((tag) => (

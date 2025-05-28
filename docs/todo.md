@@ -7,19 +7,18 @@
 - [ ] click aspect labels to prefill roll
 - [ ] more helpful budget description: show your comfortable affordance, one lower, and limit or whatever
 - [ ] aspect skill modifier tag list + conditional extra field for weaken/enhance modifier, probably
-- [ ] (stretch) flat stat buffs from items
-- [ ] (stretch) rest button
+- [ ] ⭐ flat stat buffs from items
+- [ ] ⭐ rest button
 
 ### aspect skills
 
 - [x] aspect skills list
 - [x] view/edit mode
-- [x] tag tooltips
-- [ ] button to prefill roll
-- [ ] additional details on each construct
-- [ ] view mode: add/show assigned points
+- [x] tag tooltips (additional details for aspect, type, properties)
+- [x] view mode: add/show assigned points
+- [ ] click to prefill roll
 - [ ] show used/total skill points
-- [ ] some UX for adding examples/presets
+- [ ] ⭐ some UX for adding examples/presets
 
 ### milestones
 
