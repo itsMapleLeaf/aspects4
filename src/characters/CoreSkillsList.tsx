@@ -1,15 +1,17 @@
+import { use } from "react"
 import { Tooltip } from "../components/ui/Tooltip.tsx"
+import { CharacterSheetContext } from "./context.ts"
 import { SheetStatField } from "./sheet/components.tsx"
-import type { FieldContext } from "./sheet/fields.ts"
 import { SkillPointsUsage } from "./SkillPointsUsage.tsx"
 import { resolveCoreSkillFields, type CoreSkillInfo } from "./skills.ts"
 
-export function CoreSkillsList({ sheet }: { sheet: FieldContext }) {
+export function CoreSkillsList() {
+	const sheet = use(CharacterSheetContext)
 	const fields = resolveCoreSkillFields(sheet)
 
 	return (
 		<div className="@container grid gap-3">
-			<SkillPointsUsage sheet={sheet} />
+			<SkillPointsUsage />
 			<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
 				{fields.map((field) => (
 					<div

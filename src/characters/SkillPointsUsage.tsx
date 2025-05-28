@@ -1,9 +1,12 @@
-import type { FieldContext } from "./sheet/fields.ts"
-import { getUsedSkillPoints } from "./skills.ts"
+import { use } from "react"
+import { CharacterSheetContext } from "./context.ts"
+import { getTotalSkillPoints, getUsedSkillPoints } from "./skills.ts"
 
-export function SkillPointsUsage({ sheet }: { sheet: FieldContext }) {
-	const usedSkillPoints = getUsedSkillPoints(sheet)
+export function SkillPointsUsage() {
+	const sheet = use(CharacterSheetContext)
 	return (
-		<div className="font-semibold">{usedSkillPoints}/5 skill points used</div>
+		<div className="font-semibold">
+			{getUsedSkillPoints(sheet)}/{getTotalSkillPoints()} skill points used
+		</div>
 	)
 }

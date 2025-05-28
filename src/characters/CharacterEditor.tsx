@@ -1,11 +1,13 @@
 import * as Ariakit from "@ariakit/react"
-import { type ReactNode } from "react"
+import { use, type ReactNode } from "react"
+import { CharacterSheetContext } from "~/characters/context.ts"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
 import { AspectSkillsList } from "./AspectSkillsList.tsx"
 import type { Character } from "./character.ts"
+import { CharacterContext } from "./context.ts"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
 import { ASPECT_AURAS, ITEM_TYPES } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
@@ -35,6 +37,24 @@ export function CharacterEditor({
 	onValueChanged: (key: string, value: unknown) => void
 }) {
 	const sheet = createFieldContext(character.values, onValueChanged)
+
+	return (
+		<CharacterContext
+			value={{
+				character,
+				updateName: onNameChanged,
+				updateFieldValue: onValueChanged,
+			}}
+		>
+			<CharacterSheetContext value={sheet}>
+				<CharacterEditorInner />
+			</CharacterSheetContext>
+		</CharacterContext>
+	)
+}
+
+function CharacterEditorInner() {
+	const sheet = use(CharacterSheetContext)
 
 	const attributeFields = {
 		strength: resolveNumberField(sheet, { id: "strength", min: 1 }),
@@ -125,12 +145,12 @@ export function CharacterEditor({
 
 	const skillsTab = {
 		name: "Skills",
-		content: <CoreSkillsList sheet={sheet} />,
+		content: <CoreSkillsList />,
 	}
 
 	const aspectSkillsTab = {
 		name: "Aspect Skills",
-		content: <AspectSkillsList sheet={sheet} />,
+		content: <AspectSkillsList />,
 	}
 
 	const itemsTab = {
@@ -226,12 +246,7 @@ export function CharacterEditor({
 		<>
 			<div className="grid gap-6">
 				<div className="flex gap-2">
-					<EditableTextField
-						label="Name"
-						value={character.name}
-						onChange={onNameChanged}
-						className="flex-1"
-					/>
+					<NameField />
 					<SheetNumberField
 						resolved={resolveNumberField(sheet, { id: "bondActivations" })}
 						className="w-32"
@@ -275,6 +290,18 @@ export function CharacterEditor({
 				/>
 			</div>
 		</>
+	)
+}
+
+function NameField() {
+	const { character, updateName } = use(CharacterContext)
+	return (
+		<EditableTextField
+			label="Name"
+			value={character.name}
+			onChange={updateName}
+			className="flex-1"
+		/>
 	)
 }
 

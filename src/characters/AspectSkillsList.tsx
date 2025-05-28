@@ -1,7 +1,8 @@
 import * as Ariakit from "@ariakit/react"
 import { uniqBy } from "es-toolkit"
-import { ReactNode, useState } from "react"
+import { ReactNode, use, useState } from "react"
 import { ResolvedAspectSkillFields } from "~/characters/aspect-skills"
+import { CharacterSheetContext } from "~/characters/context.ts"
 import { ASPECT_ART_PROPERTIES } from "~/characters/data.ts"
 import {
 	SheetNumberField,
@@ -10,7 +11,6 @@ import {
 } from "~/characters/sheet/components.tsx"
 import {
 	createResolvedListItemContext,
-	FieldContext,
 	resolveListField,
 } from "~/characters/sheet/fields.ts"
 import { SheetListField } from "~/characters/sheet/SheetListField.tsx"
@@ -23,7 +23,8 @@ import ASPECTS from "~/data/list-of-aspects.json"
 import { resolveAspectSkillFields } from "./aspect-skills.ts"
 import { SkillPointsUsage } from "./SkillPointsUsage.tsx"
 
-export function AspectSkillsList({ sheet }: { sheet: FieldContext }) {
+export function AspectSkillsList() {
+	const sheet = use(CharacterSheetContext)
 	const resolvedList = resolveListField(sheet, "aspectSkills")
 
 	const [mode, setMode] = useState<"view" | "edit">(
@@ -55,7 +56,7 @@ export function AspectSkillsList({ sheet }: { sheet: FieldContext }) {
 	return (
 		<section aria-label="Aspect Skills" className="mb-4 grid gap-4">
 			<header>
-				<SkillPointsUsage sheet={sheet} />
+				<SkillPointsUsage />
 			</header>
 
 			<main className="contents">
