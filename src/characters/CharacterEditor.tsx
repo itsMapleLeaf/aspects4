@@ -116,11 +116,6 @@ function CharacterEditorInner() {
 						</div>
 					)}
 				</SheetListFieldMinimal>
-
-				<SheetTextField
-					resolved={resolveTextField(sheet, { id: "details" })}
-					multiline
-				/>
 			</div>
 		),
 	}
@@ -274,9 +269,15 @@ function CharacterEditorInner() {
 					})}
 					description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
 				/>
+
+				<SheetTextField
+					description="Add any other important details, and/or use this to track other important information."
+					multiline
+					resolved={resolveTextField(sheet, { id: "details" })}
+				/>
 			</div>
 
-			<div className="mt-4 grid gap-3">
+			<div className="mt-4">
 				<Tabs
 					persistenceKey="mainTabs"
 					tabs={[
