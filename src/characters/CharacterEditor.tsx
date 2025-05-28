@@ -1,14 +1,24 @@
 import * as Ariakit from "@ariakit/react"
-import { type ReactNode } from "react"
+import { uniqBy } from "es-toolkit"
+import { Fragment, useState, type ReactNode } from "react"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
+import { Badge, BadgeColor } from "../components/ui/Badge.tsx"
+import { Button } from "../components/ui/Button.tsx"
+import { Icon } from "../components/ui/Icon.tsx"
 import { Tooltip } from "../components/ui/Tooltip.tsx"
+import ASPECTS from "../data/list-of-aspects.json"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
 import LINEAGES from "../data/list-of-lineages.json"
 import CORE_SKILLS from "../data/list-of-skills.json"
 import type { Character } from "./character.ts"
-import { auraOptions, itemTypeOptions } from "./data.ts"
+import {
+	ASPECT_ART_PROPERTIES,
+	ASPECT_ART_TYPES,
+	ASPECT_AURAS,
+	ITEM_TYPES,
+} from "./data.ts"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -17,6 +27,8 @@ import {
 } from "./sheet/components.tsx"
 import {
 	createFieldContext,
+	createResolvedListItemContext,
+	resolveListField,
 	resolveNumberField,
 	resolveSelectField,
 	resolveTextField,
@@ -53,13 +65,6 @@ export function CharacterEditor({
 		darkness: resolveNumberField(sheet, { id: "darkness" }),
 	}
 
-	const coreSkills = CORE_SKILLS.sort((a, b) =>
-		a.skill.localeCompare(b.skill),
-	).map((info) => ({
-		info,
-		resolved: resolveNumberField(sheet, { id: `coreSkills:${info.skill}` }),
-	}))
-
 	const damageLimit =
 		attributeFields.strength.value + attributeFields.dexterity.value
 
@@ -67,11 +72,6 @@ export function CharacterEditor({
 		attributeFields.sense.value +
 		attributeFields.intellect.value +
 		attributeFields.presence.value
-
-	const usedSkillPoints = coreSkills.reduce(
-		(sum, { resolved }) => sum + resolved.value,
-		0,
-	)
 
 	const characterTab = {
 		name: "Character",
@@ -138,28 +138,18 @@ export function CharacterEditor({
 
 	const skillsTab = {
 		name: "Skills",
-		content: (
-			<div className="@container grid gap-3">
-				<strong className="font-semibold">
-					{usedSkillPoints}/5 skill points used
-				</strong>
-				<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
-					{coreSkills.map((props) => (
-						<CoreSkillField key={props.resolved.id} {...props} />
-					))}
-				</div>
-				<SheetTextField
-					resolved={resolveTextField(sheet, { id: "aspectSkills" })}
-					multiline
-				/>
-			</div>
-		),
+		content: <CoreSkillsList sheet={sheet} />,
+	}
+
+	const aspectSkillsTab = {
+		name: "Aspect Skills",
+		content: <AspectSkillsList sheet={sheet} />,
 	}
 
 	const itemsTab = {
 		name: "Items",
 		content: (
-			<SheetListField context={sheet} id="items">
+			<SheetListField resolved={resolveListField(sheet, "items")}>
 				{(itemContext) => (
 					<div className="grid gap-2">
 						<div className="flex gap-2">
@@ -189,7 +179,7 @@ export function CharacterEditor({
 							resolved={resolveSelectField(itemContext, {
 								id: "type",
 								defaultValue: "tool",
-								options: itemTypeOptions,
+								choices: ITEM_TYPES,
 							})}
 						/>
 
@@ -208,7 +198,7 @@ export function CharacterEditor({
 	const bondsTab = {
 		name: "Bonds",
 		content: (
-			<SheetListField context={sheet} id="bonds">
+			<SheetListField resolved={resolveListField(sheet, "bonds")}>
 				{(bondContext) => (
 					<div className="grid gap-2">
 						<div className="flex gap-2">
@@ -230,7 +220,7 @@ export function CharacterEditor({
 						<SheetSelectField
 							resolved={resolveSelectField(bondContext, {
 								id: "aura",
-								options: auraOptions,
+								choices: ASPECT_AURAS,
 							})}
 						/>
 						<SheetTextField
@@ -271,7 +261,7 @@ export function CharacterEditor({
 				<SheetSelectField
 					resolved={resolveSelectField(sheet, {
 						id: "budget",
-						options: EXPENSE_TIERS.sort((a, b) =>
+						choices: EXPENSE_TIERS.sort((a, b) =>
 							a.name.localeCompare(b.name),
 						).map((tier) => ({
 							label: tier.name,
@@ -287,14 +277,213 @@ export function CharacterEditor({
 			<div className="mt-4 grid gap-3">
 				<CharacterEditorTabs
 					persistenceKey="mainTabs"
-					tabs={[characterTab, statsTab, skillsTab, itemsTab, bondsTab]}
+					tabs={[
+						characterTab,
+						statsTab,
+						skillsTab,
+						aspectSkillsTab,
+						itemsTab,
+						bondsTab,
+					]}
 				/>
 			</div>
 		</>
 	)
 }
 
+function AspectSkillsList({ sheet }: { sheet: FieldContext }) {
+	const resolvedList = resolveListField(sheet, "aspectSkills")
+
+	const [mode, setMode] = useState<"view" | "edit">(
+		resolvedList.items.length === 0 ? "edit" : "view",
+	)
+
+	function resolveListItemFields(itemContext: FieldContext) {
+		return {
+			name: resolveTextField(itemContext, {
+				id: "name",
+				defaultValue: "New Aspect Skill",
+			}),
+			aspect: resolveSelectField(itemContext, {
+				id: "aspect",
+				choices: ASPECTS.map((item) => ({
+					value: item.name,
+					hint: item.material,
+				})),
+			}),
+			points: resolveNumberField(itemContext, {
+				id: "points",
+				min: 0,
+			}),
+			type: resolveSelectField(itemContext, {
+				id: "type",
+				choices: ASPECT_ART_TYPES,
+			}),
+			modifiers: resolveTextField(itemContext, {
+				id: "modifiers",
+			}),
+			description: resolveTextField(itemContext, {
+				id: "description",
+			}),
+		}
+	}
+
+	return mode === "view" ?
+			<section>
+				<ul className="mb-3 grid gap-4 px-3 py-3">
+					{resolvedList.items.map((item, index) => {
+						const resolved = resolveListItemFields(
+							createResolvedListItemContext(item, resolvedList, index),
+						)
+
+						type Tag = {
+							text: string
+							color: BadgeColor
+							tooltip?: ReactNode
+						}
+
+						const tags = [
+							resolved.aspect.value && {
+								text: resolved.aspect.value,
+								color: {
+									Fire: "red",
+									Water: "blue",
+									Wind: "green",
+									Light: "yellow",
+									Darkness: "purple",
+								}[resolved.aspect.value],
+								tooltip: ASPECTS.find((it) => it.name === resolved.aspect.value)
+									?.material,
+							},
+							resolved.type.value && {
+								text: resolved.type.value,
+								color: "bright",
+								tooltip: resolved.type.currentOption?.hint,
+							},
+							...resolved.modifiers.value
+								.split(/\s*[,+]\s*/g)
+								.map<Tag>((modifier) => ({
+									text: modifier,
+									color: "default",
+									tooltip: ASPECT_ART_PROPERTIES.find(
+										(prop) =>
+											prop.name.toLowerCase() === modifier.toLowerCase(),
+									)?.description,
+								})),
+						].filter<Tag>(Boolean)
+
+						return (
+							<Fragment key={index}>
+								<Ariakit.HeadingLevel>
+									<li>
+										<p>
+											<strong className="text-lg">{resolved.name.value}</strong>
+										</p>
+										<p>{resolved.description.value}</p>
+										<ul className="mt-1 flex flex-wrap gap-1.5">
+											{uniqBy(tags, (it) => it.text).map((tag) => (
+												<li key={tag.text}>
+													<Tooltip
+														content={tag.tooltip}
+														placement="bottom-start"
+													>
+														<Badge color={tag.color}>{tag.text}</Badge>
+													</Tooltip>
+												</li>
+											))}
+										</ul>
+									</li>
+								</Ariakit.HeadingLevel>
+							</Fragment>
+						)
+					})}
+				</ul>
+
+				<Button
+					icon={<Icon icon="mingcute:pencil-fill" />}
+					onClick={() => setMode("edit")}
+				>
+					Edit
+				</Button>
+			</section>
+		:	<section>
+				<Button
+					icon={<Icon icon="mingcute:check-fill" />}
+					onClick={() => setMode("view")}
+				>
+					Done
+				</Button>
+				<div className="my-3 border-b border-gray-800" />
+				<SheetListField
+					resolved={resolvedList}
+					extraActions={
+						<Button
+							icon={<Icon icon="mingcute:check-fill" />}
+							onClick={() => setMode("view")}
+						>
+							Done
+						</Button>
+					}
+				>
+					{(listContext) => {
+						const resolved = resolveListItemFields(listContext)
+						return (
+							<div className="grid gap-2">
+								<div className="flex gap-2">
+									<SheetTextField className="flex-1" resolved={resolved.name} />
+									<SheetSelectField
+										className="w-44"
+										placeholder="Choose an aspect"
+										resolved={resolved.aspect}
+									/>
+									<SheetNumberField
+										className="w-24"
+										resolved={resolved.points}
+									/>
+								</div>
+								<div className="flex gap-2">
+									<SheetSelectField className="w-40" resolved={resolved.type} />
+									<SheetTextField
+										className="flex-1"
+										resolved={resolved.modifiers}
+									/>
+								</div>
+								<SheetTextField multiline resolved={resolved.description} />
+							</div>
+						)
+					}}
+				</SheetListField>
+			</section>
+}
+
 type CoreSkillInfo = (typeof CORE_SKILLS)[number]
+
+function CoreSkillsList({ sheet }: { sheet: FieldContext }) {
+	const coreSkills = CORE_SKILLS.sort((a, b) =>
+		a.skill.localeCompare(b.skill),
+	).map((info) => ({
+		info,
+		resolved: resolveNumberField(sheet, { id: `coreSkills:${info.skill}` }),
+	}))
+
+	const usedSkillPoints = coreSkills.reduce(
+		(sum, { resolved }) => sum + resolved.value,
+		0,
+	)
+
+	return (
+		<div className="@container grid gap-3">
+			<strong className="font-semibold">
+				{usedSkillPoints}/5 skill points used
+			</strong>
+			<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
+				{coreSkills.map((props) => (
+					<CoreSkillField key={props.resolved.id} {...props} />
+				))}
+			</div>
+		</div>
+	)
+}
 
 function CoreSkillField({
 	info,
@@ -335,7 +524,7 @@ function CoreSkillFieldLabel({ info }: { info: CoreSkillInfo }) {
 function LineageFieldGroup({ sheet }: { sheet: FieldContext }) {
 	const lineage = resolveSelectField(sheet, {
 		id: "lineage",
-		options: LINEAGES.sort((a, b) => a.lineage.localeCompare(b.lineage)).map(
+		choices: LINEAGES.sort((a, b) => a.lineage.localeCompare(b.lineage)).map(
 			(item) => ({
 				label: item.lineage,
 				value: item.lineage,
@@ -400,12 +589,12 @@ function CharacterEditorTabs({
 			selectedId={selectedId}
 			setSelectedId={(id) => id != null && setSelectedId(id)}
 		>
-			<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
+			<Ariakit.TabList className="flex flex-wrap gap-1 rounded-md bg-gray-950/25 p-1">
 				{tabs.map((tab) => (
 					<Ariakit.Tab
 						key={tab.name}
 						id={tab.name}
-						className="rounded px-3 py-1.5 text-center text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+						className="flex-grow rounded px-3 py-1.5 text-center whitespace-nowrap text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
 					>
 						{tab.name || toTitleCase(tab.name)}
 					</Ariakit.Tab>

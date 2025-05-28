@@ -1,4 +1,5 @@
 import { parseNumberSafe } from "~/lib/utils.ts"
+import type { SelectChoice } from "../../components/ui/SelectField.tsx"
 
 export type FieldContext = {
 	values: Record<string, unknown>
@@ -40,31 +41,62 @@ export function resolveNumberField(
 }
 
 export type ResolvedSelectField = ReturnType<typeof resolveSelectField>
+
+export type ResolvedSelectChoice = SelectChoice & {
+	/**
+	 * Displays beneath the select label on the popover; if not provided, uses
+	 * description instead
+	 */
+	hint?: string
+}
+
 export function resolveSelectField(
 	context: FieldContext,
-	options: {
+	config: {
 		id: string
 		defaultValue?: string
-		options: Array<{
-			value: string
-			label: string
-			/** Displays beneath the select while this option is selected */
-			description?: string
-			/**
-			 * Displays beneath the select label on the popover; if not provided, uses
-			 * description instead
-			 */
-			hint?: string
-		}>
+		choices: readonly ResolvedSelectChoice[]
 	},
 ) {
-	const value = String(context.values[options.id] ?? options.defaultValue ?? "")
-	const currentOption = options.options.find((opt) => opt.value === value)
+	const value = String(context.values[config.id] ?? config.defaultValue ?? "")
+	const currentOption = config.choices.find((opt) => opt.value === value)
 	return {
-		id: options.id,
+		id: config.id,
 		value: value,
-		options: options.options,
+		choices: config.choices,
 		currentOption,
 		context,
 	}
+}
+
+export type ResolvedListField = ReturnType<typeof resolveListField>
+export type ResolvedListFieldItemValues = Record<string, unknown>
+
+export function resolveListField(context: FieldContext, id: string) {
+	const items: ResolvedListFieldItemValues[] = []
+	if (Array.isArray(context.values[id])) {
+		for (const item of context.values[id]) {
+			if (typeof item === "object" && item != null) {
+				items.push(item as Record<string, unknown>)
+			}
+		}
+	}
+
+	return {
+		id,
+		items,
+		setItems: (items: ResolvedListFieldItemValues[]) => {
+			context.updateValue(id, items)
+		},
+	}
+}
+
+export function createResolvedListItemContext(
+	item: ResolvedListFieldItemValues,
+	resolved: ResolvedListField,
+	index: number,
+): FieldContext {
+	return createFieldContext(item, (key, value) => {
+		resolved.setItems(resolved.items.with(index, { ...item, [key]: value }))
+	})
 }

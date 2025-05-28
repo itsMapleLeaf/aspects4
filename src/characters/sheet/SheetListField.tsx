@@ -1,97 +1,56 @@
-import * as Ariakit from "@ariakit/react"
 import type { ReactNode } from "react"
 import { Button } from "../../components/ui/Button.tsx"
-import { Field } from "../../components/ui/Field.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
-import { toTitleCase } from "../../lib/utils.ts"
-import { createFieldContext, type FieldContext } from "./fields.ts"
+import {
+	createResolvedListItemContext,
+	type FieldContext,
+	type ResolvedListField,
+} from "./fields.ts"
 
 export function SheetListField({
-	context,
-	id,
-	displayName,
+	resolved,
 	description,
 	children,
+	extraActions,
 }: {
-	context: FieldContext
-	id: string
-	displayName?: string
+	resolved: ResolvedListField
 	description?: string
-	children: (itemContext: FieldContext) => ReactNode
+	children: (item: FieldContext) => ReactNode
+	extraActions?: ReactNode
 }) {
-	const items: Record<string, unknown>[] = []
-	if (Array.isArray(context.values[id])) {
-		for (const value of context.values[id]) {
-			if (typeof value === "object" && value != null) {
-				items.push(value as Record<string, unknown>)
-			}
-		}
-	}
-
 	return (
-		<ListFieldLayout
-			heading={displayName ?? toTitleCase(id)}
-			onAdd={() => {
-				context.updateValue(id, [...items, {}])
-			}}
-		>
+		<div className="grid gap-3">
 			<p className="text-sm whitespace-pre-line text-gray-300 empty:hidden">
 				{description}
 			</p>
-			{items.map((item, index) => {
-				const itemContext = createFieldContext(item, (key, value) => {
-					return context.updateValue(
-						id,
-						items.with(index, { ...item, [key]: value }),
-					)
-				})
-
+			{resolved.items.map((item, index) => {
 				return (
 					<ListFieldItemLayout
 						key={index}
 						onRemove={() => {
-							context.updateValue(id, items.toSpliced(index, 1))
+							resolved.setItems(resolved.items.toSpliced(index, 1))
 						}}
 						onDuplicate={() => {
-							context.updateValue(id, items.toSpliced(index + 1, 0, item))
+							resolved.setItems(resolved.items.toSpliced(index + 1, 0, item))
 						}}
 					>
-						{children(itemContext)}
+						{children(createResolvedListItemContext(item, resolved, index))}
 					</ListFieldItemLayout>
 				)
 			})}
-		</ListFieldLayout>
-	)
-}
 
-function ListFieldLayout({
-	heading,
-	children,
-	onAdd,
-}: {
-	heading: ReactNode
-	children: ReactNode
-	onAdd: () => void
-}) {
-	return (
-		<Ariakit.HeadingLevel>
-			<Field
-				label={
-					<Ariakit.Heading className="mb-1 heading-xl">
-						{heading}
-					</Ariakit.Heading>
-				}
-			>
-				<div className="grid gap-3">
-					{children}
-					<div>
-						<Button icon={<Icon icon="mingcute:plus-fill" />} onClick={onAdd}>
-							Add New
-						</Button>
-					</div>
-				</div>
-			</Field>
-		</Ariakit.HeadingLevel>
+			<div className="flex gap-2">
+				<Button
+					icon={<Icon icon="mingcute:plus-fill" />}
+					onClick={() => {
+						resolved.setItems([...resolved.items, {}])
+					}}
+				>
+					Add New
+				</Button>
+				{extraActions}
+			</div>
+		</div>
 	)
 }
 

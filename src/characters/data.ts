@@ -1,4 +1,6 @@
-export const itemTypeOptions = [
+import type { ResolvedSelectChoice } from "./sheet/fields.ts"
+
+export const ITEM_TYPES = [
 	{
 		value: "consumable",
 		label: "Consumable",
@@ -16,7 +18,7 @@ export const itemTypeOptions = [
 	},
 ]
 
-export const auraOptions = [
+export const ASPECT_AURAS = [
 	{
 		value: "Fire",
 		label: "Fire",
@@ -44,5 +46,63 @@ export const auraOptions = [
 		value: "Darkness",
 		label: "Darkness",
 		description: "Manifests from tension, mistrust, and uncertainty.",
+	},
+]
+
+export const ASPECT_ART_TYPES: ResolvedSelectChoice[] = [
+	{
+		value: "Projectile",
+		hint: `a transient manifestation that moves in a direction or towards a *visible or known target* of your choosing, then disappears on contact`,
+	},
+	{
+		value: "Enchantment",
+		hint: `a direct, non-physical application of an effect on a *visible or known target*`,
+	},
+	{
+		value: "Construct",
+		hint: `physical manifestations which can be seen and interacted with`,
+	},
+	{
+		value: "Item",
+		hint: `wielding the product of your art as a utility`,
+	},
+	{
+		value: "Environmental",
+		hint: `modifies the area of the scene and affects present characters, including yourself`,
+	},
+]
+
+export const ASPECT_ART_PROPERTIES = [
+	{
+		name: "Damage",
+		description: `deal 1 damage per impact point to yourself or a target`,
+	},
+	{
+		name: "Healing",
+		description: `heal 1 damage or negative condition per impact point to yourself or a target`,
+	},
+	{
+		name: "Shield",
+		description: `as a reaction, prevent 1 damage per impact point against a target`,
+	},
+	{
+		name: "Enhance",
+		description: `add 1 die per impact point to a character’s next roll with a chosen skill`,
+	},
+	{
+		name: "Weaken",
+		description: `subtract 1 die per impact point from a character’s next roll with a chosen skill (to no less than 1)`,
+	},
+	{
+		name: "Exhaust",
+		description: `deal 1 fatigue per impact point`,
+	},
+	{
+		name: "Shift",
+		description: `move a target’s position`,
+	},
+	{
+		name: "Blast",
+		description: `apply this art to other nearby targets`,
 	},
 ]

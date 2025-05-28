@@ -2,11 +2,18 @@ import * as Ariakit from "@ariakit/react"
 import { ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 
+export type SelectChoice = {
+	value: string
+	label?: ReactNode
+	/** Displays beneath the select while this choice is selected */
+	description?: ReactNode
+}
+
 export function SelectField({
 	className,
 	label,
 	description,
-	options,
+	choices: choicesProp,
 	placeholder,
 	value,
 	onChangeValue,
@@ -15,10 +22,14 @@ export function SelectField({
 	label: ReactNode
 	description?: ReactNode
 	placeholder: ReactNode
-	options: Array<{ value: string; label: string; description?: ReactNode }>
+	choices: Array<SelectChoice>
 	value: string
 	onChangeValue: (value: string) => void
 }) {
+	const choices = choicesProp.map((it) => ({
+		...it,
+		label: it.label ?? it.value,
+	}))
 	return (
 		<Ariakit.SelectProvider
 			value={value}
@@ -33,7 +44,7 @@ export function SelectField({
 				<Ariakit.Select className="relative flex control items-center justify-between">
 					<Ariakit.SelectValue>
 						{(value) =>
-							options.find((opt) => opt.value === value)?.label ?? placeholder
+							choices.find((opt) => opt.value === value)?.label ?? placeholder
 						}
 					</Ariakit.SelectValue>
 					<div className="absolute right-1">
@@ -52,7 +63,7 @@ export function SelectField({
 					<div className="fixed inset-0 bg-black/25 opacity-0 transition data-enter:opacity-100" />
 				}
 			>
-				{options.map((option) => (
+				{choices.map((option) => (
 					<Ariakit.SelectItem
 						key={option.value}
 						value={option.value}

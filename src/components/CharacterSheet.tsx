@@ -132,7 +132,7 @@ export function CharacterSheet({
 					<SelectField
 						label="Persona"
 						placeholder="Choose a persona..."
-						options={personaList.map((p) => ({
+						choices={personaList.map((p) => ({
 							value: p.persona,
 							label: p.persona,
 							description: (
@@ -148,7 +148,7 @@ export function CharacterSheet({
 					<SelectField
 						label="Lineage"
 						placeholder="Choose a lineage..."
-						options={lineageList.map((l) => ({
+						choices={lineageList.map((l) => ({
 							value: l.lineage,
 							label: l.lineage,
 							description: (
@@ -632,7 +632,7 @@ function BondForm({
 				placeholder="Choose an aura..."
 				value={bond.aura || ""}
 				onChange={(event) => onChange({ ...bond, aura: event.target.value })}
-				options={[
+				choices={[
 					{
 						label: "Fire",
 						value: "Fire",

@@ -1,7 +1,9 @@
 @utility menu-panel {
 	@apply flex translate-y-1 flex-col gap-1 overflow-y-auto panel bg-gray-900 p-1 opacity-0 shadow-lg shadow-black/25 transition data-enter:translate-y-0 data-enter:opacity-100;
+	--max-length: var(--popover-overflow-padding) * 2;
 	min-width: 180px;
-	max-height: min(--spacing(80), calc(100vh - var(--spacing-4)));
+	max-width: calc(100vw - var(--max-length));
+	max-height: calc(max(--spacing(80), 100vh - var(--max-length)));
 }
 
 @utility menu-item {

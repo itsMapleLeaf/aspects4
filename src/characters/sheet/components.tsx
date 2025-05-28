@@ -94,14 +94,14 @@ export function SheetSelectField({
 				label={label}
 				placeholder={placeholder}
 				value={field.value}
-				options={field.options.map((opt) => ({
+				choices={field.choices.map((opt) => ({
 					...opt,
 					description: opt.hint ?? opt.description,
 				}))}
 				onChangeValue={(value) => field.context.updateValue(field.id, value)}
 			/>
 			<p className="mt-0.5 mb-1 text-sm text-gray-300 empty:hidden">
-				{field.options?.find((opt) => opt.value === field.value)?.description}
+				{field.choices?.find((opt) => opt.value === field.value)?.description}
 			</p>
 		</div>
 	)
