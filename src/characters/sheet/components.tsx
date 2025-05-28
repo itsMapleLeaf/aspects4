@@ -6,17 +6,17 @@ import {
 } from "../../components/EditableNumber.tsx"
 import { EditableTextField } from "../../components/EditableTextField.tsx"
 import { SelectField } from "../../components/ui/SelectField.tsx"
-import { toTitleCase } from "../../lib/utils.ts"
+import { lowerFirst, toTitleCase } from "../../lib/utils.ts"
 import type {
-	resolveNumberField,
-	resolveSelectField,
-	resolveTextField,
-} from "./fields.tsx"
+	ResolvedNumberField,
+	ResolvedSelectField,
+	ResolvedTextField,
+} from "./fields.ts"
 
 export function SheetTextField({
 	resolved: field,
 	...props
-}: { resolved: ReturnType<typeof resolveTextField> } & Partial<
+}: { resolved: ResolvedTextField } & Partial<
 	ComponentProps<typeof EditableTextField>
 >) {
 	return (
@@ -32,7 +32,7 @@ export function SheetTextField({
 export function SheetNumberField({
 	resolved: field,
 	...props
-}: { resolved: ReturnType<typeof resolveNumberField> } & Partial<
+}: { resolved: ResolvedNumberField } & Partial<
 	ComponentProps<typeof EditableNumberField>
 >) {
 	return (
@@ -52,7 +52,7 @@ export function SheetStatField({
 	label,
 	...props
 }: {
-	resolved: ReturnType<typeof resolveNumberField>
+	resolved: ResolvedNumberField
 	label?: ReactNode
 } & Partial<ComponentProps<typeof EditableNumber>>) {
 	return (
@@ -75,20 +75,28 @@ export function SheetStatField({
 export function SheetSelectField({
 	resolved: field,
 	...props
-}: { resolved: ReturnType<typeof resolveSelectField> } & Partial<
+}: { resolved: ResolvedSelectField } & Partial<
 	ComponentProps<typeof SelectField>
 >) {
+	const label = props.label ?? toTitleCase(field.id)
+
+	const placeholder =
+		props.placeholder ??
+		(typeof props.label === "string" ?
+			`Choose a ${lowerFirst(props.label)}`
+		:	`Choose a ${lowerFirst(toTitleCase(field.id))}`)
+
 	return (
 		<div>
 			<SelectField
 				{...props}
-				label={props.label ?? toTitleCase(field.id)}
+				label={label}
+				placeholder={placeholder}
 				value={field.value}
 				options={field.options.map((opt) => ({
 					...opt,
 					description: opt.hint ?? opt.description,
 				}))}
-				placeholder={props.placeholder ?? `Select ${toTitleCase(field.id)}`}
 				onChangeValue={(value) => field.context.updateValue(field.id, value)}
 			/>
 			<p className="mt-0.5 mb-1 text-sm text-gray-300 empty:hidden">

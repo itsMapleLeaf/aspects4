@@ -19,7 +19,7 @@ import {
 	resolveNumberField,
 	resolveSelectField,
 	resolveTextField,
-} from "./sheet/fields.tsx"
+} from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
 

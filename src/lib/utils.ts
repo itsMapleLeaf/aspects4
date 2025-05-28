@@ -50,3 +50,7 @@ export function toTitleCase(fieldId: string) {
 		)
 		.join(" ")
 }
+
+export function lowerFirst(text: string) {
+	return text.slice(0, 1).toLowerCase() + text.slice(1)
+}

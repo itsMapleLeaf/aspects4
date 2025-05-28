@@ -12,6 +12,7 @@ export function createFieldContext(
 	return { values, updateValue }
 }
 
+export type ResolvedTextField = ReturnType<typeof resolveTextField>
 export function resolveTextField(
 	context: FieldContext,
 	options: { id: string; defaultValue?: string },
@@ -23,6 +24,7 @@ export function resolveTextField(
 	}
 }
 
+export type ResolvedNumberField = ReturnType<typeof resolveNumberField>
 export function resolveNumberField(
 	context: FieldContext,
 	options: { id: string; defaultValue?: number; min?: number; max?: number },
@@ -37,6 +39,7 @@ export function resolveNumberField(
 	}
 }
 
+export type ResolvedSelectField = ReturnType<typeof resolveSelectField>
 export function resolveSelectField(
 	context: FieldContext,
 	options: {
