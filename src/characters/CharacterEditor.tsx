@@ -128,7 +128,7 @@ function CharacterEditorInner() {
 	const statsTab = {
 		name: "Stats",
 		content: (
-			<div className="grid grid-cols-2 gap-x-4">
+			<div className="grid grid-cols-2 gap-3">
 				<div className="grid gap-3">
 					{Object.values(attributeFields).map((field) => (
 						<SheetStatField key={field.id} resolved={field} />

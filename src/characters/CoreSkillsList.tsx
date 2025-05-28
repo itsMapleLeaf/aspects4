@@ -1,5 +1,4 @@
 import { use } from "react"
-import { Tooltip } from "../components/ui/Tooltip.tsx"
 import { CharacterSheetContext } from "./context.ts"
 import { SheetStatField } from "./sheet/components.tsx"
 import { SkillPointsUsage } from "./SkillPointsUsage.tsx"
@@ -12,7 +11,7 @@ export function CoreSkillsList() {
 	return (
 		<div className="@container grid gap-3">
 			<SkillPointsUsage />
-			<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
+			<div className="grid gap-3 @sm:grid-cols-2">
 				{fields.map((field) => (
 					<div
 						key={field.id}
@@ -22,6 +21,7 @@ export function CoreSkillsList() {
 						<SheetStatField
 							resolved={field}
 							label={<CoreSkillFieldLabel info={field.info} />}
+							tooltip={field.info.flavor}
 						/>
 					</div>
 				))}
@@ -32,15 +32,9 @@ export function CoreSkillsList() {
 
 function CoreSkillFieldLabel({ info }: { info: CoreSkillInfo }) {
 	return (
-		<Tooltip content={info.flavor} placement="bottom-start">
-			<button
-				type="button"
-				className="cursor-default leading-tight transition hover:text-primary-300"
-			>
-				{info.skill}
-				<br />
-				<span className="text-sm font-normal opacity-60">{info.attribute}</span>
-			</button>
-		</Tooltip>
+		<div>
+			<div>{info.skill}</div>
+			<div className="text-sm font-normal opacity-60">{info.attribute}</div>
+		</div>
 	)
 }
