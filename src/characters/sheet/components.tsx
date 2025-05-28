@@ -74,6 +74,7 @@ export function SheetStatField({
 
 export function SheetSelectField({
 	resolved: field,
+	className,
 	...props
 }: { resolved: ResolvedSelectField } & Partial<
 	ComponentProps<typeof SelectField>
@@ -87,7 +88,7 @@ export function SheetSelectField({
 		:	`Choose a ${lowerFirst(toTitleCase(field.id))}`)
 
 	return (
-		<div>
+		<div className={className}>
 			<SelectField
 				{...props}
 				label={label}
