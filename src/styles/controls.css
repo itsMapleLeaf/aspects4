@@ -1,5 +1,5 @@
 @utility control {
-	@apply h-10 panel-dark rounded border px-3 ring-2 ring-transparent transition focus:ring-primary-500/50 focus:outline-none;
+	@apply min-h-10 panel-dark rounded border px-3 ring-2 ring-transparent transition focus:ring-primary-500/50 focus:outline-none;
 }
 
 @utility button-solid {

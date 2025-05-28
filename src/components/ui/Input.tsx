@@ -21,14 +21,14 @@ export function Input({
 	...props
 }: InputProps) {
 	return (
-		<div className={twMerge("min-w-0", className)}>
+		<div className={twMerge("flex min-w-0 flex-col", className)}>
 			{label && (
 				<label className="mb-0.5 flex items-center gap-1 text-sm text-gray-300">
 					<p className="font-semibold">{label}</p>
 					{hint && <IconTooltip content={hint} className="size-4" />}
 				</label>
 			)}
-			<div className="flex items-center gap-2">
+			<div className="flex flex-1 items-center gap-2">
 				<input
 					className={twMerge(
 						`input flex-1`,

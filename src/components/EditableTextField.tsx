@@ -13,10 +13,12 @@ export function EditableTextField({
 }) {
 	const id = useId()
 	return (
-		<Field className={className} label={label} htmlFor={id}>
-			<p className="text-xs whitespace-pre-line text-gray-300 empty:hidden">
-				{description}
-			</p>
+		<Field
+			className={className}
+			label={label}
+			description={description}
+			htmlFor={id}
+		>
 			<EditableText id={id} {...props} />
 		</Field>
 	)
