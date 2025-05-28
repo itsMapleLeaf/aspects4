@@ -4,8 +4,8 @@ import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
-import listOfExpenseTiers from "../data/list-of-expense-tiers.json"
-import listOfLineages from "../data/list-of-lineages.json"
+import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
+import LINEAGES from "../data/list-of-lineages.json"
 import type { Character } from "./character.ts"
 import { auraOptions, itemTypeOptions } from "./data.ts"
 import {
@@ -84,7 +84,7 @@ export function CharacterEditor({
 				<SheetSelectField
 					resolved={resolveSelectField(sheet, {
 						id: "budget",
-						options: listOfExpenseTiers.map((tier) => ({
+						options: EXPENSE_TIERS.map((tier) => ({
 							label: tier.name,
 							value: tier.name,
 							description: tier.examples,
@@ -137,14 +137,14 @@ export function CharacterEditor({
 									<SheetSelectField
 										resolved={resolveSelectField(sheet, {
 											id: "lineage",
-											options: listOfLineages
-												.sort((a, b) => a.lineage.localeCompare(b.lineage))
-												.map((item) => ({
-													label: item.lineage,
-													value: item.lineage,
-													hint: item.memberCreatures,
-													description: item.ability,
-												})),
+											options: LINEAGES.sort((a, b) =>
+												a.lineage.localeCompare(b.lineage),
+											).map((item) => ({
+												label: item.lineage,
+												value: item.lineage,
+												hint: item.memberCreatures,
+												description: item.ability,
+											})),
 										})}
 									/>
 									<SheetTextField
