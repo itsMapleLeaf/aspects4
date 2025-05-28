@@ -1,6 +1,5 @@
 import * as Ariakit from "@ariakit/react"
 import { type ReactNode } from "react"
-import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
@@ -73,6 +72,179 @@ export function CharacterEditor({
 		(sum, { resolved }) => sum + resolved.value,
 		0,
 	)
+
+	const characterTab = {
+		name: "Character",
+		content: (
+			<div className="grid gap-3">
+				<SheetListFieldMinimal
+					context={sheet}
+					id="conditions"
+					description={`Damage limit: ${damageLimit}\nFatigue limit: ${fatigueLimit}`}
+				>
+					{(itemContext, index) => (
+						<div className="flex gap-2" key={index}>
+							<SheetTextField
+								resolved={resolveTextField(itemContext, {
+									id: "name",
+								})}
+								className="flex-1"
+								label={
+									index > 0 ?
+										<span className="sr-only">Condition</span>
+									:	"Condition"
+								}
+							/>
+							<SheetNumberField
+								resolved={resolveNumberField(itemContext, {
+									id: "intensity",
+								})}
+								className="w-20"
+								label={
+									index > 0 ?
+										<span className="sr-only">Intensity</span>
+									:	undefined
+								}
+							/>
+						</div>
+					)}
+				</SheetListFieldMinimal>
+
+				<SheetTextField
+					resolved={resolveTextField(sheet, { id: "details" })}
+					multiline
+				/>
+			</div>
+		),
+	}
+
+	const statsTab = {
+		name: "Stats",
+		content: (
+			<div className="grid grid-cols-2 gap-x-4">
+				<div className="grid gap-3">
+					{Object.values(attributeFields).map((field) => (
+						<SheetStatField key={field.id} resolved={field} />
+					))}
+				</div>
+				<div className="grid gap-3">
+					{Object.values(aspectFields).map((field) => (
+						<SheetStatField key={field.id} resolved={field} />
+					))}
+				</div>
+			</div>
+		),
+	}
+
+	const skillsTab = {
+		name: "Skills",
+		content: (
+			<div className="@container grid gap-3">
+				<strong className="font-semibold">
+					{usedSkillPoints}/5 skill points used
+				</strong>
+				<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
+					{coreSkills.map((props) => (
+						<CoreSkillField key={props.resolved.id} {...props} />
+					))}
+				</div>
+				<SheetTextField
+					resolved={resolveTextField(sheet, { id: "aspectSkills" })}
+					multiline
+				/>
+			</div>
+		),
+	}
+
+	const itemsTab = {
+		name: "Items",
+		content: (
+			<SheetListField context={sheet} id="items">
+				{(itemContext) => (
+					<div className="grid gap-2">
+						<div className="flex gap-2">
+							<SheetTextField
+								resolved={resolveTextField(itemContext, {
+									id: "name",
+									defaultValue: "New Item",
+								})}
+								className="flex-1"
+							/>
+							<SheetNumberField
+								resolved={resolveNumberField(itemContext, {
+									id: "size",
+									min: 1,
+								})}
+								className="w-16"
+							/>
+							<SheetNumberField
+								resolved={resolveNumberField(itemContext, {
+									id: "uses",
+								})}
+								className="w-16"
+							/>
+						</div>
+
+						<SheetSelectField
+							resolved={resolveSelectField(itemContext, {
+								id: "type",
+								defaultValue: "tool",
+								options: itemTypeOptions,
+							})}
+						/>
+
+						<SheetTextField
+							resolved={resolveTextField(itemContext, {
+								id: "description",
+							})}
+							multiline
+						/>
+					</div>
+				)}
+			</SheetListField>
+		),
+	}
+
+	const bondsTab = {
+		name: "Bonds",
+		content: (
+			<SheetListField context={sheet} id="bonds">
+				{(bondContext) => (
+					<div className="grid gap-2">
+						<div className="flex gap-2">
+							<SheetTextField
+								resolved={resolveTextField(bondContext, {
+									id: "name",
+									defaultValue: "New Bond",
+								})}
+								className="flex-1"
+							/>
+							<SheetNumberField
+								resolved={resolveNumberField(bondContext, {
+									id: "strength",
+									min: 1,
+								})}
+								className="w-24"
+							/>
+						</div>
+						<SheetSelectField
+							resolved={resolveSelectField(bondContext, {
+								id: "aura",
+								options: auraOptions,
+							})}
+						/>
+						<SheetTextField
+							resolved={resolveTextField(bondContext, {
+								id: "description",
+							})}
+							multiline
+						/>
+					</div>
+				)}
+			</SheetListField>
+		),
+	}
+
 	return (
 		<>
 			<div className="grid gap-6">
@@ -113,177 +285,10 @@ export function CharacterEditor({
 			</div>
 
 			<div className="mt-4 grid gap-3">
-				<CharacterEditorTabs persistenceKey="mainTabs">
-					{[
-						{
-							name: "Character",
-							content: (
-								<div className="grid gap-3">
-									<SheetListFieldMinimal
-										context={sheet}
-										id="conditions"
-										description={`Damage limit: ${damageLimit}\nFatigue limit: ${fatigueLimit}`}
-									>
-										{(itemContext, index) => (
-											<div className="flex gap-2" key={index}>
-												<SheetTextField
-													resolved={resolveTextField(itemContext, {
-														id: "name",
-													})}
-													className="flex-1"
-													label={
-														index > 0 ?
-															<span className="sr-only">Condition</span>
-														:	"Condition"
-													}
-												/>
-												<SheetNumberField
-													resolved={resolveNumberField(itemContext, {
-														id: "intensity",
-													})}
-													className="w-20"
-													label={
-														index > 0 ?
-															<span className="sr-only">Intensity</span>
-														:	undefined
-													}
-												/>
-											</div>
-										)}
-									</SheetListFieldMinimal>
-
-									<SheetTextField
-										resolved={resolveTextField(sheet, { id: "details" })}
-										multiline
-									/>
-								</div>
-							),
-						},
-						{
-							name: "Stats",
-							content: (
-								<div className="grid grid-cols-2 gap-x-4">
-									<div className="grid gap-3">
-										{Object.values(attributeFields).map((field) => (
-											<SheetStatField key={field.id} resolved={field} />
-										))}
-									</div>
-									<div className="grid gap-3">
-										{Object.values(aspectFields).map((field) => (
-											<SheetStatField key={field.id} resolved={field} />
-										))}
-									</div>
-								</div>
-							),
-						},
-						{
-							name: "Skills",
-							content: (
-								<div className="@container grid gap-3">
-									<strong className="font-semibold">
-										{usedSkillPoints}/5 skill points used
-									</strong>
-									<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
-										{coreSkills.map((props) => (
-											<CoreSkillField key={props.resolved.id} {...props} />
-										))}
-									</div>
-									<SheetTextField
-										resolved={resolveTextField(sheet, { id: "aspectSkills" })}
-										multiline
-									/>
-								</div>
-							),
-						},
-						{
-							name: "Items",
-							content: (
-								<SheetListField context={sheet} id="items">
-									{(itemContext) => (
-										<div className="grid gap-2">
-											<div className="flex gap-2">
-												<SheetTextField
-													resolved={resolveTextField(itemContext, {
-														id: "name",
-														defaultValue: "New Item",
-													})}
-													className="flex-1"
-												/>
-												<SheetNumberField
-													resolved={resolveNumberField(itemContext, {
-														id: "size",
-														min: 1,
-													})}
-													className="w-16"
-												/>
-												<SheetNumberField
-													resolved={resolveNumberField(itemContext, {
-														id: "uses",
-													})}
-													className="w-16"
-												/>
-											</div>
-
-											<SheetSelectField
-												resolved={resolveSelectField(itemContext, {
-													id: "type",
-													defaultValue: "tool",
-													options: itemTypeOptions,
-												})}
-											/>
-
-											<SheetTextField
-												resolved={resolveTextField(itemContext, {
-													id: "description",
-												})}
-												multiline
-											/>
-										</div>
-									)}
-								</SheetListField>
-							),
-						},
-						{
-							name: "Bonds",
-							content: (
-								<SheetListField context={sheet} id="bonds">
-									{(bondContext) => (
-										<div className="grid gap-2">
-											<div className="flex gap-2">
-												<SheetTextField
-													resolved={resolveTextField(bondContext, {
-														id: "name",
-														defaultValue: "New Bond",
-													})}
-													className="flex-1"
-												/>
-												<SheetNumberField
-													resolved={resolveNumberField(bondContext, {
-														id: "strength",
-														min: 1,
-													})}
-													className="w-24"
-												/>
-											</div>
-											<SheetSelectField
-												resolved={resolveSelectField(bondContext, {
-													id: "aura",
-													options: auraOptions,
-												})}
-											/>
-											<SheetTextField
-												resolved={resolveTextField(bondContext, {
-													id: "description",
-												})}
-												multiline
-											/>
-										</div>
-									)}
-								</SheetListField>
-							),
-						},
-					]}
-				</CharacterEditorTabs>
+				<CharacterEditorTabs
+					persistenceKey="mainTabs"
+					tabs={[characterTab, statsTab, skillsTab, itemsTab, bondsTab]}
+				/>
 			</div>
 		</>
 	)
@@ -372,11 +377,11 @@ function LineageFieldGroup({ sheet }: { sheet: FieldContext }) {
 }
 
 function CharacterEditorTabs({
-	children,
-	defaultTabName = children[0].name,
+	tabs,
+	defaultTabName = tabs[0]?.name,
 	persistenceKey,
 }: {
-	children: NonEmptyTuple<{ name: string; content: ReactNode }>
+	tabs: ReadonlyArray<{ name: string; content: ReactNode }>
 	defaultTabName?: string
 	persistenceKey: string
 }) {
@@ -386,13 +391,17 @@ function CharacterEditorTabs({
 		(input) => (typeof input === "string" ? input : defaultTabName),
 	)
 
+	if (tabs.length === 0) {
+		return null
+	}
+
 	return (
 		<Ariakit.TabProvider
 			selectedId={selectedId}
 			setSelectedId={(id) => id != null && setSelectedId(id)}
 		>
 			<Ariakit.TabList className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-gray-950/25 p-1">
-				{children.map((tab) => (
+				{tabs.map((tab) => (
 					<Ariakit.Tab
 						key={tab.name}
 						id={tab.name}
@@ -403,7 +412,7 @@ function CharacterEditorTabs({
 				))}
 			</Ariakit.TabList>
 
-			{children.map((tab) => (
+			{tabs.map((tab) => (
 				<Ariakit.TabPanel key={tab.name} id={tab.name} className="grid gap-3">
 					{tab.content}
 				</Ariakit.TabPanel>
