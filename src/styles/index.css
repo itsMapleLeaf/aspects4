@@ -62,6 +62,10 @@
 		@apply border-t border-gray-700 text-sm text-gray-300;
 	}
 
+	button {
+		text-align: start;
+	}
+
 	strong {
 		@apply font-medium;
 	}
