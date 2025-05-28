@@ -19,6 +19,7 @@ import {
 	resolveNumberField,
 	resolveSelectField,
 	resolveTextField,
+	type FieldContext,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
@@ -104,6 +105,8 @@ export function CharacterEditor({
 							name: "Character",
 							content: (
 								<div className="grid gap-3">
+									<LineageSelect sheet={sheet} />
+
 									<SheetListFieldMinimal
 										context={sheet}
 										id="conditions"
@@ -136,19 +139,7 @@ export function CharacterEditor({
 											</div>
 										)}
 									</SheetListFieldMinimal>
-									<SheetSelectField
-										resolved={resolveSelectField(sheet, {
-											id: "lineage",
-											options: LINEAGES.sort((a, b) =>
-												a.lineage.localeCompare(b.lineage),
-											).map((item) => ({
-												label: item.lineage,
-												value: item.lineage,
-												hint: item.memberCreatures,
-												description: item.ability,
-											})),
-										})}
-									/>
+
 									<SheetTextField
 										resolved={resolveTextField(sheet, { id: "details" })}
 										multiline
@@ -280,6 +271,50 @@ export function CharacterEditor({
 					]}
 				</CharacterEditorTabs>
 			</div>
+		</div>
+	)
+}
+
+function LineageSelect({ sheet }: { sheet: FieldContext }) {
+	const lineage = resolveSelectField(sheet, {
+		id: "lineage",
+		options: LINEAGES.sort((a, b) => a.lineage.localeCompare(b.lineage)).map(
+			(item) => ({
+				label: item.lineage,
+				value: item.lineage,
+				hint: item.memberCreatures,
+			}),
+		),
+	})
+
+	const [abilityName, abilityDescription] =
+		LINEAGES.find((it) => it.lineage === lineage.value)?.ability?.split(
+			" - ",
+			2,
+		) ?? []
+
+	return (
+		<div>
+			<div className="flex gap-2">
+				<SheetSelectField className="flex-1" resolved={lineage} />
+				{lineage.value === "Furbearer" && (
+					<SheetNumberField
+						className="w-32"
+						resolved={resolveNumberField(sheet, { id: "adaptationPoints" })}
+					/>
+				)}
+				{lineage.value === "Scalebearer" && (
+					<SheetNumberField
+						className="w-32"
+						resolved={resolveNumberField(sheet, { id: "reflectionPoints" })}
+					/>
+				)}
+			</div>
+			{abilityName && abilityDescription && (
+				<p className="mt-1 text-sm">
+					<strong>{abilityName}</strong> - <em>{abilityDescription}</em>
+				</p>
+			)}
 		</div>
 	)
 }
