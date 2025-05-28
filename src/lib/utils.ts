@@ -54,3 +54,29 @@ export function toTitleCase(fieldId: string) {
 export function lowerFirst(text: string) {
 	return text.slice(0, 1).toLowerCase() + text.slice(1)
 }
+
+/**
+ * No-op helper to explicitly specify a type in an expression position to aid
+ * inference. Compared to alternatives:
+ *
+ * - `satisfies` - Only ensures that an expression matches a type, and doesn't
+ *   change the inferred type
+ * - `as const` - Aggressively narrows the type and doesn't let you specify the
+ *   actual type you want
+ *
+ * @example
+ * 	type PlayerKind = "human" | "npc"
+ *
+ * 	const player = {
+ * 		kind: typed<PlayerKind>("human"),
+ * 	}
+ *
+ * 	type Player = typeof player
+ *
+ * 	const robot: Player = {
+ * 		kind: "npc",
+ * 	}
+ */
+export function typed<T>(value: T): T {
+	return value
+}
