@@ -84,7 +84,9 @@ export function CharacterEditor({
 				<SheetSelectField
 					resolved={resolveSelectField(sheet, {
 						id: "budget",
-						options: EXPENSE_TIERS.map((tier) => ({
+						options: EXPENSE_TIERS.sort((a, b) =>
+							a.name.localeCompare(b.name),
+						).map((tier) => ({
 							label: tier.name,
 							value: tier.name,
 							description: tier.examples,
