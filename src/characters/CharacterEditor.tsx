@@ -277,7 +277,7 @@ function CharacterEditorInner() {
 				/>
 			</div>
 
-			<div className="mt-4">
+			<div className="mt-6">
 				<Tabs
 					persistenceKey="mainTabs"
 					tabs={[
@@ -330,7 +330,7 @@ function Tabs({
 			selectedId={selectedId}
 			setSelectedId={(id) => id != null && setSelectedId(id)}
 		>
-			<Ariakit.TabList className="flex flex-wrap gap-1 rounded-md bg-gray-950/25 p-1">
+			<Ariakit.TabList className="mb-3 flex flex-wrap gap-1 rounded-md bg-gray-950/25 p-1">
 				{tabs.map((tab) => (
 					<Ariakit.Tab
 						key={tab.name}
