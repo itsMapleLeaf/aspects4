@@ -58,10 +58,13 @@ export function resolveSelectField(
 		}>
 	},
 ) {
+	const value = String(context.values[options.id] ?? options.defaultValue ?? "")
+	const currentOption = options.options.find((opt) => opt.value === value)
 	return {
 		id: options.id,
-		value: String(context.values[options.id] ?? options.defaultValue ?? ""),
+		value: value,
 		options: options.options,
+		currentOption,
 		context,
 	}
 }
