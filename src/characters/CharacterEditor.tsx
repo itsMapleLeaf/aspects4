@@ -9,12 +9,16 @@ import { AspectSkillsList } from "./AspectSkillsList.tsx"
 import type { Character } from "./character.ts"
 import { CharacterContext } from "./context.ts"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
-import { ASPECT_AURAS, ITEM_TYPES } from "./data.ts"
+import {
+	ASPECT_AURAS,
+	ASPECT_NAMES,
+	ATTRIBUTE_NAMES,
+	ITEM_TYPES,
+} from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
 import {
 	SheetNumberField,
 	SheetSelectField,
-	SheetStatField,
 	SheetTextField,
 } from "./sheet/components.tsx"
 import {
@@ -26,6 +30,8 @@ import {
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
+import { SheetStatField } from "./sheet/SheetStatField.tsx"
+import { resolveCharacterScores } from "./utils.ts"
 
 export function CharacterEditor({
 	character,
@@ -56,32 +62,17 @@ export function CharacterEditor({
 function CharacterEditorInner() {
 	const sheet = use(CharacterSheetContext)
 
-	const attributeFields = {
-		strength: resolveNumberField(sheet, { id: "strength", min: 1 }),
-		sense: resolveNumberField(sheet, { id: "sense", min: 1 }),
-		dexterity: resolveNumberField(sheet, { id: "dexterity", min: 1 }),
-		intellect: resolveNumberField(sheet, { id: "intellect", min: 1 }),
-		presence: resolveNumberField(sheet, { id: "presence", min: 1 }),
-	}
+	const scores = resolveCharacterScores(sheet)
 
-	const aspectFields = {
-		fire: resolveNumberField(sheet, { id: "fire" }),
-		water: resolveNumberField(sheet, { id: "water" }),
-		wind: resolveNumberField(sheet, { id: "wind" }),
-		light: resolveNumberField(sheet, { id: "light" }),
-		darkness: resolveNumberField(sheet, { id: "darkness" }),
-	}
-
-	const damageLimit =
-		attributeFields.strength.value + attributeFields.dexterity.value
+	const damageLimit = scores.scoreOf("Strength") + scores.scoreOf("Dexterity")
 
 	const fatigueLimit =
-		attributeFields.sense.value +
-		attributeFields.intellect.value +
-		attributeFields.presence.value
+		scores.scoreOf("Sense") +
+		scores.scoreOf("Intellect") +
+		scores.scoreOf("Presence")
 
 	const characterTab = {
-		name: "Character",
+		name: "Conditions",
 		content: (
 			<div className="grid gap-3">
 				<SheetListFieldMinimal
@@ -125,14 +116,30 @@ function CharacterEditorInner() {
 		content: (
 			<div className="grid grid-cols-2 gap-3">
 				<div className="grid gap-3">
-					{Object.values(attributeFields).map((field) => (
-						<SheetStatField key={field.id} resolved={field} />
-					))}
+					{ATTRIBUTE_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
+						(field) => (
+							<SheetStatField
+								key={field.id}
+								label={field.name}
+								tooltip={field.description}
+								score={scores.scoreOf(field.name)}
+								resolved={field}
+							/>
+						),
+					)}
 				</div>
 				<div className="grid gap-3">
-					{Object.values(aspectFields).map((field) => (
-						<SheetStatField key={field.id} resolved={field} />
-					))}
+					{ASPECT_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
+						(field) => (
+							<SheetStatField
+								key={field.id}
+								label={field.name}
+								tooltip={field.description}
+								score={scores.scoreOf(field.name)}
+								resolved={field}
+							/>
+						),
+					)}
 				</div>
 			</div>
 		),

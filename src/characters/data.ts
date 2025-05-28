@@ -1,5 +1,23 @@
 import type { ResolvedSelectChoice } from "./sheet/fields.ts"
 
+export type AttributeName = (typeof ATTRIBUTE_NAMES)[number] | (string & {})
+export const ATTRIBUTE_NAMES = [
+	"Strength",
+	"Sense",
+	"Dexterity",
+	"Intellect",
+	"Presence",
+] as const
+
+export type AspectName = (typeof ASPECT_NAMES)[number] | (string & {})
+export const ASPECT_NAMES = [
+	"Fire",
+	"Water",
+	"Wind",
+	"Light",
+	"Darkness",
+] as const
+
 export const ITEM_TYPES = [
 	{
 		value: "consumable",
