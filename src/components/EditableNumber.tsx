@@ -23,7 +23,11 @@ export function EditableNumber({
 	const value = clamp(valueProp, min, max)
 	const [editingValue, setEditingValue] = useState<string>()
 
-	const wheelHandlerRef = (element: HTMLElement | null) => {
+	function submitNewValue(newValue: number) {
+		onChange(clamp(newValue, min, max))
+	}
+
+	function wheelHandlerRef(element: HTMLElement | null) {
 		const controller = new AbortController()
 
 		element?.addEventListener(
@@ -36,10 +40,8 @@ export function EditableNumber({
 
 				function tweak(delta: number) {
 					const currentValue = parseNumberSafe(editingValue) ?? value
-					const newValue = clamp(currentValue + delta, min, max)
-
-					onChange(newValue)
-					setEditingValue(String(newValue))
+					submitNewValue(clamp(currentValue + delta, min, max))
+					setEditingValue(undefined)
 				}
 			},
 			{ signal: controller.signal, passive: false },
@@ -49,7 +51,7 @@ export function EditableNumber({
 	}
 
 	return (
-		<>
+		<div ref={wheelHandlerRef}>
 			{editingValue != null ?
 				<Input
 					id={id}
@@ -58,7 +60,6 @@ export function EditableNumber({
 					inputMode="numeric"
 					value={editingValue}
 					autoFocus
-					ref={wheelHandlerRef}
 					onFocus={(event) => {
 						event.currentTarget.select()
 					}}
@@ -66,34 +67,30 @@ export function EditableNumber({
 						setEditingValue(event.currentTarget.value)
 					}}
 					onBlur={() => {
-						onChange(clamp(parseNumberSafe(editingValue) ?? 0, min, max))
+						submitNewValue(parseNumberSafe(editingValue) ?? 0)
 						setEditingValue(undefined)
 					}}
 					onKeyDown={(event) => {
-						const normalizedEditingValue = clamp(
-							parseNumberSafe(editingValue) ?? 0,
-							min,
-							max,
-						)
+						const editingValueNormalized = parseNumberSafe(editingValue) ?? 0
 
 						if (event.key === "Enter") {
 							event.preventDefault()
-							onChange(normalizedEditingValue)
+							submitNewValue(editingValueNormalized)
 							setEditingValue(undefined)
 						}
 
 						if (event.key === "ArrowUp") {
 							event.preventDefault()
-							const newValue = normalizedEditingValue + 1
-							setEditingValue(String(newValue))
-							onChange(newValue)
+							const newValue = editingValueNormalized + 1
+							submitNewValue(newValue)
+							setEditingValue(String(clamp(newValue, min, max)))
 						}
 
 						if (event.key === "ArrowDown") {
 							event.preventDefault()
-							const newValue = normalizedEditingValue - 1
-							setEditingValue(String(newValue))
-							onChange(newValue)
+							const newValue = editingValueNormalized - 1
+							submitNewValue(newValue)
+							setEditingValue(String(clamp(newValue, min, max)))
 						}
 					}}
 				/>
@@ -103,12 +100,11 @@ export function EditableNumber({
 					onFocus={() => setEditingValue(String(value))}
 					align="center"
 					className={className}
-					ref={wheelHandlerRef}
 				>
 					{value}
 				</Button>
 			}
-		</>
+		</div>
 	)
 }
 
