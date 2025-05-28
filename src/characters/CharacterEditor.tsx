@@ -1,25 +1,14 @@
 import * as Ariakit from "@ariakit/react"
-import { uniqBy } from "es-toolkit"
-import { Fragment, useState, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
-import { EditableNumber } from "../components/EditableNumber.tsx"
 import { EditableTextField } from "../components/EditableTextField.tsx"
-import { Badge, BadgeColor } from "../components/ui/Badge.tsx"
-import { Button } from "../components/ui/Button.tsx"
-import { Icon } from "../components/ui/Icon.tsx"
-import { Tooltip } from "../components/ui/Tooltip.tsx"
-import ASPECTS from "../data/list-of-aspects.json"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
-import LINEAGES from "../data/list-of-lineages.json"
-import CORE_SKILLS from "../data/list-of-skills.json"
+import { AspectSkillsList } from "./AspectSkillsList.tsx"
 import type { Character } from "./character.ts"
-import {
-	ASPECT_ART_PROPERTIES,
-	ASPECT_ART_TYPES,
-	ASPECT_AURAS,
-	ITEM_TYPES,
-} from "./data.ts"
+import { CoreSkillsList } from "./CoreSkillsList.tsx"
+import { ASPECT_AURAS, ITEM_TYPES } from "./data.ts"
+import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -28,13 +17,10 @@ import {
 } from "./sheet/components.tsx"
 import {
 	createFieldContext,
-	createResolvedListItemContext,
 	resolveListField,
 	resolveNumberField,
 	resolveSelectField,
 	resolveTextField,
-	type FieldContext,
-	type ResolvedNumberField,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
@@ -276,7 +262,7 @@ export function CharacterEditor({
 			</div>
 
 			<div className="mt-4 grid gap-3">
-				<CharacterEditorTabs
+				<Tabs
 					persistenceKey="mainTabs"
 					tabs={[
 						characterTab,
@@ -292,293 +278,7 @@ export function CharacterEditor({
 	)
 }
 
-function AspectSkillsList({ sheet }: { sheet: FieldContext }) {
-	const resolvedList = resolveListField(sheet, "aspectSkills")
-
-	const [mode, setMode] = useState<"view" | "edit">(
-		resolvedList.items.length === 0 ? "edit" : "view",
-	)
-
-	function resolveListItemFields(itemContext: FieldContext) {
-		return {
-			name: resolveTextField(itemContext, {
-				id: "name",
-				defaultValue: "New Aspect Skill",
-			}),
-			aspect: resolveSelectField(itemContext, {
-				id: "aspect",
-				choices: ASPECTS.map((item) => ({
-					value: item.name,
-					hint: item.material,
-				})),
-			}),
-			points: resolveNumberField(itemContext, {
-				id: "points",
-				min: 0,
-			}),
-			type: resolveSelectField(itemContext, {
-				id: "type",
-				choices: ASPECT_ART_TYPES,
-			}),
-			modifiers: resolveTextField(itemContext, {
-				id: "modifiers",
-			}),
-			description: resolveTextField(itemContext, {
-				id: "description",
-			}),
-		}
-	}
-
-	return mode === "view" ?
-			<section>
-				<ul className="mb-3 grid gap-2 px-3 py-3">
-					{resolvedList.items.map((item, index) => {
-						const resolved = resolveListItemFields(
-							createResolvedListItemContext(item, resolvedList, index),
-						)
-
-						type Tag = {
-							text: string
-							color: BadgeColor
-							tooltip?: ReactNode
-						}
-
-						const tags = [
-							resolved.aspect.value && {
-								text: resolved.aspect.value,
-								color: {
-									Fire: "red",
-									Water: "blue",
-									Wind: "green",
-									Light: "yellow",
-									Darkness: "purple",
-								}[resolved.aspect.value],
-								tooltip: ASPECTS.find((it) => it.name === resolved.aspect.value)
-									?.material,
-							},
-							resolved.type.value && {
-								text: resolved.type.value,
-								color: "bright",
-								tooltip: resolved.type.currentOption?.hint,
-							},
-							...resolved.modifiers.value
-								.split(/\s*[,+]\s*/g)
-								.map<Tag>((modifier) => ({
-									text: modifier,
-									color: "default",
-									tooltip: ASPECT_ART_PROPERTIES.find(
-										(prop) =>
-											prop.name.toLowerCase() === modifier.toLowerCase(),
-									)?.description,
-								})),
-						].filter<Tag>(Boolean)
-
-						return (
-							<Fragment key={index}>
-								<Ariakit.HeadingLevel>
-									<li>
-										<EditableNumber
-											className="float-right mt-1 w-12"
-											aria-label={`Skill Points for ${resolved.name.value}`}
-											min={0}
-											value={resolved.points.value}
-											onChange={(value) => {
-												resolved.points.context.updateValue(
-													resolved.points.id,
-													value,
-												)
-											}}
-										/>
-										<Ariakit.Heading className="text-lg font-semibold">
-											{resolved.name.value}
-										</Ariakit.Heading>
-										<p>{resolved.description.value}</p>
-										<ul className="mt-1 flex flex-wrap gap-1.5">
-											{uniqBy(tags, (it) => it.text).map((tag) => (
-												<li key={tag.text}>
-													<Tooltip
-														content={tag.tooltip}
-														placement="bottom-start"
-													>
-														<Badge color={tag.color}>{tag.text}</Badge>
-													</Tooltip>
-												</li>
-											))}
-										</ul>
-									</li>
-								</Ariakit.HeadingLevel>
-							</Fragment>
-						)
-					})}
-				</ul>
-
-				<Button
-					icon={<Icon icon="mingcute:pencil-fill" />}
-					onClick={() => setMode("edit")}
-				>
-					Edit
-				</Button>
-			</section>
-		:	<section>
-				<Button
-					icon={<Icon icon="mingcute:check-fill" />}
-					onClick={() => setMode("view")}
-				>
-					Done
-				</Button>
-				<div className="my-3 border-b border-gray-800" />
-				<SheetListField
-					resolved={resolvedList}
-					extraActions={
-						<Button
-							icon={<Icon icon="mingcute:check-fill" />}
-							onClick={() => setMode("view")}
-						>
-							Done
-						</Button>
-					}
-				>
-					{(listContext) => {
-						const resolved = resolveListItemFields(listContext)
-						return (
-							<div className="grid gap-2">
-								<div className="flex gap-2">
-									<SheetTextField className="flex-1" resolved={resolved.name} />
-									<SheetSelectField
-										className="w-44"
-										placeholder="Choose an aspect"
-										resolved={resolved.aspect}
-									/>
-									<SheetNumberField
-										className="w-24"
-										resolved={resolved.points}
-									/>
-								</div>
-								<div className="flex gap-2">
-									<SheetSelectField className="w-40" resolved={resolved.type} />
-									<SheetTextField
-										className="flex-1"
-										resolved={resolved.modifiers}
-									/>
-								</div>
-								<SheetTextField multiline resolved={resolved.description} />
-							</div>
-						)
-					}}
-				</SheetListField>
-			</section>
-}
-
-type CoreSkillInfo = (typeof CORE_SKILLS)[number]
-
-function CoreSkillsList({ sheet }: { sheet: FieldContext }) {
-	const coreSkills = CORE_SKILLS.sort((a, b) =>
-		a.skill.localeCompare(b.skill),
-	).map((info) => ({
-		info,
-		resolved: resolveNumberField(sheet, { id: `coreSkills:${info.skill}` }),
-	}))
-
-	const usedSkillPoints = coreSkills.reduce(
-		(sum, { resolved }) => sum + resolved.value,
-		0,
-	)
-
-	return (
-		<div className="@container grid gap-3">
-			<strong className="font-semibold">
-				{usedSkillPoints}/5 skill points used
-			</strong>
-			<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
-				{coreSkills.map((props) => (
-					<CoreSkillField key={props.resolved.id} {...props} />
-				))}
-			</div>
-		</div>
-	)
-}
-
-function CoreSkillField({
-	info,
-	resolved,
-}: {
-	info: CoreSkillInfo
-	resolved: ResolvedNumberField
-}) {
-	return (
-		<div
-			key={info.skill}
-			data-active={resolved.value > 0 || undefined}
-			className="opacity-60 transition data-active:opacity-100"
-		>
-			<SheetStatField
-				resolved={resolved}
-				label={<CoreSkillFieldLabel info={info} />}
-			/>
-		</div>
-	)
-}
-
-function CoreSkillFieldLabel({ info }: { info: CoreSkillInfo }) {
-	return (
-		<Tooltip content={info.flavor} placement="bottom-start">
-			<button
-				type="button"
-				className="cursor-default leading-tight transition hover:text-primary-300"
-			>
-				{info.skill}
-				<br />
-				<span className="text-sm font-normal opacity-60">{info.attribute}</span>
-			</button>
-		</Tooltip>
-	)
-}
-
-function LineageFieldGroup({ sheet }: { sheet: FieldContext }) {
-	const lineage = resolveSelectField(sheet, {
-		id: "lineage",
-		choices: LINEAGES.sort((a, b) => a.lineage.localeCompare(b.lineage)).map(
-			(item) => ({
-				label: item.lineage,
-				value: item.lineage,
-				hint: item.memberCreatures,
-			}),
-		),
-	})
-
-	const [abilityName, abilityDescription] =
-		LINEAGES.find((it) => it.lineage === lineage.value)?.ability?.split(
-			" - ",
-			2,
-		) ?? []
-
-	return (
-		<div>
-			<div className="flex gap-2">
-				<SheetSelectField className="flex-1" resolved={lineage} />
-				{lineage.value === "Furbearer" && (
-					<SheetNumberField
-						className="w-32"
-						resolved={resolveNumberField(sheet, { id: "adaptationPoints" })}
-					/>
-				)}
-				{lineage.value === "Scalebearer" && (
-					<SheetNumberField
-						className="w-32"
-						resolved={resolveNumberField(sheet, { id: "reflectionPoints" })}
-					/>
-				)}
-			</div>
-			{abilityName && abilityDescription && (
-				<p className="mt-1 text-sm">
-					<strong>{abilityName}</strong> - <em>{abilityDescription}</em>
-				</p>
-			)}
-		</div>
-	)
-}
-
-function CharacterEditorTabs({
+function Tabs({
 	tabs,
 	defaultTabName = tabs[0]?.name,
 	persistenceKey,

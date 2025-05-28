@@ -16,8 +16,8 @@
 - [x] view/edit mode
 - [x] tag tooltips (additional details for aspect, type, properties)
 - [x] view mode: add/show assigned points
+- [x] show used/total skill points
 - [ ] click to prefill roll
-- [ ] show used/total skill points
 - [ ] ⭐ some UX for adding examples/presets
 
 ### milestones

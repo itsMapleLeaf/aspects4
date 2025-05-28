@@ -51,12 +51,12 @@ export function EditableNumber({
 	}
 
 	return (
-		<div ref={wheelHandlerRef}>
+		<div ref={wheelHandlerRef} className={className}>
 			{editingValue != null ?
 				<Input
 					id={id}
-					className={className}
 					align="center"
+					className="w-full"
 					inputMode="numeric"
 					value={editingValue}
 					autoFocus
@@ -96,10 +96,10 @@ export function EditableNumber({
 				/>
 			:	<Button
 					id={id}
+					className="w-full"
 					onClick={() => setEditingValue(String(value))}
 					onFocus={() => setEditingValue(String(value))}
 					align="center"
-					className={className}
 				>
 					{value}
 				</Button>

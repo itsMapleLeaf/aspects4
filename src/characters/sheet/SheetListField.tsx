@@ -20,9 +20,24 @@ export function SheetListField({
 }) {
 	return (
 		<div className="grid gap-3">
+			<div className="flex flex-wrap justify-between gap-2">
+				<Button
+					icon={<Icon icon="mingcute:plus-fill" />}
+					onClick={() => {
+						resolved.setItems([{}, ...resolved.items])
+					}}
+				>
+					Add New
+				</Button>
+				<div className="flex flex-wrap gap-2">{extraActions}</div>
+			</div>
+
+			<div className="my-1.5 border-b border-gray-800" />
+
 			<p className="text-sm whitespace-pre-line text-gray-300 empty:hidden">
 				{description}
 			</p>
+
 			{resolved.items.map((item, index) => {
 				return (
 					<ListFieldItemLayout
@@ -39,7 +54,7 @@ export function SheetListField({
 				)
 			})}
 
-			<div className="flex gap-2">
+			<div className="flex flex-wrap justify-between gap-2">
 				<Button
 					icon={<Icon icon="mingcute:plus-fill" />}
 					onClick={() => {
@@ -48,7 +63,7 @@ export function SheetListField({
 				>
 					Add New
 				</Button>
-				{extraActions}
+				<div className="flex flex-wrap gap-2">{extraActions}</div>
 			</div>
 		</div>
 	)
