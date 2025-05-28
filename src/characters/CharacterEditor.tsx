@@ -4,9 +4,10 @@ import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
+import listOfExpenseTiers from "../data/list-of-expense-tiers.json"
 import listOfLineages from "../data/list-of-lineages.json"
 import type { Character } from "./character.ts"
-import { auraOptions, budgetOptions, itemTypeOptions } from "./data.ts"
+import { auraOptions, itemTypeOptions } from "./data.ts"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -83,7 +84,11 @@ export function CharacterEditor({
 				<SheetSelectField
 					resolved={resolveSelectField(sheet, {
 						id: "budget",
-						options: budgetOptions,
+						options: listOfExpenseTiers.map((tier) => ({
+							label: tier.name,
+							value: tier.name,
+							description: tier.examples,
+						})),
 						defaultValue: "dirt",
 					})}
 					description="What's the most expensive thing you can afford? You can freely buy things two tiers down."

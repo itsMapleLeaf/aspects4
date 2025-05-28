@@ -1,37 +1,3 @@
-export const budgetOptions = [
-	{
-		value: "dirt",
-		label: "1. Dirt",
-		description: "Water and other freely-available resources",
-	},
-	{
-		value: "cheap",
-		label: "2. Cheap",
-		description: "Common meals, simple clothing",
-	},
-	{
-		value: "inexpensive",
-		label: "3. Inexpensive",
-		description: "Five-star meals, basic tools and weapons, reasonable lodging",
-	},
-	{
-		value: "steep",
-		label: "4. Steep",
-		description:
-			"Premium tools and weapons, extravagant clothing, comfortable lodging",
-	},
-	{
-		value: "expensive",
-		label: "5. Expensive",
-		description: "A house, luxurious lodging",
-	},
-	{ value: "valuable", label: "6. Valuable", description: "A mansion" },
-	{
-		value: "priceless",
-		label: "7. Priceless",
-		description: "An extremely rare, precious, powerful artifact",
-	},
-]
 export const itemTypeOptions = [
 	{
 		value: "consumable",
@@ -49,6 +15,7 @@ export const itemTypeOptions = [
 		description: "Can be worn for a persistent effect",
 	},
 ]
+
 export const auraOptions = [
 	{
 		value: "Fire",
