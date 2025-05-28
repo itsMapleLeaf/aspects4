@@ -1,5 +1,5 @@
 import * as Ariakit from "@ariakit/react"
-import { Fragment, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
@@ -22,6 +22,7 @@ import {
 	resolveSelectField,
 	resolveTextField,
 	type FieldContext,
+	type ResolvedNumberField,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
@@ -53,6 +54,13 @@ export function CharacterEditor({
 		darkness: resolveNumberField(sheet, { id: "darkness" }),
 	}
 
+	const coreSkills = CORE_SKILLS.sort((a, b) =>
+		a.skill.localeCompare(b.skill),
+	).map((info) => ({
+		info,
+		resolved: resolveNumberField(sheet, { id: `coreSkills:${info.skill}` }),
+	}))
+
 	const damageLimit =
 		attributeFields.strength.value + attributeFields.dexterity.value
 
@@ -61,9 +69,13 @@ export function CharacterEditor({
 		attributeFields.intellect.value +
 		attributeFields.presence.value
 
+	const usedSkillPoints = coreSkills.reduce(
+		(sum, { resolved }) => sum + resolved.value,
+		0,
+	)
 	return (
-		<div className="grid gap-8">
-			<div className="grid gap-3">
+		<>
+			<div className="grid gap-6">
 				<div className="flex gap-2">
 					<EditableTextField
 						label="Name"
@@ -75,15 +87,15 @@ export function CharacterEditor({
 						resolved={resolveNumberField(sheet, { id: "bondActivations" })}
 						className="w-32"
 					/>
-				</div>
-				<div className="grid grid-cols-2 gap-2">
 					<SheetNumberField
-						resolved={resolveNumberField(sheet, { id: "skillPoints" })}
-					/>
-					<SheetNumberField
+						label="Aspect EXP"
 						resolved={resolveNumberField(sheet, { id: "aspectExperience" })}
+						className="w-24"
 					/>
 				</div>
+
+				<LineageFieldGroup sheet={sheet} />
+
 				<SheetSelectField
 					resolved={resolveSelectField(sheet, {
 						id: "budget",
@@ -100,15 +112,13 @@ export function CharacterEditor({
 				/>
 			</div>
 
-			<div className="grid gap-3">
+			<div className="mt-4 grid gap-3">
 				<CharacterEditorTabs persistenceKey="mainTabs">
 					{[
 						{
 							name: "Character",
 							content: (
 								<div className="grid gap-3">
-									<LineageSelect sheet={sheet} />
-
 									<SheetListFieldMinimal
 										context={sheet}
 										id="conditions"
@@ -170,26 +180,12 @@ export function CharacterEditor({
 							name: "Skills",
 							content: (
 								<div className="@container grid gap-3">
+									<strong className="font-semibold">
+										{usedSkillPoints}/5 skill points used
+									</strong>
 									<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
-										{CORE_SKILLS.sort((a, b) =>
-											a.skill.localeCompare(b.skill),
-										).map((item) => (
-											<Fragment key={item.skill}>
-												<SheetStatField
-													label={
-														<Tooltip
-															content={item.flavor}
-															placement="bottom-start"
-															className="cursor-default"
-														>
-															{item.skill}
-														</Tooltip>
-													}
-													resolved={resolveNumberField(sheet, {
-														id: `coreSkills:${item.skill}`,
-													})}
-												/>
-											</Fragment>
+										{coreSkills.map((props) => (
+											<CoreSkillField key={props.resolved.id} {...props} />
 										))}
 									</div>
 									<SheetTextField
@@ -289,11 +285,49 @@ export function CharacterEditor({
 					]}
 				</CharacterEditorTabs>
 			</div>
+		</>
+	)
+}
+
+type CoreSkillInfo = (typeof CORE_SKILLS)[number]
+
+function CoreSkillField({
+	info,
+	resolved,
+}: {
+	info: CoreSkillInfo
+	resolved: ResolvedNumberField
+}) {
+	return (
+		<div
+			key={info.skill}
+			data-active={resolved.value > 0 || undefined}
+			className="opacity-60 transition data-active:opacity-100"
+		>
+			<SheetStatField
+				resolved={resolved}
+				label={<CoreSkillFieldLabel info={info} />}
+			/>
 		</div>
 	)
 }
 
-function LineageSelect({ sheet }: { sheet: FieldContext }) {
+function CoreSkillFieldLabel({ info }: { info: CoreSkillInfo }) {
+	return (
+		<Tooltip content={info.flavor} placement="bottom-start">
+			<button
+				type="button"
+				className="cursor-default leading-tight transition hover:text-primary-300"
+			>
+				{info.skill}
+				<br />
+				<span className="text-sm font-normal opacity-60">{info.attribute}</span>
+			</button>
+		</Tooltip>
+	)
+}
+
+function LineageFieldGroup({ sheet }: { sheet: FieldContext }) {
 	const lineage = resolveSelectField(sheet, {
 		id: "lineage",
 		options: LINEAGES.sort((a, b) => a.lineage.localeCompare(b.lineage)).map(
@@ -362,7 +396,7 @@ function CharacterEditorTabs({
 					<Ariakit.Tab
 						key={tab.name}
 						id={tab.name}
-						className="rounded px-3 py-1.5 text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+						className="rounded px-3 py-1.5 text-center text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
 					>
 						{tab.name || toTitleCase(tab.name)}
 					</Ariakit.Tab>

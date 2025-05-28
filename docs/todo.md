@@ -1,14 +1,21 @@
 ## aspects sheet features
 
-- [ ] core skill point assignments
+- [x] core skill point assignments
+- [x] label showing spent/total skill points
 - [ ] aspect skills list
-- [ ] label showing spent/total skill points
 - [ ] attribute/aspect point calculation + validation
 - [ ] click attribute labels to prefill roll
 - [ ] click aspect labels to prefill roll
-- [ ] list of milestone selections
+- [ ] more helpful budget description: show your comfortable affordance, one lower, and limit or whatever
 - [ ] (stretch) flat stat buffs from items
 - [ ] (stretch) rest button
+
+### milestones
+
+- [ ] list of milestone selections
+- [ ] computed skill point total
+- [ ] computed stress limits
+- (todo, break this down)
 
 ## sheet capabilities
 
