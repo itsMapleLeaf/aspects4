@@ -1,11 +1,13 @@
 import * as Ariakit from "@ariakit/react"
-import { type ReactNode } from "react"
+import { Fragment, type ReactNode } from "react"
 import type { NonEmptyTuple } from "type-fest"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
+import { Tooltip } from "../components/ui/Tooltip.tsx"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
 import LINEAGES from "../data/list-of-lineages.json"
+import CORE_SKILLS from "../data/list-of-skills.json"
 import type { Character } from "./character.ts"
 import { auraOptions, itemTypeOptions } from "./data.ts"
 import {
@@ -167,17 +169,33 @@ export function CharacterEditor({
 						{
 							name: "Skills",
 							content: (
-								<div className="grid gap-3">
-									<div className="grid grid-cols-2 gap-4">
-										<SheetTextField
-											resolved={resolveTextField(sheet, { id: "coreSkills" })}
-											multiline
-										/>
-										<SheetTextField
-											resolved={resolveTextField(sheet, { id: "aspectSkills" })}
-											multiline
-										/>
+								<div className="@container grid gap-3">
+									<div className="grid gap-x-6 gap-y-2 @sm:grid-cols-2">
+										{CORE_SKILLS.sort((a, b) =>
+											a.skill.localeCompare(b.skill),
+										).map((item) => (
+											<Fragment key={item.skill}>
+												<SheetStatField
+													label={
+														<Tooltip
+															content={item.flavor}
+															placement="bottom-start"
+															className="cursor-default"
+														>
+															{item.skill}
+														</Tooltip>
+													}
+													resolved={resolveNumberField(sheet, {
+														id: `coreSkills:${item.skill}`,
+													})}
+												/>
+											</Fragment>
+										))}
 									</div>
+									<SheetTextField
+										resolved={resolveTextField(sheet, { id: "aspectSkills" })}
+										multiline
+									/>
 								</div>
 							),
 						},
