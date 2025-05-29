@@ -4,9 +4,8 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "bunx convex dev --once --until-success && netlify dev",
-		"netlify:dev": "bunx run-p --print-label 'dev:*'",
-		"dev:vite": "vite",
+		"dev": "bunx convex dev --once --until-success && run-p 'dev:*'",
+		"dev:app": "netlify dev",
 		"dev:convex": "convex dev --tail-logs",
 		"build": "vite build",
 		"lint": "eslint .",

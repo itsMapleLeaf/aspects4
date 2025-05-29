@@ -1,8 +1,5 @@
 [dev]
-# I would just inline the setup script here,
-# but the way Netlify runs processes breaks the use of
-# `&&` and other shell constructs
-command = "bun run netlify:dev"
+command = "vite"
 
 [build]
 command = "bun run predeploy"
