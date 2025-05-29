@@ -3,7 +3,7 @@
 
 ## general app stuff
 
-- [ ] ‼️ update aspects dice algo
+- [x] ‼️ update aspects dice algo
 - [ ] ✨ cooler dice roll messages
 - [ ] ✨ silo characters in rooms (instead of sharing them across all rooms)
 

@@ -1,3 +1,5 @@
+import { randomInt, sum } from "es-toolkit"
+
 type DiceRollResult =
 	| { success: true; message: string }
 	| { success: false; error: string }
@@ -56,24 +58,18 @@ export function rollAspectsDice(count: number): DiceRollResult {
 	if (count <= 0 || count > 100) {
 		return {
 			success: false,
-			error: "Error: Invalid dice count. Must be between 1 and 100.",
+			error: "Error: Invalid dice count. Must be from 1 to 100.",
 		}
 	}
 
-	const rolls = []
-	let successCount = 0
-
+	const values = []
 	for (let i = 0; i < count; i++) {
-		const roll = Math.floor(Math.random() * 12) + 1
-		rolls.push(roll)
-
-		if (roll >= 9 && roll <= 11) {
-			successCount += 1
-		} else if (roll === 12) {
-			successCount += 2
-		}
+		const faceValues = [1, 1, 1, 2, 2, 3]
+		const value = faceValues[randomInt(faceValues.length)] as number
+		values.push(value)
 	}
 
-	const rollMessage = `Rolled ${count} dice: ${successCount} successes (${rolls.join(", ")})`
+	const result = sum(values)
+	const rollMessage = `Rolled ${count} dice. Result: ${result} (${values.join(", ")})`
 	return { success: true, message: rollMessage }
 }
