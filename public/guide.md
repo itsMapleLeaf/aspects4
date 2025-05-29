@@ -30,6 +30,8 @@ This story-first approach means that, while the game has clear rules and mechani
 
 </aside>
 
+### 🚧 Date & Time
+
 ### Scenes
 
 Gameplay is divided into chunks of interaction, or **scenes**. A scene begins when characters enter a location and the narrator allows characters to interact.
@@ -39,6 +41,36 @@ Scenes usually end when characters move to another location, but the narrator ma
 When the current scene ends, a new scene begins.
 
 _Example: A group of friends enters the popular Avians’ Rest cafe in Rosenfeld. The cafe's light aspect crystals cast a warm glow as they settle into a cozy corner booth. A waitress with white feathered wings takes their orders, while nearby, a young dragon-lineage student practices small fire aspect techniques to heat their coffee. When the group decides to head to the shopping district to browse for food and equipment, that scene ends, and a new scene begins at the market square._
+
+### Dice Rolls
+
+Dice rolls are used for making [actions](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4), determining [eventful rests](https://www.notion.so/1b8b0b885c0e80f78124e5e0be0f55bf#201b0b885c0e804dac66d12c95d10b84), determining a player’s luckiness, and any other time you or the narrator may find it useful.
+
+Dice rolls use any number of six-sided dice, where the number of them you roll may depend on various factors, such as your [attribute score](https://www.notion.so/1b1b0b885c0e80bd9d24c363bc9a1c01) when using it to make an action.
+
+The **value** of a die is the number it lands on after rolling, and the **result** is the sum of all the values.
+
+Dice in this game use a special set of face values: 1, 1, 1, 2, 2, 3.
+
+<aside>
+
+👀 These face values cause rolls to mostly hover towards the low end, with a few explosive results every so often!
+
+</aside>
+
+<aside>
+
+ℹ️ To simulate these dice with standard six-sided dice, then interpret the results like so:
+
+- 1-3 ⇒ **1**
+
+- 4-5 ⇒ **2**
+
+- 6 ⇒ **3**
+
+Example: you make a [Strength](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee) roll. Since you have a [Strength](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee) score of 4, you’ll roll 4 dice. The dice land on 1, 4, 2, and 6. The **value** of each die is 1, 2, 1, and 3 respectively. Add them together, and you get a **result** of **7**.
+
+</aside>
 
 ### Conditions
 
@@ -180,9 +212,39 @@ You are now unconscious and no longer overloaded.
 
 ### Resting
 
-You may heal 1 fatigue per 1 in-game hour spent resting. If you rest for 8 consecutive hours, heal all fatigue.
+<aside>
+
+🚧 this will change significantly
+
+</aside>
+
+You may heal 1 fatigue per 1 in-game hour spent resting. If you rest for 8 consecutive hours or more, heal all fatigue.
 
 Resting for any amount of time will also restore 1 [bond activation](https://www.notion.so/1bdb0b885c0e80a88e37d34e61d7f01f), to a max of 3.
+
+#### Eventful Rests
+
+Mind your time! The longer you rest, the more likely something may happen in the meantime.
+
+When resting, the narrator makes a [dice roll](https://www.notion.so/201b0b885c0e803d9b05f8fa5a3301da) with **one die per hour rested**. The result determines whether an event occurs, and the significance thereof:
+
+- 1-11 → **uneventful**; nothing notable happens.
+
+  _You sleep peacefully. Maybe a butterfly comes to land on your nose, and you shift a bit in your bedroll, but not much else happens._
+
+- 12-15 → **eventful**; a slight change occurs while resting
+
+  _You check your backpack, noticing that a few of your snacks are missing. You find a group of squirrels nearby munching on said snacks._
+
+- 16+ → **significant**, and your rest is interrupted: divide your resting time in half, rounded down. An event takes place that requires your immediate attention.
+
+  _You wake to the crackling thunder of a raging storm of biblical proportions. Hailstones shatter the window, and the wind flings your belongings about the room._
+
+<aside>
+
+🚧 idea: probably put a roll table here or something with generic event prompts
+
+</aside>
 
 ### Positioning, Movement & Distance
 
@@ -210,6 +272,36 @@ Attributes represent your character's capabilities in different domains. Charact
 | Sense     | Finding and picking up on things through the senses |
 | Strength  | Applying force and heavy hits                       |
 
+### Skills
+
+Your character’s skillset is informed by the **skill points** assigned to each **skill**.
+
+**Players start with 5 skill points**, and skills may have **up to 5 points** assigned to them.
+
+You may reassign any number of skill points at the start or end of sessions.
+
+| Skill      | Attribute | Effect                                                                                                      | Flavor                                                                                                    | Activation |
+| ---------- | --------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------- |
+| Intuit     | Intellect |                                                                                                             | _Apply understanding to solve a logical problem_                                                          |            |
+| Persuade   | Intellect |                                                                                                             | _Influence another character through reasoning_                                                           |            |
+| Aid        | Intellect |                                                                                                             | _Offer first aid to someone else_                                                                         |            |
+| Maneuver   | Dexterity |                                                                                                             | _Jumping, climbing, swimming, and other movements requiring precision and/or balance_                     |            |
+| Read       | Presence  |                                                                                                             | _Try to see through lies or glean someone's intent_                                                       |            |
+| Deceive    | Presence  |                                                                                                             | _Try to lie convincingly_                                                                                 |            |
+| Intimidate | Presence  |                                                                                                             | _Influence another character with threats or blackmail_                                                   |            |
+| Charm      | Presence  |                                                                                                             | _Influence another character with bribery, flattery, or amusement_                                        |            |
+| Shoot      | Dexterity | Make an action roll. Deal damage equal to the result to a far away target.                                  | _Fire a weapon to strike at a range_                                                                      |            |
+| Sneak      | Dexterity |                                                                                                             | _Stay hidden and/or quiet_                                                                                |            |
+| Dash       | Dexterity |                                                                                                             | _Move swiftly to get to your destination quicker_                                                         |            |
+| Dodge      | Dexterity | Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage. | _Evade an incoming attack_                                                                                | Reaction   |
+| Focus      | Sense     |                                                                                                             | _Perform meticulous and/or complex tasks requiring concentration_                                         |            |
+| Notice     | Sense     |                                                                                                             | _Reactively see, hear, or feel something_                                                                 |            |
+| Locate     | Sense     |                                                                                                             | _Proactively find something with your senses_                                                             |            |
+| Endure     | Strength  |                                                                                                             | _Resist external physical forces_                                                                         | Reaction   |
+| Exert      | Strength  |                                                                                                             | _Any general application of force: lifting things, pushing things, holding another character still, etc._ |            |
+| Block      | Strength  | Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1. | _Guard against an incoming attack_                                                                        | Reaction   |
+| Strike     | Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                    | _Attack a character with your fist or a weapon_                                                           |            |
+
 ### Actions
 
 Characters interact with the world and others through **actions**, an attempt at affecting the world in some way: to make progress, gain information, assert leverage over another, and so on. Some actions include:
@@ -232,48 +324,55 @@ If the action has some chance of failure or complication, that’s where **actio
 
 #### Action Rolls
 
-To make an action roll, choose the most appropriate [attribute](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b1b0b885c0e80bd9d24c363bc9a1c01) for the action, then roll a number of six-sided dice equal to the character’s score for that attribute.
+An action roll determines the impact and/or the level of success of an action.
 
-The **value** of each die depends on the face that it lands on. An action roll die has:
+To make an action roll:
 
-- three faces with a value of 1
+1. Choose the [skill](https://www.notion.so/1b8b0b885c0e802e837ef397dbac439a) that best fits your action.
 
-- two faces with a value of 2
+1. [Make a dice roll](https://www.notion.so/201b0b885c0e803d9b05f8fa5a3301da) with a number of dice equal to your score in that skill, _plus_ your score in the attribute for that skill.
 
-- one face with a value of 3
+The narrator may also add or remove dice for the roll depending on the situation.
 
-You can represent action dice with common numerical dice by assigning a value to each number according to the dice-value table.
+After rolling, the narrator will describe what happens based on the **impact** of the action, which is based on the result of the roll:
 
-The roll’s **result** is the **value** of each die added together.
+- Low impact: 1-5
 
-_Example: you make a\_\_ _[_Strength_](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee)_ roll. Since you have a _[_Strength_](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee)_ score of 4, you’ll roll 4 dice**. The dice land on 1, 4, 2, and 6. The value of each die is 1, 2, 1, and 3 respectively. Add them together, and you get a result of ****7**\_\_._
+- Medium impact: 6-10
 
-When rolling, the narrator determines a **difficulty tier** that describes how difficult the action is. Each tier defines a **requirement**, a result which must be met to avoid failure or complications.
+- High impact: 11+
 
-| Face | Value |
-| ---- | ----- |
-| 1    | **1** |
-| 2    | **1** |
-| 3    | **1** |
-| 4    | **2** |
-| 5    | **2** |
-| 6    | **3** |
+_Example:_
 
-| Tier        | Requirement | Description                                                             |
-| ----------- | ----------- | ----------------------------------------------------------------------- |
-| Simple      | 3           | Basic tasks with no real pressure. Anyone competent should pull it off. |
-| Routine     | 6           | Standard challenges; requires some skill or focus, but nothing special. |
-| Challenging | 9           | You’ll want solid stats and maybe some help.                            |
-| Harrowing   | 12          | A feat few can pull off. High risk, high reward. Expect to fail often.  |
-| Draconic    | 15          | Good luck!                                                              |
+- _Firing a crossbow at a moving target would involve _[_Shoot_](https://www.notion.so/1b1b0b885c0e80e7913cccd5f36843c4)
 
-If the roll’s result meets the requirement, the action succeeds without any complication. If the roll does not meet the requirement, the narrator may consider the action a failure and prevent it, or let the action succeed with an added complication.
+- _Collecting information from a crime scene would involve _[_Locate_](https://www.notion.so/1b1b0b885c0e807b9265dd0f77e22915)
 
-_Some tier requirements can’t even be met unless you roll a certain number of dice. For example: you can’t meet a task of Challenging difficulty with only 1 die, which can only give you a max of 3. As the narrator, you may consider such a roll for this task as an automatic failure and eschew the actual dice roll. Alternatively, you may let them make the roll and avoid some amount of complication with a higher result, even if they can’t meet the requirement._
+- _Trying to scare someone into giving back something they stole would involve _[_Intimidate_](https://www.notion.so/1b1b0b885c0e8075953cc499b88b921d)
+
+_Let’s say you’re making an _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)_ roll for deciphering the language of an ancient grimoire._
+
+_For this action, the narrator determines the outcome of each potential impact level:_
+
+- _Low impact: You can’t really make heads or tails of what’s written._
+
+- _Medium impact: you know what language it is, but it uses a lot of unfamiliar, arcane vocabulary. Deciphering the meaning of the text proves difficult._
+
+- _High impact: You can read and interpret the text in great detail._
+
+_The attribute for _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)_ is _[_Intellect_](https://www.notion.so/1b2b0b885c0e8097891bc55d3cadb9dd)_. You have a 3 in _[_Intellect_](https://www.notion.so/1b2b0b885c0e8097891bc55d3cadb9dd)_, and a 2 in _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)_; the total is 5, and that’s how many dice you’ll roll. You get 2 + 1 + 1 + 3 + 2 = 9, for medium impact._
+
+_The narrator says that you can decipher the language, but not much more beyond that. Maybe there’s an expert on the language you can bring this to._
 
 ##### Push Yourself
 
-After you make a roll, once per roll, you may take 2 fatigue to **push yourself** and reroll it, then take the new result if it’s higher than the previous.
+After you make an action roll, once per roll, you may take 2 fatigue to **push yourself** and reroll it, then take the new result if it’s higher than the previous.
+
+##### Assist
+
+When another player makes an action roll, once per roll, you may take 1 fatigue to **assist** them. For each skill point **you** have in the same skill that they’re rolling with, add that many dice to their roll.
+
+This does not apply to rerolls from Push Yourself, but you may spend fatigue **again** to assist with a reroll.
 
 ##### Contested Rolls
 
@@ -282,34 +381,6 @@ Use contested rolls to determine the victor of an adversarial situation. Both ch
 If there's a tie in successes, the character with the higher attribute score wins. If there's still a tie, both characters may choose to either back down or make another roll.
 
 _Example: A thief tries to pickpocket a merchant in a crowded marketplace. The thief rolls _[_Dexterity_](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995)_ to attempt the theft stealthily, while the merchant rolls _[_Sense_](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10)_ to notice the attempt. If the thief rolls higher, they successfully steal the item without being noticed. If the merchant rolls higher, they catch the thief in the act._
-
-### Skills
-
-Your character’s skillset is informed by the **skill points** assigned to each **skill**. When making an action roll, certain skills may give bonuses to the roll when relevant. For example: when making an action roll to break a window, the [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381) skill would be applicable.
-
-Players start with 5 skill points, and skills may only have up to 5 points assigned to them. You may reassign any number of skill points at the start or end of sessions.
-
-| Skill      | Attribute | Effect                                                                                                      | Flavor                                                                                                    | Activation |
-| ---------- | --------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------- |
-| Intuit     | Intellect |                                                                                                             | _Apply understanding to solve a logical problem_                                                          |            |
-| Persuade   | Intellect |                                                                                                             | _Influence another character through reasoning_                                                           |            |
-| Aid        | Intellect |                                                                                                             | _Offer first aid to someone else_                                                                         |            |
-| Maneuver   | Dexterity |                                                                                                             | _Jumping, climbing, swimming, and other movements requiring precision and/or balance_                     |            |
-| Read       | Presence  |                                                                                                             | _Try to see through lies or glean someone's intent_                                                       |            |
-| Deceive    | Presence  |                                                                                                             | _Try to lie convincingly_                                                                                 |            |
-| Intimidate | Presence  |                                                                                                             | _Influence another character with threats or blackmail_                                                   |            |
-| Charm      | Presence  |                                                                                                             | _Influence another character with bribery, flattery, or amusement_                                        |            |
-| Shoot      | Dexterity | Make an action roll. Deal damage equal to the result to a far away target.                                  | _Fire a weapon to strike at a range_                                                                      |            |
-| Sneak      | Dexterity |                                                                                                             | _Stay hidden and/or quiet_                                                                                |            |
-| Dash       | Dexterity |                                                                                                             | _Move swiftly to get to your destination quicker_                                                         |            |
-| Dodge      | Dexterity | Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage. | _Evade an incoming attack_                                                                                | Reaction   |
-| Focus      | Sense     |                                                                                                             | _Resist external emotional or any other form of mental influence_                                         |            |
-| Notice     | Sense     |                                                                                                             | _Reactively see, hear, or feel something_                                                                 |            |
-| Locate     | Sense     |                                                                                                             | _Proactively find something with your senses_                                                             |            |
-| Endure     | Strength  |                                                                                                             | _Resist external physical forces_                                                                         | Reaction   |
-| Exert      | Strength  |                                                                                                             | _Any general application of force: lifting things, pushing things, holding another character still, etc._ |            |
-| Block      | Strength  | Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1. | _Guard against an incoming attack_                                                                        | Reaction   |
-| Strike     | Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                    | _Attack a character with your fist or a weapon_                                                           |            |
 
 ### Unarmed Combat
 
@@ -383,21 +454,29 @@ You may only use aspects in which you have a score of 1 or higher, or if an effe
 
 #### Aspect Art
 
-Aspect art actions allow you to compose several parts to define the mechanical impact of an aspect art. Aspect art actions may be used as [reactions](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1b8b0b885c0e808fb835e607c32816dc).
+Aspect art actions are a special kind of [action](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4) that allow you to compose several parts to define the mechanical impact of an aspect art. Aspect art may be made as [reactions](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1b8b0b885c0e808fb835e607c32816dc).
 
 To perform an aspect art, follow these steps in any order.
 
 _(Click the arrow on each step to expand for more details.)_
 
-- Choose the aspects with which which you’re making the roll. Take 1 fatigue per chosen aspect _(including the first)_.
+- Choose one or more aspects for this art. Take 1 fatigue per chosen aspect _(including the first)_.
 
-_If using an _[_aspect skill_](https://www.notion.so/1b8b0b885c0e80809c18c6e0ccc7ab05#1cbb0b885c0e8031a981dc38bc6e9024)_, add any applicable bonuses._
+For the dice count, add together the following:
 
-The result is the number of **impact points** you may spend for this art to strengthen the impact of the art in various ways _(you may choose to spend none)_.
+- The **highest score** among your chosen aspects for this art
 
-Each type of aspect art comes with its own nuances.
+- If using an [aspect skill](https://www.notion.so/1b8b0b885c0e80809c18c6e0ccc7ab05#1cbb0b885c0e8031a981dc38bc6e9024), the number of skill points in that
 
-Additionally, all non-enchantment types include _both modification and removal_ of physical manifestations, except for [Water](https://www.notion.so/1b1b0b885c0e80d7b371d75b75b3ac1e), which only allows modification (you can’t create or destroy water).
+- Any situational modifiers applied by the narrator
+
+After rolling, the result is the number of **impact points** you may spend for this art to strengthen the impact of the art in various ways _(you may choose to spend none)_.
+
+_Example: you’re performing a _[_Water_](https://www.notion.so/1b1b0b885c0e80d7b371d75b75b3ac1e)_ art that extracts the water from a pile of wet clothes to dry them faster._
+
+_Let’s say your score in _[_Water_](https://www.notion.so/1b1b0b885c0e80d7b371d75b75b3ac1e)_ is 3, and that you’re using a specific aspect skill called “Extract Water” with 2 points in it. The narrator also subtracts a die because of the overall complexity of the task. That would give you ****4 dice**** for this roll._
+
+The type determines how your art manifests in a general sense, and how it interacts with the world.
 
 _Properties apply to targets that make contact with the projectile, after which, the projectile is destroyed, and its properties cannot be applied again. \_\_**This includes any obstacles that would intercept it while moving towards an intended target.**_
 
@@ -449,7 +528,9 @@ _When making an environmental art, the environmental modification stays in play 
 
 _Properties apply when targets first move into the area, ****and**** each time they move ****within**** the area (and ****not**** when they exit)._
 
-When choosing a property, assign any number of impact points to the property to increase its intensity. You cannot use the same impact points on multiple properties.
+_All non-enchantment types include both modification and removal of physical manifestations, except for _[_Water_](https://www.notion.so/1b1b0b885c0e80d7b371d75b75b3ac1e)_, which only allows modification (you can’t create or destroy water)._
+
+Properties give the art mechanical effects. When choosing a property, assign any number of impact points to the property to increase its **intensity**.
 
 Available properties include:
 
@@ -485,7 +566,7 @@ _Example: you could exclude specific characters or categories of targets from be
 
 - _characters with water as their highest aspect score_
 
-_You could also delaying its activation until another character makes a certain action or moves to a specific location, making it work similarly to a trap._
+_You could also delay its activation until another character makes a certain action or moves to a specific location, making it work similarly to a trap._
 
 _However, you ****cannot**** declare a condition that doubles damage on certain targets, for example._
 
@@ -904,11 +985,11 @@ Then, order follows on a logical basis, depending on factors such as:
 
 - A character’s speed or reaction time, represented by their [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) (those with a higher score would go sooner)
 
-For a more concretely determined order, you may also make competing [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls, where those with more successes go before those with less.
+For a more concretely determined order, you may also make competing [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls, going in order of highest to lowest rolls.
 
 Optionally, you can have **teams** of characters—those who are narratively allied and working towards or against the same goal—take their turns one after another, where initiative is counted on a per-team basis by adding the success count for everyone’s [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls. Your party would take their turns in any order, your adversaries would do the same, as well as any third-party groups that are neutral or enemies to either groups.
 
-You have one action during your turn. If you make a reaction (such as using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be)), you forfeit your action for your following turn.
+You can make up to one [action](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4) during your turn. If you make a reaction (such as using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be)), you forfeit your action for your following turn.
 
 Once per turn, you may use **adrenaline**, which allows you to take 2 fatigue for an additional action.
 
@@ -924,12 +1005,12 @@ _Click each entry below for more details!_
 
 | Lineage     | Ability                                                                                                                                                                                                                                                                                     | Member Creatures                                             |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Umbral      | **Push the Odds** - Once before making an action roll, you may take 1 fatigue to roll with **exploding** dice: when a die lands on 3, roll another die and add it to the result. Repeat for each new 3 that is rolled.                                                                      | _demons, succubus/incubus, vampires_                         |
+| Umbral      | **Push the Odds** - While making an action roll, any time you roll a 3, you may take 1 fatigue to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                                     | _demons, succubus/incubus, vampires_                         |
 | Arthropod   | **Double-Edged Senses** - Once per roll, you may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) action roll. Take 1 fatigue for every die in that roll with a value of 3.                                                                                | _insects, arachnids, bugs, most creatures with exoskeletons_ |
 | Avian       | **Momentum** - After making an action with [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following action roll gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       |
 | Aquatic     | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the action roll.                                                         | _fish, dolphins, other water-bound creatures_                |
 | Scalebearer | **Reflection** - When you take damage, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to an action roll.                                                                                                                           | _dragons, lizard, snake, alligator, crocodile_               |
-| Furbearer   | **Adaptation** - After you fail an action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                                      | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  |
+| Furbearer   | **Adaptation** - After you make a low-impact action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                            | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  |
 
 ### Character Creation
 
@@ -992,12 +1073,12 @@ Update the lineage section heading and also specify your member species, then co
 
 | Ability                                                                                                                                                                                                                                                                                     | Member Creatures                                             | Lineage     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------- |
-| **Push the Odds** - Once before making an action roll, you may take 1 fatigue to roll with **exploding** dice: when a die lands on 3, roll another die and add it to the result. Repeat for each new 3 that is rolled.                                                                      | _demons, succubus/incubus, vampires_                         | Umbral      |
+| **Push the Odds** - While making an action roll, any time you roll a 3, you may take 1 fatigue to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                                     | _demons, succubus/incubus, vampires_                         | Umbral      |
 | **Double-Edged Senses** - Once per roll, you may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) action roll. Take 1 fatigue for every die in that roll with a value of 3.                                                                                | _insects, arachnids, bugs, most creatures with exoskeletons_ | Arthropod   |
 | **Momentum** - After making an action with [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following action roll gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       | Avian       |
 | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the action roll.                                                         | _fish, dolphins, other water-bound creatures_                | Aquatic     |
 | **Reflection** - When you take damage, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to an action roll.                                                                                                                           | _dragons, lizard, snake, alligator, crocodile_               | Scalebearer |
-| **Adaptation** - After you fail an action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                                      | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  | Furbearer   |
+| **Adaptation** - After you make a low-impact action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                            | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  | Furbearer   |
 
 <aside>
 
@@ -1162,9 +1243,11 @@ Darkness: 3
 
 ##### Assign [skill points](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e8015812fda2be0aa71ba).
 
-Your character’s skillset is informed by the **skill points** assigned to each **skill**. When making an action roll, certain skills may give bonuses to the roll when relevant. For example: when making an action roll to break a window, the [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381) skill would be applicable.
+Your character’s skillset is informed by the **skill points** assigned to each **skill**.
 
-Players start with 5 skill points, and skills may only have up to 5 points assigned to them. You may reassign any number of skill points at the start or end of sessions.
+**Players start with 5 skill points**, and skills may have **up to 5 points** assigned to them.
+
+You may reassign any number of skill points at the start or end of sessions.
 
 <aside>
 
@@ -1194,7 +1277,7 @@ Surge: +1
 | Dexterity |                                                                                                             | _Stay hidden and/or quiet_                                                                                | Sneak      |            |
 | Dexterity |                                                                                                             | _Move swiftly to get to your destination quicker_                                                         | Dash       |            |
 | Dexterity | Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage. | _Evade an incoming attack_                                                                                | Dodge      | Reaction   |
-| Sense     |                                                                                                             | _Resist external emotional or any other form of mental influence_                                         | Focus      |            |
+| Sense     |                                                                                                             | _Perform meticulous and/or complex tasks requiring concentration_                                         | Focus      |            |
 | Sense     |                                                                                                             | _Reactively see, hear, or feel something_                                                                 | Notice     |            |
 | Sense     |                                                                                                             | _Proactively find something with your senses_                                                             | Locate     |            |
 | Strength  |                                                                                                             | _Resist external physical forces_                                                                         | Endure     | Reaction   |
@@ -1299,7 +1382,7 @@ Additionally, narrators may determine the impact of an NPC action narratively an
 
 - Gain 3 skill points
 
-- Increase damage limit or fatigue limit by 5 (up to 3 times)
+- Increase damage limit or fatigue limit by 5 _(up to 3 times)_
 
 When choosing an upgrade, add a new “Milestones” section on your character sheet if you don’t have one. Then add a note for the milestone that was achieved and the corresponding upgrade.
 
@@ -1413,3 +1496,39 @@ Among these variant folk, you'll see some happily chatting with friends through 
 Your ears suddenly flick and stand tall as they pick up a noise from behind, but as you turn to look, no one is there. It sounded like a gasp—almost like… a squelched shout? …Maybe you're hearing things.
 
 _Banner source: _[_https://www.pixiv.net/en/artworks/128156485_](https://www.pixiv.net/en/artworks/128156485)
+
+## Inspirations
+
+- [Charge RPG](https://keeper.farirpgs.com/resources/fari-rpgs/charge/)
+
+- [Call of Cthulhu](https://www.chaosium.com/call-of-cthulhu-rpg/)
+
+- [Daggerheart](https://www.daggerheart.com/)
+
+- [Dungeons & Dragons](https://www.dndbeyond.com/)
+
+- [Avatar: The Last Airbender](https://avatar.fandom.com/wiki/Avatar:_The_Last_Airbender)
+
+- Several fantasy / isekai / supernatural series, including:
+
+  - [Frieren: Beyond Journey’s End](https://anilist.co/manga/118586/Frieren-Beyond-Journeys-End/)
+
+  - [Re:ZERO](https://anilist.co/anime/21355/ReZERO-Starting-Life-in-Another-World/)
+
+  - [Ascendance of a Bookworm](https://anilist.co/anime/108268/Ascendance-of-a-Bookworm/)
+
+  - [Lycoris Recoil](https://anilist.co/anime/143270/Lycoris-Recoil/)
+
+  - [Mushoku Tensei: Jobless Reincarnation](https://anilist.co/anime/108465/Mushoku-Tensei-Jobless-Reincarnation/)
+
+  - [The Demon Girl Next Door](https://anilist.co/anime/107490/The-Demon-Girl-Next-Door/)
+
+  - [The Executioner and Her Way of Life](https://anilist.co/anime/129193/The-Executioner-and-Her-Way-of-Life/)
+
+  - [The Saint’s Magic Power is Omnipotent](https://anilist.co/anime/123802/The-Saints-Magic-Power-is-Omnipotent/)
+
+  - [Wonder Egg Priority](https://anilist.co/anime/124845/WONDER-EGG-PRIORITY/)
+
+  - [Wandering Witch: The Journey of Elaina](https://anilist.co/anime/112609/Wandering-Witch-The-Journey-of-Elaina/)
+
+- My awesome friends who put up with my mostly-coherent rambling

@@ -1,6 +1,6 @@
 [
   {
-    "ability": "Push the Odds - Once before making an action roll, you may take 1 fatigue to roll with exploding dice: when a die lands on 3, roll another die and add it to the result. Repeat for each new 3 that is rolled.",
+    "ability": "Push the Odds - While making an action roll, any time you roll a 3, you may take 1 fatigue to add an additional die to your roll and add it to the result (including any additional 3s that are rolled this way).",
     "memberCreatures": "demons, succubus/incubus, vampires",
     "lineage": "Umbral"
   },
@@ -25,7 +25,7 @@
     "lineage": "Scalebearer"
   },
   {
-    "ability": "Adaptation - After you fail an action roll, gain one adaptation point. At any time, spend any number of adaptation points to add that many dice to an action roll (except rolls that gave you those points).",
+    "ability": "Adaptation - After you make a low-impact action roll, gain one adaptation point. At any time, spend any number of adaptation points to add that many dice to an action roll (except rolls that gave you those points).",
     "memberCreatures": "dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons",
     "lineage": "Furbearer"
   }
