@@ -38,8 +38,7 @@ export function resolveCharacterScores(sheet: FieldContext) {
 
 	return {
 		fields,
-		scoreOf: (attributeName: AttributeName) => {
-			return fields.get(attributeName)?.value ?? 0
-		},
+		scoreOf: (attributeName: AttributeName) =>
+			fields.get(attributeName)?.value ?? 0,
 	}
 }

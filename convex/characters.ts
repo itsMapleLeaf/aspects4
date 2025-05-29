@@ -2,40 +2,24 @@ import { getAuthUserId } from "@convex-dev/auth/server"
 import { omit as omitValidator } from "convex-helpers"
 import { partial } from "convex-helpers/validators"
 import { v } from "convex/values"
-import { omit } from "es-toolkit"
-import type { OverrideProperties, SetRequired } from "type-fest"
-import type { Doc } from "./_generated/dataModel"
+import type { Merge, SetRequired } from "type-fest"
+import type { Doc, Id } from "./_generated/dataModel"
 import { mutation, query } from "./_generated/server"
 import schema from "./schema.ts"
 
-export const migrate = mutation({
-	async handler(ctx) {
-		for await (const roomCharacter of ctx.db.query("roomCharacters")) {
-			const character = (await ctx.db.get(roomCharacter.characterId))!
-			await ctx.db.insert("characters", {
-				...omit(character, ["_id", "_creationTime"]),
-				roomId: roomCharacter.roomId,
-				data: {
-					...character.data,
-					items: character.items,
-					bonds: character.bonds,
-				},
-				items: undefined,
-				bonds: undefined,
-			})
-		}
-	},
-})
-
-export type NormalizedCharacter = OverrideProperties<
+export type NormalizedCharacter = Merge<
 	SetRequired<Doc<"characters">, "name">,
 	{
 		data: Record<string, unknown>
+		isOwner: boolean
 	}
 >
 
-function normalizeCharacter(doc: Doc<"characters">): NormalizedCharacter {
-	return { name: "", data: {}, ...doc }
+function normalizeCharacter(
+	doc: Doc<"characters">,
+	userId: Id<"users">,
+): NormalizedCharacter {
+	return { name: "", data: {}, ...doc, isOwner: doc.ownerId === userId }
 }
 
 export const get = query({
@@ -58,7 +42,7 @@ export const listByRoom = query({
 
 		return characters
 			.filter((it) => it.isPublic || it.ownerId === userId)
-			.map(normalizeCharacter)
+			.map((it) => normalizeCharacter(it, userId))
 			.sort((a, b) => a.name.localeCompare(b.name))
 	},
 })
@@ -73,7 +57,7 @@ export const listOwned = query({
 			.withIndex("ownerId", (q) => q.eq("ownerId", userId))
 			.collect()
 
-		return characters.map(normalizeCharacter)
+		return characters.map((it) => normalizeCharacter(it, userId))
 	},
 })
 
@@ -100,7 +84,25 @@ export const update = mutation({
 		data: v.object(partial(schema.tables.characters.validator.fields)),
 	},
 	async handler(ctx, { characterId, data }) {
-		return await ctx.db.patch(characterId, data)
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new Error("Not logged in")
+
+		const character = await ctx.db.get(characterId)
+		if (!character) throw new Error("Character not found")
+
+		const room = await ctx.db.get(
+			// @ts-expect-error: will be fixed when roomId is required later
+			character.roomId,
+		)
+		if (!room) throw new Error("Character room not found")
+
+		const hasPermission = character.ownerId === userId || userId == room.ownerId
+		if (!hasPermission) throw new Error("Not allowed")
+
+		return await ctx.db.patch(characterId, {
+			...data,
+			data: { ...character.data, ...data.data },
+		})
 	},
 })
 

@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge"
 export type SelectChoice = {
 	value: string
 	label?: ReactNode
-	/** Displays beneath the select while this choice is selected */
+	/** Displays beneath each label in the dropdown */
 	description?: ReactNode
 }
 
@@ -21,7 +21,7 @@ export function SelectField({
 	className?: string
 	label: ReactNode
 	description?: ReactNode
-	placeholder: ReactNode
+	placeholder?: ReactNode
 	choices: Array<SelectChoice>
 	value: string
 	onChangeValue: (value: string) => void

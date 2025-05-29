@@ -4,6 +4,7 @@ import { CharacterSheetContext } from "~/characters/context.ts"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
+import { SelectField } from "../components/ui/SelectField.tsx"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
 import { AspectSkillsList } from "./AspectSkillsList.tsx"
 import type { Character } from "./character.ts"
@@ -35,23 +36,19 @@ import { resolveCharacterScores } from "./utils.ts"
 
 export function CharacterEditor({
 	character,
-	onNameChanged,
-	onValueChanged,
+	onUpdate,
 }: {
 	character: Character
-	onNameChanged: (name: string) => void
-	onValueChanged: (key: string, value: unknown) => void
+	onUpdate: (patch: Partial<Character>) => void
 }) {
-	const sheet = createFieldContext(character.values, onValueChanged)
+	const sheet = createFieldContext(character.data, (name, value) => {
+		onUpdate({
+			data: { [name]: value },
+		})
+	})
 
 	return (
-		<CharacterContext
-			value={{
-				character,
-				updateName: onNameChanged,
-				updateFieldValue: onValueChanged,
-			}}
-		>
+		<CharacterContext value={{ character, updateCharacter: onUpdate }}>
 			<CharacterSheetContext value={sheet}>
 				<CharacterEditorInner />
 			</CharacterSheetContext>
@@ -282,6 +279,8 @@ function CharacterEditorInner() {
 					multiline
 					resolved={resolveTextField(sheet, { id: "details" })}
 				/>
+
+				<VisibilityField />
 			</div>
 
 			<div className="mt-6">
@@ -302,13 +301,38 @@ function CharacterEditorInner() {
 }
 
 function NameField() {
-	const { character, updateName } = use(CharacterContext)
+	const { character, updateCharacter } = use(CharacterContext)
 	return (
 		<EditableTextField
 			label="Name"
 			value={character.name}
-			onChange={updateName}
+			onChange={(name) => updateCharacter({ name })}
 			className="flex-1"
+		/>
+	)
+}
+
+function VisibilityField() {
+	const { character, updateCharacter } = use(CharacterContext)
+	return (
+		<SelectField
+			label="Visibility"
+			choices={[
+				{
+					value: "Public",
+					description: "Everyone in the room can see this (but not edit it).",
+				},
+				{
+					value: "Private",
+					description: "Only you can see this.",
+				},
+			]}
+			value={character.isPublic ? "Public" : "Private"}
+			onChangeValue={(value) => {
+				updateCharacter({
+					isPublic: value === "Public",
+				})
+			}}
 		/>
 	)
 }

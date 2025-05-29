@@ -4,9 +4,11 @@ import type { Character } from "./character.ts"
 import { createFieldContext } from "./sheet/fields.ts"
 
 export const CharacterContext = createContext({
-	character: typed<Character>({ name: "Unknown Character", values: {} }),
-	updateName: (_name: string) => {},
-	updateFieldValue: (_key: string, _value: unknown) => {},
+	character: typed<Character>({
+		name: "Unknown Character",
+		data: {},
+	}),
+	updateCharacter: (_character: Partial<Character>) => {},
 })
 
 export const CharacterSheetContext = createContext(
