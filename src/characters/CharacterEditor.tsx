@@ -1,6 +1,8 @@
 import * as Ariakit from "@ariakit/react"
 import { use, type ReactNode } from "react"
 import { CharacterSheetContext } from "~/characters/context.ts"
+import { getTotalSkillPoints } from "~/characters/milestones.ts"
+import { getUsedSkillPoints } from "~/characters/skills.ts"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
@@ -17,6 +19,11 @@ import {
 	ITEM_TYPES,
 } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
+import {
+	getDamageLimit,
+	getFatigueLimit,
+	resolveMilestoneFields,
+} from "./milestones.ts"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -58,98 +65,129 @@ export function CharacterEditor({
 
 function CharacterEditorInner() {
 	const sheet = use(CharacterSheetContext)
-
 	const scores = resolveCharacterScores(sheet)
-
-	const damageLimit = scores.scoreOf("Strength") + scores.scoreOf("Dexterity")
-
-	const fatigueLimit =
-		scores.scoreOf("Sense") +
-		scores.scoreOf("Intellect") +
-		scores.scoreOf("Presence")
+	const damageLimit = getDamageLimit(sheet)
+	const fatigueLimit = getFatigueLimit(sheet)
+	const usedPoints = getUsedSkillPoints(sheet)
+	const totalPoints = getTotalSkillPoints(sheet)
 
 	const characterTab = {
-		name: "Conditions",
+		name: "Character",
 		content: (
-			<div className="grid gap-3">
-				<SheetListFieldMinimal
-					context={sheet}
-					id="conditions"
-					description={`Damage limit: ${damageLimit}\nFatigue limit: ${fatigueLimit}`}
-				>
-					{(itemContext, index) => (
-						<div className="flex gap-2" key={index}>
-							<SheetTextField
-								resolved={resolveTextField(itemContext, {
-									id: "name",
-								})}
-								className="flex-1"
-								label={
-									index > 0 ?
-										<span className="sr-only">Condition</span>
-									:	"Condition"
-								}
-							/>
-							<SheetNumberField
-								resolved={resolveNumberField(itemContext, {
-									id: "intensity",
-								})}
-								className="w-20"
-								label={
-									index > 0 ?
-										<span className="sr-only">Intensity</span>
-									:	undefined
-								}
-							/>
-						</div>
-					)}
-				</SheetListFieldMinimal>
-			</div>
-		),
-	}
+			<Ariakit.HeadingLevel>
+				<div className="grid gap-3">
+					<div className="grid gap-6">
+						<LineageFieldGroup sheet={sheet} />
 
-	const statsTab = {
-		name: "Stats",
-		content: (
-			<div className="grid grid-cols-2 gap-3">
-				<div className="grid gap-3">
-					{ATTRIBUTE_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
-						(field) => (
-							<SheetStatField
-								key={field.id}
-								label={field.name}
-								tooltip={field.description}
-								score={scores.scoreOf(field.name)}
-								resolved={field}
-							/>
-						),
-					)}
+						<SheetSelectField
+							resolved={resolveSelectField(sheet, {
+								id: "budget",
+								choices: EXPENSE_TIERS.sort((a, b) =>
+									a.name.localeCompare(b.name),
+								).map((tier) => ({
+									label: tier.name,
+									value: tier.name,
+									description: tier.examples,
+								})),
+								defaultValue: "dirt",
+							})}
+							description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
+						/>
+
+						<SheetTextField
+							description="Add any other important details, and/or use this to track other important information."
+							multiline
+							resolved={resolveTextField(sheet, { id: "details" })}
+						/>
+
+						<VisibilityField />
+
+						<div>
+							<Ariakit.Heading className="mb-2 heading-2xl">
+								Conditions
+							</Ariakit.Heading>
+							<SheetListFieldMinimal context={sheet} id="conditions">
+								{(itemContext, index) => (
+									<div className="flex gap-2" key={index}>
+										<SheetTextField
+											resolved={resolveTextField(itemContext, {
+												id: "name",
+											})}
+											className="flex-1"
+											label={
+												index > 0 ?
+													<span className="sr-only">Condition</span>
+												:	"Condition"
+											}
+										/>
+										<SheetNumberField
+											resolved={resolveNumberField(itemContext, {
+												id: "intensity",
+											})}
+											className="w-20"
+											label={
+												index > 0 ?
+													<span className="sr-only">Intensity</span>
+												:	undefined
+											}
+										/>
+									</div>
+								)}
+							</SheetListFieldMinimal>
+						</div>
+					</div>
 				</div>
-				<div className="grid gap-3">
-					{ASPECT_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
-						(field) => (
-							<SheetStatField
-								key={field.id}
-								label={field.name}
-								tooltip={field.description}
-								score={scores.scoreOf(field.name)}
-								resolved={field}
-							/>
-						),
-					)}
-				</div>
-			</div>
+			</Ariakit.HeadingLevel>
 		),
 	}
 
 	const skillsTab = {
 		name: "Skills",
-		content: <CoreSkillsList />,
-	}
+		content: (
+			<Ariakit.HeadingLevel>
+				<section>
+					<Ariakit.Heading className="mb-2 heading-2xl">Scores</Ariakit.Heading>
+					<div className="grid grid-cols-2 gap-3">
+						<div className="grid gap-3">
+							{ATTRIBUTE_NAMES.flatMap(
+								(name) => scores.fields.get(name) ?? [],
+							).map((field) => (
+								<SheetStatField
+									key={field.id}
+									label={field.name}
+									tooltip={field.description}
+									score={scores.scoreOf(field.name)}
+									resolved={field}
+								/>
+							))}
+						</div>
+						<div className="grid gap-3">
+							{ASPECT_NAMES.flatMap(
+								(name) => scores.fields.get(name) ?? [],
+							).map((field) => (
+								<SheetStatField
+									key={field.id}
+									label={field.name}
+									tooltip={field.description}
+									score={scores.scoreOf(field.name)}
+									resolved={field}
+								/>
+							))}
+						</div>
+					</div>
 
-	const aspectSkillsTab = {
-		name: "Aspect Skills",
-		content: <AspectSkillsList />,
+					<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
+						Core Skills
+					</Ariakit.Heading>
+					<CoreSkillsList />
+
+					<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
+						Aspect Skills
+					</Ariakit.Heading>
+					<AspectSkillsList />
+				</section>
+			</Ariakit.HeadingLevel>
+		),
 	}
 
 	const itemsTab = {
@@ -241,9 +279,31 @@ function CharacterEditorInner() {
 		),
 	}
 
+	const milestonesTab = {
+		name: "Milestones",
+		content: (
+			<SheetListField resolved={resolveListField(sheet, "milestones")}>
+				{(milestoneContext) => {
+					const fields = resolveMilestoneFields(milestoneContext)
+					return (
+						<div className="grid gap-2">
+							<SheetSelectField resolved={fields.bonusType} />
+							<SheetTextField
+								resolved={fields.notes}
+								label="Notes"
+								multiline
+								description="Add context for this milestone"
+							/>
+						</div>
+					)
+				}}
+			</SheetListField>
+		),
+	}
+
 	return (
-		<>
-			<div className="grid gap-6">
+		<div className="grid gap-6">
+			<div className="grid gap-3">
 				<div className="flex gap-2">
 					<NameField />
 					<SheetNumberField
@@ -257,46 +317,33 @@ function CharacterEditorInner() {
 					/>
 				</div>
 
-				<LineageFieldGroup sheet={sheet} />
-
-				<SheetSelectField
-					resolved={resolveSelectField(sheet, {
-						id: "budget",
-						choices: EXPENSE_TIERS.sort((a, b) =>
-							a.name.localeCompare(b.name),
-						).map((tier) => ({
-							label: tier.name,
-							value: tier.name,
-							description: tier.examples,
-						})),
-						defaultValue: "dirt",
-					})}
-					description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
-				/>
-
-				<SheetTextField
-					description="Add any other important details, and/or use this to track other important information."
-					multiline
-					resolved={resolveTextField(sheet, { id: "details" })}
-				/>
-
-				<VisibilityField />
+				<div className="grid auto-cols-fr grid-flow-col gap-3">
+					<div className="flex flex-col gap-1">
+						<div className="text-sm font-semibold">Fatigue limit</div>
+						<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
+							{fatigueLimit}
+						</div>
+					</div>
+					<div className="flex flex-col gap-1">
+						<div className="text-sm font-semibold">Damage limit</div>
+						<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
+							{damageLimit}
+						</div>
+					</div>
+					<div className="flex flex-col gap-1">
+						<div className="text-sm font-semibold">Skill points used</div>
+						<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
+							{usedPoints}/{totalPoints}
+						</div>
+					</div>
+				</div>
 			</div>
 
-			<div className="mt-6">
-				<Tabs
-					persistenceKey="mainTabs"
-					tabs={[
-						characterTab,
-						statsTab,
-						skillsTab,
-						aspectSkillsTab,
-						itemsTab,
-						bondsTab,
-					]}
-				/>
-			</div>
-		</>
+			<Tabs
+				persistenceKey="mainTabs"
+				tabs={[characterTab, skillsTab, itemsTab, bondsTab, milestonesTab]}
+			/>
+		</div>
 	)
 }
 
@@ -361,23 +408,26 @@ function Tabs({
 			selectedId={selectedId}
 			setSelectedId={(id) => id != null && setSelectedId(id)}
 		>
-			<Ariakit.TabList className="mb-3 flex flex-wrap gap-1 rounded-md bg-gray-950/25 p-1">
+			<div className="isolate">
+				<div className="sticky -top-3 z-10 -mx-3 -mt-3 bg-gray-900 p-3">
+					<Ariakit.TabList className="flex flex-wrap gap-1 rounded-md bg-gray-950/25 p-1">
+						{tabs.map((tab) => (
+							<Ariakit.Tab
+								key={tab.name}
+								id={tab.name}
+								className="flex-grow rounded px-3 py-1.5 text-center whitespace-nowrap text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+							>
+								{tab.name || toTitleCase(tab.name)}
+							</Ariakit.Tab>
+						))}
+					</Ariakit.TabList>
+				</div>
 				{tabs.map((tab) => (
-					<Ariakit.Tab
-						key={tab.name}
-						id={tab.name}
-						className="flex-grow rounded px-3 py-1.5 text-center whitespace-nowrap text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
-					>
-						{tab.name || toTitleCase(tab.name)}
-					</Ariakit.Tab>
+					<Ariakit.TabPanel key={tab.name} id={tab.name} className="grid gap-3">
+						{tab.content}
+					</Ariakit.TabPanel>
 				))}
-			</Ariakit.TabList>
-
-			{tabs.map((tab) => (
-				<Ariakit.TabPanel key={tab.name} id={tab.name} className="grid gap-3">
-					{tab.content}
-				</Ariakit.TabPanel>
-			))}
+			</div>
 		</Ariakit.TabProvider>
 	)
 }

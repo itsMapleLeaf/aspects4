@@ -31,7 +31,3 @@ export function getUsedSkillPoints(sheet: FieldContext) {
 		aspectSkillItems.reduce((total, field) => total + field.points.value, 0)
 	)
 }
-
-export function getTotalSkillPoints() {
-	return 5 // TODO: calculate from milestones
-}

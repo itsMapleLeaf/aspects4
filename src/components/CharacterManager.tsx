@@ -97,7 +97,7 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 							id={character._id}
 							key={character._id}
 							className={panel(
-								"h-full w-148 flex-1 overflow-y-auto p-3 [scrollbar-gutter:stable]",
+								"h-full w-148 flex-1 overflow-y-auto p-3 will-change-scroll [scrollbar-gutter:stable]",
 							)}
 							unmountOnHide
 						>

@@ -1,7 +1,6 @@
 import { use } from "react"
 import { CharacterSheetContext } from "./context.ts"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
-import { SkillPointsUsage } from "./SkillPointsUsage.tsx"
 import { resolveCoreSkillFields } from "./skills.ts"
 import { resolveCharacterScores } from "./utils.ts"
 
@@ -12,7 +11,6 @@ export function CoreSkillsList() {
 
 	return (
 		<div className="@container grid gap-3">
-			<SkillPointsUsage />
 			<div className="grid gap-3 @sm:grid-cols-2">
 				{fields.map((field) => (
 					<SheetStatField

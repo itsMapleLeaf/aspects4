@@ -1,12 +1,16 @@
 import { use } from "react"
 import { CharacterSheetContext } from "./context.ts"
-import { getTotalSkillPoints, getUsedSkillPoints } from "./skills.ts"
+import { getTotalSkillPoints } from "./milestones.ts"
+import { getUsedSkillPoints } from "./skills.ts"
 
 export function SkillPointsUsage() {
 	const sheet = use(CharacterSheetContext)
+	const usedPoints = getUsedSkillPoints(sheet)
+	const totalPoints = getTotalSkillPoints(sheet)
+
 	return (
 		<div className="font-semibold">
-			{getUsedSkillPoints(sheet)}/{getTotalSkillPoints()} skill points used
+			{usedPoints}/{totalPoints} skill points used
 		</div>
 	)
 }

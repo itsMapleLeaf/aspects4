@@ -21,7 +21,6 @@ import { Icon } from "~/components/ui/Icon.tsx"
 import { Tooltip } from "~/components/ui/Tooltip.tsx"
 import ASPECTS from "~/data/list-of-aspects.json"
 import { resolveAspectSkillFields } from "./aspect-skills.ts"
-import { SkillPointsUsage } from "./SkillPointsUsage.tsx"
 
 export function AspectSkillsList() {
 	const sheet = use(CharacterSheetContext)
@@ -54,12 +53,8 @@ export function AspectSkillsList() {
 	}
 
 	return (
-		<section aria-label="Aspect Skills" className="mb-4 grid gap-4">
-			<header>
-				<SkillPointsUsage />
-			</header>
-
-			<main className="contents">
+		<div className="mb-4 grid gap-4">
+			<div className="contents">
 				{resolvedList.items.map((item, index) => (
 					<AspectSkillDetails
 						key={index}
@@ -68,17 +63,17 @@ export function AspectSkillsList() {
 						)}
 					/>
 				))}
-			</main>
+			</div>
 
-			<footer>
+			<div>
 				<Button
 					icon={<Icon icon="mingcute:pencil-fill" />}
 					onClick={() => setMode("edit")}
 				>
 					Edit
 				</Button>
-			</footer>
-		</section>
+			</div>
+		</div>
 	)
 }
 
