@@ -30,6 +30,10 @@ export function useEditableNumber({
 		element?.addEventListener(
 			"wheel",
 			(event) => {
+				// INTENTIONALLY only allow editing when focused,
+				// otherwise accidental tweaks while scrolling the page are too easy
+				if (!editingValue) return
+
 				event.preventDefault()
 
 				if (event.deltaY < 0) tweak(1)
@@ -37,8 +41,9 @@ export function useEditableNumber({
 
 				function tweak(delta: number) {
 					const currentValue = parseNumberSafe(editingValue) ?? value
-					submitNewValue(clamp(currentValue + delta, min, max))
-					setEditingValue(undefined)
+					const newValue = clamp(currentValue + delta, min, max)
+					setEditingValue(String(newValue))
+					onChange(newValue)
 				}
 			},
 			{ signal: controller.signal, passive: false },
