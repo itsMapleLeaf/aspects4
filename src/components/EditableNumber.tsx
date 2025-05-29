@@ -25,10 +25,10 @@ export function EditableNumber({
 		useEditableNumber({ value: valueProp, min, max, onChange })
 
 	return (
-		<div {...rootProps()} className={twMerge("flex", className)}>
+		<div {...rootProps()} className={twMerge("grid", className)}>
 			{isEditing ?
-				<Input {...inputProps()} id={id} className="w-full" align="center" />
-			:	<Button {...buttonProps()} id={id} className="w-full" align="center">
+				<Input {...inputProps()} id={id} align="center" />
+			:	<Button {...buttonProps()} id={id} align="center">
 					{value}
 				</Button>
 			}
