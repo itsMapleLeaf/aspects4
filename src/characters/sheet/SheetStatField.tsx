@@ -13,7 +13,7 @@ export function SheetStatField({
 	label,
 	description,
 	tooltip: tooltipContent,
-	score = 0,
+	score: scoreOverride,
 	...props
 }: {
 	resolved: ResolvedNumberField
@@ -31,6 +31,8 @@ export function SheetStatField({
 		max: field.max,
 		onChange: (value) => field.context.updateValue(field.id, value),
 	})
+
+	const score = scoreOverride ?? editable.value
 
 	return (
 		<div
