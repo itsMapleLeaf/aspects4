@@ -1,3 +1,4 @@
+import { clamp } from "es-toolkit"
 import { parseNumberSafe } from "~/lib/utils.ts"
 import type { SelectChoice } from "../../components/ui/SelectField.tsx"
 
@@ -28,14 +29,21 @@ export function resolveTextField(
 export type ResolvedNumberField = ReturnType<typeof resolveNumberField>
 export function resolveNumberField(
 	context: FieldContext,
-	options: { id: string; defaultValue?: number; min?: number; max?: number },
+	{
+		min = 0,
+		max = Number.POSITIVE_INFINITY,
+		...options
+	}: { id: string; defaultValue?: number; min?: number; max?: number },
 ) {
 	return {
 		id: options.id,
-		value:
+		value: clamp(
 			parseNumberSafe(context.values[options.id]) ?? options.defaultValue ?? 0,
-		min: options.min ?? 0,
-		max: options.max ?? Number.POSITIVE_INFINITY,
+			min,
+			max,
+		),
+		min,
+		max,
 		context,
 	}
 }
