@@ -38,11 +38,12 @@ export function EditableNumber({
 
 export function EditableNumberField({
 	label,
+	className,
 	...props
 }: ComponentProps<typeof EditableNumber> & { label: ReactNode }) {
 	const id = useId()
 	return (
-		<Field label={label} htmlFor={props.id ?? id}>
+		<Field label={label} htmlFor={props.id ?? id} className={className}>
 			<EditableNumber id={id} {...props} />
 		</Field>
 	)
