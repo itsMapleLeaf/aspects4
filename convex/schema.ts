@@ -23,7 +23,11 @@ export default defineSchema({
 			v.array(v.object({ name: v.string(), description: v.string() })),
 		),
 		ownerId: v.id("users"),
-	}).index("ownerId", ["ownerId", "name"]),
+		roomId: v.optional(v.id("rooms")),
+		isPublic: v.optional(v.boolean()),
+	})
+		.index("ownerId", ["ownerId", "name"])
+		.index("roomId", ["roomId", "name"]),
 
 	assets: defineTable({
 		name: v.string(),

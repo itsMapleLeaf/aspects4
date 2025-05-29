@@ -24,8 +24,6 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 	const createCharacter = useMutation(api.characters.create)
 	const updateCharacter = useMutation(api.characters.update)
 	const removeCharacter = useMutation(api.characters.remove)
-	const addToRoom = useMutation(api.characters.addToRoom)
-	const removeFromRoom = useMutation(api.characters.removeFromRoom)
 
 	const [activeCharacterId, setActiveCharacterId] = useLocalStorageState<
 		string | undefined | null
@@ -34,7 +32,7 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 	)
 
 	async function addNewCharacter() {
-		const character = await createCharacter({})
+		const character = await createCharacter({ roomId })
 		setActiveCharacterId(character._id)
 	}
 
