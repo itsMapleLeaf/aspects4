@@ -1,5 +1,6 @@
 import * as Ariakit from "@ariakit/react"
-import { use, type ReactNode } from "react"
+import { use, type ComponentProps, type ReactNode } from "react"
+import { twMerge } from "tailwind-merge"
 import { CharacterSheetContext } from "~/characters/context.ts"
 import { getTotalSkillPoints } from "~/characters/milestones.ts"
 import { getUsedSkillPoints } from "~/characters/skills.ts"
@@ -39,7 +40,6 @@ import {
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
-import { SheetStatField } from "./sheet/SheetStatField.tsx"
 
 export function CharacterEditor({
 	character,
@@ -146,40 +146,47 @@ function CharacterEditorInner() {
 		content: (
 			<Ariakit.HeadingLevel>
 				<section>
-					<Ariakit.Heading className="mb-2 heading-2xl">Scores</Ariakit.Heading>
-					<div className="grid grid-cols-2 gap-3">
-						<div className="grid gap-3">
-							{ATTRIBUTE_NAMES.flatMap(
-								(name) => scores.fields.get(name) ?? [],
-							).map((field) => (
-								<SheetStatField
-									key={field.id}
-									label={field.name}
-									tooltip={field.description}
-									score={scores.scoreOf(field.name)}
-									resolved={field}
-								/>
-							))}
-						</div>
-						<div className="grid gap-3">
-							{ASPECT_NAMES.flatMap(
-								(name) => scores.fields.get(name) ?? [],
-							).map((field) => (
-								<SheetStatField
-									key={field.id}
-									label={field.name}
-									tooltip={field.description}
-									score={scores.scoreOf(field.name)}
-									resolved={field}
-								/>
-							))}
-						</div>
+					<div className="grid auto-cols-fr grid-flow-col gap-3">
+						{ATTRIBUTE_NAMES.flatMap(
+							(name) => scores.fields.get(name) ?? [],
+						).map((field) => (
+							<SheetNumberField
+								key={field.id}
+								label={field.name}
+								// tooltip={field.description}
+								// score={scores.scoreOf(field.name)}
+								resolved={field}
+							/>
+						))}
 					</div>
 
 					<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
 						Core Skills
 					</Ariakit.Heading>
 					<CoreSkillsList />
+				</section>
+			</Ariakit.HeadingLevel>
+		),
+	}
+
+	const aspectsTab = {
+		name: "Aspects",
+		content: (
+			<Ariakit.HeadingLevel>
+				<section>
+					<div className="grid auto-cols-fr grid-flow-col gap-3">
+						{ASPECT_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
+							(field) => (
+								<SheetNumberField
+									key={field.id}
+									label={field.name}
+									// tooltip={field.description}
+									// score={scores.scoreOf(field.name)}
+									resolved={field}
+								/>
+							),
+						)}
+					</div>
 
 					<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
 						Aspect Skills
@@ -302,47 +309,65 @@ function CharacterEditorInner() {
 	}
 
 	return (
-		<div className="grid gap-6">
-			<div className="grid gap-3">
-				<div className="flex gap-2">
-					<NameField />
-					<SheetNumberField
-						resolved={resolveNumberField(sheet, { id: "bondActivations" })}
-						className="w-32"
-					/>
-					<SheetNumberField
-						label="Aspect EXP"
-						resolved={resolveNumberField(sheet, { id: "aspectExperience" })}
-						className="w-24"
-					/>
-				</div>
-
-				<div className="grid auto-cols-fr grid-flow-col gap-3">
-					<div className="flex flex-col gap-1">
-						<div className="text-sm font-semibold">Fatigue limit</div>
-						<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
-							{fatigueLimit}
-						</div>
-					</div>
-					<div className="flex flex-col gap-1">
-						<div className="text-sm font-semibold">Damage limit</div>
-						<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
-							{damageLimit}
-						</div>
-					</div>
-					<div className="flex flex-col gap-1">
-						<div className="text-sm font-semibold">Skill points used</div>
-						<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
-							{usedPoints}/{totalPoints}
-						</div>
-					</div>
-				</div>
+		<>
+			<div className="flex gap-2">
+				<NameField />
 			</div>
+
+			<div className="h-2"></div>
+
+			<div className="flex gap-3">
+				<SheetNumberField
+					label={`Damage (limit ${damageLimit})`}
+					resolved={resolveNumberField(sheet, { id: "damage" })}
+					className="flex-1"
+				/>
+				<SheetNumberField
+					label={`Fatigue (limit ${fatigueLimit})`}
+					resolved={resolveNumberField(sheet, { id: "fatigue" })}
+					className="flex-1"
+				/>
+				<SheetNumberField
+					resolved={resolveNumberField(sheet, { id: "bondActivations" })}
+					className="flex-1"
+				/>
+				<InfoField label="Skill points used" className="flex-1">
+					{usedPoints}/{totalPoints}
+				</InfoField>
+			</div>
+
+			<div className="h-6"></div>
 
 			<Tabs
 				persistenceKey="mainTabs"
-				tabs={[characterTab, skillsTab, itemsTab, bondsTab, milestonesTab]}
+				tabs={[
+					characterTab,
+					skillsTab,
+					aspectsTab,
+					itemsTab,
+					bondsTab,
+					milestonesTab,
+				]}
 			/>
+		</>
+	)
+}
+
+function InfoField({
+	label,
+	children,
+	className,
+	...props
+}: ComponentProps<"div"> & {
+	label: ReactNode
+	children: ReactNode
+}) {
+	return (
+		<div className={twMerge("flex flex-col gap-0.5", className)} {...props}>
+			<div className="text-sm font-semibold">{label}</div>
+			<div className="flex h-10 w-full items-center justify-center panel bg-black/25 text-center text-lg font-semibold">
+				{children}
+			</div>
 		</div>
 	)
 }
