@@ -1,11 +1,11 @@
+import LIST_OF_ASPECTS from "../data/list-of-aspects.json"
+import LIST_OF_ATTRIBUTES from "../data/list-of-attributes.json"
+import type { AttributeName } from "./data.ts"
 import {
 	resolveNumberField,
 	type FieldContext,
 	type ResolvedNumberField,
-} from "../characters/sheet/fields.ts"
-import LIST_OF_ASPECTS from "../data/list-of-aspects.json"
-import LIST_OF_ATTRIBUTES from "../data/list-of-attributes.json"
-import type { AttributeName } from "./data.ts"
+} from "./sheet/fields.ts"
 
 export interface ResolvedCharacterScoreField extends ResolvedNumberField {
 	name: string

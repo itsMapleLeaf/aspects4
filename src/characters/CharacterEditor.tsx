@@ -24,6 +24,7 @@ import {
 	getFatigueLimit,
 	resolveMilestoneFields,
 } from "./milestones.ts"
+import { resolveCharacterScores } from "./scores.ts"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -39,7 +40,6 @@ import {
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
-import { resolveCharacterScores } from "./utils.ts"
 
 export function CharacterEditor({
 	character,

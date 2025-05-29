@@ -6,7 +6,7 @@ import {
 	resolveTextField,
 	type ResolvedSelectChoice,
 } from "../characters/sheet/fields.ts"
-import { resolveCharacterScores } from "./utils.ts"
+import { resolveCharacterScores } from "./scores.ts"
 
 const MILESTONE_BONUS_TYPES: ResolvedSelectChoice[] = [
 	{

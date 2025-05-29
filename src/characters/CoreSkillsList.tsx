@@ -1,8 +1,8 @@
 import { use } from "react"
 import { CharacterSheetContext } from "./context.ts"
+import { resolveCharacterScores } from "./scores.ts"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
 import { resolveCoreSkillFields } from "./skills.ts"
-import { resolveCharacterScores } from "./utils.ts"
 
 export function CoreSkillsList() {
 	const sheet = use(CharacterSheetContext)
