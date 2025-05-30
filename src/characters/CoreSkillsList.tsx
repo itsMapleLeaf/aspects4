@@ -1,11 +1,10 @@
-import { use } from "react"
-import { CharacterSheetContext } from "./context.ts"
+import { useEditorCharacterSheet } from "./context.tsx"
 import { resolveCharacterScores } from "./scores.ts"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
 import { resolveCoreSkillFields } from "./skills.ts"
 
 export function CoreSkillsList() {
-	const sheet = use(CharacterSheetContext)
+	const sheet = useEditorCharacterSheet()
 	const fields = resolveCoreSkillFields(sheet)
 	const scores = resolveCharacterScores(sheet)
 

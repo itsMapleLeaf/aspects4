@@ -1,8 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { uniqBy } from "es-toolkit"
-import { ReactNode, use, useState } from "react"
+import { ReactNode, useState } from "react"
 import { ResolvedAspectSkillFields } from "~/characters/aspect-skills"
-import { CharacterSheetContext } from "~/characters/context.ts"
 import { ASPECT_ART_PROPERTIES } from "~/characters/data.ts"
 import {
 	SheetNumberField,
@@ -21,9 +20,10 @@ import { Icon } from "~/components/ui/Icon.tsx"
 import { Tooltip } from "~/components/ui/Tooltip.tsx"
 import ASPECTS from "~/data/list-of-aspects.json"
 import { resolveAspectSkillFields } from "./aspect-skills.ts"
+import { useEditorCharacterSheet } from "./context.tsx"
 
 export function AspectSkillsList() {
-	const sheet = use(CharacterSheetContext)
+	const sheet = useEditorCharacterSheet()
 	const resolvedList = resolveListField(sheet, "aspectSkills")
 
 	const [mode, setMode] = useState<"view" | "edit">(

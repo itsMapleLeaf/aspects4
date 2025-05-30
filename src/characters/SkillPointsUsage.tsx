@@ -1,10 +1,9 @@
-import { use } from "react"
-import { CharacterSheetContext } from "./context.ts"
+import { useEditorCharacterSheet } from "./context.tsx"
 import { getTotalSkillPoints } from "./milestones.ts"
 import { getUsedSkillPoints } from "./skills.ts"
 
 export function SkillPointsUsage() {
-	const sheet = use(CharacterSheetContext)
+	const sheet = useEditorCharacterSheet()
 	const usedPoints = getUsedSkillPoints(sheet)
 	const totalPoints = getTotalSkillPoints(sheet)
 

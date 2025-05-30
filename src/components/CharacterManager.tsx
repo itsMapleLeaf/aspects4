@@ -12,7 +12,6 @@ import { Tooltip } from "./ui/Tooltip.tsx"
 export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 	const characters = useQuery(api.characters.listByRoom, { roomId })
 	const createCharacter = useMutation(api.characters.create)
-	const updateCharacter = useMutation(api.characters.update)
 	const removeCharacter = useMutation(api.characters.remove)
 
 	const [activeCharacterId, setActiveCharacterId] = useLocalStorageState<
@@ -101,15 +100,7 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 							)}
 							unmountOnHide
 						>
-							<CharacterEditor
-								character={character}
-								onUpdate={(data) => {
-									updateCharacter({
-										characterId: character._id,
-										data,
-									})
-								}}
-							/>
+							<CharacterEditor character={character} />
 						</Ariakit.TabPanel>
 					))}
 				</section>

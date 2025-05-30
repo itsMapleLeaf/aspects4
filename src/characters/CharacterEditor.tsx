@@ -1,17 +1,21 @@
 import * as Ariakit from "@ariakit/react"
-import { use, type ComponentProps, type ReactNode } from "react"
+import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
-import { CharacterSheetContext } from "~/characters/context.ts"
 import { getTotalSkillPoints } from "~/characters/milestones.ts"
 import { getUsedSkillPoints } from "~/characters/skills.ts"
 import { useLocalStorageState } from "~/hooks/storage.ts"
 import { toTitleCase } from "~/lib/utils.ts"
+import type { NormalizedCharacter } from "../../convex/characters.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
 import { SelectField } from "../components/ui/SelectField.tsx"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
 import { AspectSkillsList } from "./AspectSkillsList.tsx"
-import type { Character } from "./character.ts"
-import { CharacterContext } from "./context.ts"
+import {
+	EditorCharacterContext,
+	useEditorCharacter,
+	useEditorCharacterSheet,
+	useUpdateEditorCharacter,
+} from "./context.tsx"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
 import {
 	ASPECT_AURAS,
@@ -32,7 +36,6 @@ import {
 	SheetTextField,
 } from "./sheet/components.tsx"
 import {
-	createFieldContext,
 	resolveListField,
 	resolveNumberField,
 	resolveSelectField,
@@ -43,28 +46,18 @@ import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
 
 export function CharacterEditor({
 	character,
-	onUpdate,
 }: {
-	character: Character
-	onUpdate: (patch: Partial<Character>) => void
+	character: NormalizedCharacter
 }) {
-	const sheet = createFieldContext(character.data, (name, value) => {
-		onUpdate({
-			data: { [name]: value },
-		})
-	})
-
 	return (
-		<CharacterContext value={{ character, updateCharacter: onUpdate }}>
-			<CharacterSheetContext value={sheet}>
-				<CharacterEditorInner />
-			</CharacterSheetContext>
-		</CharacterContext>
+		<EditorCharacterContext value={character}>
+			<CharacterEditorInner />
+		</EditorCharacterContext>
 	)
 }
 
 function CharacterEditorInner() {
-	const sheet = use(CharacterSheetContext)
+	const sheet = useEditorCharacterSheet()
 	const scores = resolveCharacterScores(sheet)
 	const damageLimit = getDamageLimit(sheet)
 	const fatigueLimit = getFatigueLimit(sheet)
@@ -373,11 +366,12 @@ function InfoField({
 }
 
 function NameField() {
-	const { character, updateCharacter } = use(CharacterContext)
+	const character = useEditorCharacter()
+	const updateCharacter = useUpdateEditorCharacter()
 	return (
 		<EditableTextField
 			label="Name"
-			value={character.name}
+			value={character?.name ?? ""}
 			onChange={(name) => updateCharacter({ name })}
 			className="flex-1"
 		/>
@@ -385,7 +379,8 @@ function NameField() {
 }
 
 function VisibilityField() {
-	const { character, updateCharacter } = use(CharacterContext)
+	const character = useEditorCharacter()
+	const updateCharacter = useUpdateEditorCharacter()
 	return (
 		<SelectField
 			label="Visibility"
@@ -399,7 +394,7 @@ function VisibilityField() {
 					description: "Only you can see this.",
 				},
 			]}
-			value={character.isPublic ? "Public" : "Private"}
+			value={character?.isPublic ? "Public" : "Private"}
 			onChangeValue={(value) => {
 				updateCharacter({
 					isPublic: value === "Public",

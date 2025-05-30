@@ -80,3 +80,7 @@ export function lowerFirst(text: string) {
 export function typed<T>(value: T): T {
 	return value
 }
+
+export function raise(message: string): never {
+	throw new Error(message)
+}
