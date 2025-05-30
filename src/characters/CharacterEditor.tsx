@@ -443,7 +443,12 @@ function Tabs({
 					</Ariakit.TabList>
 				</div>
 				{tabs.map((tab) => (
-					<Ariakit.TabPanel key={tab.name} id={tab.name} className="grid gap-3">
+					<Ariakit.TabPanel
+						key={tab.name}
+						id={tab.name}
+						className="grid gap-3"
+						unmountOnHide
+					>
 						{tab.content}
 					</Ariakit.TabPanel>
 				))}
