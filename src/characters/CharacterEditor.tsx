@@ -32,7 +32,6 @@ import {
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
-import { getTotalSkillPoints, getUsedSkillPoints } from "./skills.ts"
 
 export function CharacterEditor({
 	character,
@@ -51,8 +50,8 @@ function CharacterEditorInner() {
 	const scores = resolveCharacterScores(sheet)
 	// const damageLimit = getDamageLimit(sheet)
 	// const fatigueLimit = getFatigueLimit(sheet)
-	const usedPoints = getUsedSkillPoints(sheet)
-	const totalPoints = getTotalSkillPoints(sheet)
+	// const usedPoints = getUsedSkillPoints(sheet)
+	// const totalPoints = getTotalSkillPoints(sheet)
 
 	const characterTab = {
 		name: "Character",
