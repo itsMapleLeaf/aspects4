@@ -1,6 +1,6 @@
 # Aspects of Nature: Guidebook
 
-## Rules
+## Gameplay
 
 ### Story First
 
@@ -26,11 +26,15 @@ This story-first approach means that, while the game has clear rules and mechani
 
 <aside>
 
-🚧 todo: examples
+🚧 todo: explain that aspects (the concept) should take a backseat to story and characters, complimenting them, instead of having stories warped entirely around aspects
 
 </aside>
 
-### 🚧 Date & Time
+<aside>
+
+🚧 todo: examples
+
+</aside>
 
 ### Scenes
 
@@ -72,47 +76,99 @@ Example: you make a [Strength](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7
 
 </aside>
 
-### Conditions
+### Stress
 
-The **conditions** listed on your character sheet represent your changing state over time. This includes various forms of physical and mental stress, or boons that amplify your abilities.
+Your **stress** represents the amount of physical damage and mental strain you take over the course of the game. It starts at 0 at character creation.
 
-The narrator adds conditions in response to various events, such as taking damage from an attack, exhausting yourself from a taxing action, or using an [item](https://www.notion.so/1b8b0b885c0e801ba751e644e7841a85) and gaining its benefits.
-
-**Variable conditions** (denoted by “Condition X”) have an **intensity,** a _positive whole number_ (a condition can’t have an intensity of 0, or a negative number) that represents the impact of the condition.
-
-The following conditions exist as a part of the system with special meanings and mechanical purposes:
-
-**Damage X** - physical harm resulting from attacks, hazards, or other external forces
-
-    _By default, damage is represented in a more abstract, cartoonish sort of way, as opposed to a  “medical” approach that describes bleeding or broken bones in detail._
-
-**Fatigue X** - exhaustion accumulated from physically or mentally taxing activities
-
-**Unconscious** - a state in which the character cannot move, act, or perceive the surrounding world in any way
-
-**Burn X** - when taking damage, take X additional damage
-
-**Cold X** - when taking fatigue, take X additional fatigue
+Your **stress limit** is the maximum amount of stress you can take before entering **peril**. It starts at 10.
 
 <aside>
 
-ℹ️ Damage and Fatigue both fall under a stress system. See [Stress](https://www.notion.so/1edb0b885c0e807ab0b5f881a026cac3) for more details.
+**Example:** Let’s say you have the following scores:
+
+[Strength](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee): 1
+
+[Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995): 3
+
+[Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10): 3
+
+[Intellect](https://www.notion.so/1b2b0b885c0e8097891bc55d3cadb9dd): 5
+
+[Presence](https://www.notion.so/1b1b0b885c0e809fa7a7fc0a4a9d0ede): 3
+
+Your damage limit would be 4 (1 + 3) and your fatigue limit would be 11 (3 + 5 + 3).
+
+If you have Damage 3, then you take 2 damage, the intensity of your damage condition gets limited to Damage 4.
 
 </aside>
 
-However, the narrator may apply other unlisted, custom conditions to characters when built-in conditions don’t fit, such as a specific type of “poisoned” condition, which impairs a certain set of abilities.
+#### Overload
 
-You can have any number of conditions at once, but any condition may only be listed once. Receiving some level of the condition when it already exists will increase the intensity of the existing condition instead of adding a new one.
+<aside>
 
-Language for modifying conditions is loose; to “take 2 fatigue” would mean to add the Fatigue condition with an intensity of 2. Similarly, “heal 2 damage” would mean to reduce the intensity of the Damage condition. Other examples:
+🚧 TODO: rename this to “peril"
 
-- “Become unconscious” - take the **Unconscious** condition
+</aside>
 
-- “Become blinded” - take the **Blinded** condition
+If taking stress causes you to reach either limit, your character **becomes overloaded**, a state in which you must make **overload rolls** to stay conscious.
 
-_Example: a character could have Damage 5 and Fatigue 3 conditions. This would mean that they’ve taken a decent bit of damage, as well as having physically exhausted themselves. Taking 2 damage from an attack would increase the intensity of their existing Damage condition to 7._
+When becoming overloaded:
 
-### Stress
+1. Take the **Overload 1** condition.
+
+1. Make an **overload roll**.
+
+While overloaded:
+
+- You must make an overload roll before making an [action roll](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4).
+
+- You must make an overload roll after taking any amount of damage.
+
+- The intensity of your Overload condition **cannot exceed 5.**
+
+- You **remain overloaded** while you have the overload condition.
+
+- Once all stress conditions have been healed below their limit, remove the Overload condition.
+
+Overload rolls are made with a standard six-sided die with numbers from 1 to 6 _(and ****not**** the special _[_action die_](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1b1b0b885c0e80e1a1afd501f2cb10d5)_)_.
+
+If you roll higher than your current overload intensity, increase it by 1.
+
+If you roll _less than or equal to_ your overload number:
+
+1. You may activate **desperation**: if an action roll caused you to make this overload roll, carry out that action with a **doubled result** of the action roll.
+
+1. Become [**unconscious**](https://www.notion.so/1e5b0b885c0e801da514d402a2a15a37#1e5b0b885c0e800399bee0ae34ce8a0d).
+
+1. Remove your overload condition.
+
+<aside>
+
+**Example:** Your fatigue limit is 11 and you’re currently at Fatigue 9.
+
+You make an action which requires taking 2 fatigue and causes you to reach your limit of 11.
+
+Reaching your fatigue limit causes you become overloaded; you now have the Overload 1 condition.
+
+Becoming overloaded requires you to make an overload roll. You must roll higher than your current overload number, which is 1.
+
+Rolling a 3, you manage to stay up, but your overload condition intensifies: you now have Overload 2.
+
+Then, you take damage from an enemy. Because you’re overloaded, you must make another overload roll.
+
+You must roll higher than your current overload number, which is 2.
+
+You roll a 5 and manage to stay up. You now have Overload 3.
+
+You retaliate against the enemy. Doing so while overloaded requires another overload roll.
+
+You roll a 1, failing to stay up. However, you choose to activate **desperation**. You carry out the action and deal a massive blow to the enemy before you go down.
+
+You are now unconscious and no longer overloaded.
+
+</aside>
+
+### Stress (old)
 
 The **Damage** and **Fatigue** [conditions](https://www.notion.so/1e5b0b885c0e801da514d402a2a15a37) both represent forms of **stress**.
 
@@ -210,59 +266,11 @@ You are now unconscious and no longer overloaded.
 
 </aside>
 
-### Resting
-
-<aside>
-
-🚧 this will change significantly
-
-</aside>
-
-You may heal 1 fatigue per 1 in-game hour spent resting. If you rest for 8 consecutive hours or more, heal all fatigue.
-
-Resting for any amount of time will also restore 1 [bond activation](https://www.notion.so/1bdb0b885c0e80a88e37d34e61d7f01f), to a max of 3.
-
-#### Eventful Rests
-
-Mind your time! The longer you rest, the more likely something may happen in the meantime.
-
-When resting, the narrator makes a [dice roll](https://www.notion.so/201b0b885c0e803d9b05f8fa5a3301da) with **one die per hour rested**. The result determines whether an event occurs, and the significance thereof:
-
-- 1-11 → **uneventful**; nothing notable happens.
-
-  _You sleep peacefully. Maybe a butterfly comes to land on your nose, and you shift a bit in your bedroll, but not much else happens._
-
-- 12-15 → **eventful**; a slight change occurs while resting
-
-  _You check your backpack, noticing that a few of your snacks are missing. You find a group of squirrels nearby munching on said snacks._
-
-- 16+ → **significant**, and your rest is interrupted: divide your resting time in half, rounded down. An event takes place that requires your immediate attention.
-
-  _You wake to the crackling thunder of a raging storm of biblical proportions. Hailstones shatter the window, and the wind flings your belongings about the room._
-
-<aside>
-
-🚧 idea: probably put a roll table here or something with generic event prompts
-
-</aside>
-
-### Positioning, Movement & Distance
-
-Positions of entities (characters or objects) and distances from one another are determined on a logical, narrative basis. An entity can be **nearby** another entity, or **far away** from them.
-
-Moving closer or far away should also be handled on a narrative basis. If nothing logically impedes a character from reaching their destination, they should be able to freely move there.
-
-Obstacles that would impede movement should be handled situationally:
-
-- smaller hurdles like fences or gaps require a [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9) action to overcome
-
-- barriers that can’t simply be walked through would require breaking it down, such as with [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381), or you could [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9) by climbing over it
-
-_Example: You’re playing as a member of a group of assassins, and you infiltrate a warehouse to find your target. Your target hired bodyguards to patrol the place and keep watch. Your allies and bodyguards on the ground floor close to the entrance would be nearby, and others elsewhere would be far away._
-
 ### Attributes
 
 Attributes represent your character's capabilities in different domains. Characters have a score in each attribute ranging from 1 to 5.
+
+Your attribute score also defines your **defense value**
 
 | Attribute | Description                                         |
 | --------- | --------------------------------------------------- |
@@ -272,67 +280,61 @@ Attributes represent your character's capabilities in different domains. Charact
 | Sense     | Finding and picking up on things through the senses |
 | Strength  | Applying force and heavy hits                       |
 
-### Skills
-
-Your character’s skillset is informed by the **skill points** assigned to each **skill**.
-
-**Players start with 5 skill points**, and skills may have **up to 5 points** assigned to them.
-
-You may reassign any number of skill points at the start or end of sessions.
-
-| Skill      | Attribute | Effect                                                                                                      | Flavor                                                                                                    | Activation |
-| ---------- | --------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------- |
-| Intuit     | Intellect |                                                                                                             | _Apply understanding to solve a logical problem_                                                          |            |
-| Persuade   | Intellect |                                                                                                             | _Influence another character through reasoning_                                                           |            |
-| Aid        | Intellect |                                                                                                             | _Offer first aid to someone else_                                                                         |            |
-| Maneuver   | Dexterity |                                                                                                             | _Jumping, climbing, swimming, and other movements requiring precision and/or balance_                     |            |
-| Read       | Presence  |                                                                                                             | _Try to see through lies or glean someone's intent_                                                       |            |
-| Deceive    | Presence  |                                                                                                             | _Try to lie convincingly_                                                                                 |            |
-| Intimidate | Presence  |                                                                                                             | _Influence another character with threats or blackmail_                                                   |            |
-| Charm      | Presence  |                                                                                                             | _Influence another character with bribery, flattery, or amusement_                                        |            |
-| Shoot      | Dexterity | Make an action roll. Deal damage equal to the result to a far away target.                                  | _Fire a weapon to strike at a range_                                                                      |            |
-| Sneak      | Dexterity |                                                                                                             | _Stay hidden and/or quiet_                                                                                |            |
-| Dash       | Dexterity |                                                                                                             | _Move swiftly to get to your destination quicker_                                                         |            |
-| Dodge      | Dexterity | Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage. | _Evade an incoming attack_                                                                                | Reaction   |
-| Focus      | Sense     |                                                                                                             | _Perform meticulous and/or complex tasks requiring concentration_                                         |            |
-| Notice     | Sense     |                                                                                                             | _Reactively see, hear, or feel something_                                                                 |            |
-| Locate     | Sense     |                                                                                                             | _Proactively find something with your senses_                                                             |            |
-| Endure     | Strength  |                                                                                                             | _Resist external physical forces_                                                                         | Reaction   |
-| Exert      | Strength  |                                                                                                             | _Any general application of force: lifting things, pushing things, holding another character still, etc._ |            |
-| Block      | Strength  | Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1. | _Guard against an incoming attack_                                                                        | Reaction   |
-| Strike     | Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                    | _Attack a character with your fist or a weapon_                                                           |            |
-
 ### Actions
 
-Characters interact with the world and others through **actions**, an attempt at affecting the world in some way: to make progress, gain information, assert leverage over another, and so on. Some actions include:
+Characters interact with the world and others through one of many **actions**, in order to make progress, gain information, assert leverage over another, and so on.
 
-- Busting down a door
+_Examples:_
 
-- Trying to find a hidden switch into a room
+- _Busting down a door would use _[_Strike_](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381)\_ \_
 
-- Narrowly dodging a blast of fire
+- _Trying to find a hidden switch into a room would use _[_Locate_](https://www.notion.so/1b1b0b885c0e807b9265dd0f77e22915)\_ \_
 
-- Analyzing data to find patterns or connections
+- _Narrowly dodging a blast of fire would use _[_Dodge_](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be)\_ \_
 
-- Make a convincing disguise to slip past guards
+- _Analyzing data to find patterns or connections would use _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)\_ \_
 
-**Reactions** are a type of action used in response to other actions or external effects. Unless stated otherwise, any action can be made as a reaction.
+- _Make a convincing disguise to slip past guards would use _[_Deceive_](https://www.notion.so/1b1b0b885c0e80458d6cf5b25591e6b4)
+
+Some actions have specific procedures and gameplay effects, such as [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381), which deals [damage](https://www.notion.so/1edb0b885c0e807ab0b5f881a026cac3) to other targets. Others are purely narrative, but the narrator may still apply gameplay effects as they deem suitable.
+
+Some actions [require an item to be used](https://www.notion.so/1b8b0b885c0e801ba751e644e7841a85). Item requirements for actions are justified on a logical basis, as determined by the narrator. When making an action that requires an item, reduce the item’s uses by one.
+
+_Example: _[_Shoot_](https://www.notion.so/1b1b0b885c0e80e7913cccd5f36843c4)_ requires a ranged weapon. A bow, crossbow, or firearm would count, but you could stretch the definition to include anything throwable, like a dagger, or a rock._
+
+**Reactions** are a type of action used in response to other actions or external effects. **Any action can be made as a reaction**, but some actions (labeled “Reaction” in the list below) may _only_ be made as a reaction.
+
+| Skill      | Attribute | Effect                                                                                                                | Flavor                                                                                                    | Activation             |
+| ---------- | --------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Intuit     | Intellect |                                                                                                                       | _Apply understanding to solve a logical problem_                                                          |                        |
+| Persuade   | Intellect |                                                                                                                       | _Influence another character through reasoning_                                                           |                        |
+| Aid        | Intellect |                                                                                                                       | _Offer first aid to someone else_                                                                         | Requires Medical Item  |
+| Maneuver   | Dexterity |                                                                                                                       | _Jumping, climbing, swimming, and other movements requiring precision and/or balance_                     |                        |
+| Read       | Presence  |                                                                                                                       | _Try to see through lies or glean someone's intent_                                                       |                        |
+| Deceive    | Presence  |                                                                                                                       | _Try to lie convincingly_                                                                                 |                        |
+| Intimidate | Presence  |                                                                                                                       | _Influence another character with threats or blackmail_                                                   |                        |
+| Charm      | Presence  |                                                                                                                       | _Influence another character with bribery, flattery, or amusement_                                        |                        |
+| Shoot      | Dexterity | Deal damage equal to the result of the action roll to a far away target.                                              | _Fire a weapon to strike at a range_                                                                      | Requires Ranged Weapon |
+| Sneak      | Dexterity |                                                                                                                       | _Stay hidden and/or quiet_                                                                                |                        |
+| Dash       | Dexterity |                                                                                                                       | _Move swiftly to get to your destination quicker_                                                         |                        |
+| Dodge      | Dexterity | Use this action before taking damage. If the action roll result is higher than the damage taken, avoid all damage.    | _Evade an incoming attack_                                                                                | Reaction               |
+| Focus      | Sense     |                                                                                                                       | _Perform meticulous and/or complex tasks requiring concentration_                                         |                        |
+| Notice     | Sense     |                                                                                                                       | _Reactively see, hear, or feel something_                                                                 | Reaction               |
+| Locate     | Sense     |                                                                                                                       | _Proactively find something with your senses_                                                             |                        |
+| Endure     | Strength  |                                                                                                                       | _Resist external physical forces_                                                                         | Reaction               |
+| Exert      | Strength  |                                                                                                                       | _Any general application of force: lifting things, pushing things, holding another character still, etc._ |                        |
+| Block      | Strength  | Use this action before taking damage. Reduce the incoming damage by the result of the action roll, to no less than 1. | _Guard against an incoming attack_                                                                        | Reaction               |
+| Strike     | Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                              | _Attack a character with your fist or a weapon_                                                           |                        |
 
 If the action is trivial in nature without any real change of failure or complication, such as opening an unlocked, unblocked door, or pressing a button, the narrator should let the player proceed with the action and narrate what happens next.
 
-If the action has some chance of failure or complication, that’s where **action rolls** come in.
+If the action has some chance of failure or complication, the narrator should call for an **action roll**, which is a specific type of [dice roll](https://www.notion.so/201b0b885c0e803d9b05f8fa5a3301da) that determines the impact and/or level of success of an action. Action rolls are made with a number of dice equal to your score in the action’s attribute.
 
-#### Action Rolls
+You can also assign **skill points** to each action, which adds one extra die per point when rolling.
 
-An action roll determines the impact and/or the level of success of an action.
+At character creation, you start with 5 skill points. Assign them to any skills of your choosing.
 
-To make an action roll:
-
-1. Choose the [skill](https://www.notion.so/1b8b0b885c0e802e837ef397dbac439a) that best fits your action.
-
-1. [Make a dice roll](https://www.notion.so/201b0b885c0e803d9b05f8fa5a3301da) with a number of dice equal to your score in that skill, _plus_ your score in the attribute for that skill.
-
-The narrator may also add or remove dice for the roll depending on the situation.
+Skills may have **no more than 3 points** assigned to them. You may only reassign skill points after reaching a [milestone](https://www.notion.so/1c8b0b885c0e801c9f4ac5ccce258a93).
 
 After rolling, the narrator will describe what happens based on the **impact** of the action, which is based on the result of the roll:
 
@@ -342,99 +344,29 @@ After rolling, the narrator will describe what happens based on the **impact** o
 
 - High impact: 11+
 
-_Example:_
+#### Attacks
 
-- _Firing a crossbow at a moving target would involve _[_Shoot_](https://www.notion.so/1b1b0b885c0e80e7913cccd5f36843c4)
+When a situation gets too heated to resolve with words, **attack actions** are your next best option. At any time, you can either make a **melee attack action**, or a **ranged attack action**.
 
-- _Collecting information from a crime scene would involve _[_Locate_](https://www.notion.so/1b1b0b885c0e807b9265dd0f77e22915)
+For melee attacks, choose a _nearby_ character, then make a [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381) action roll. Subtract the target’s defense value
 
-- _Trying to scare someone into giving back something they stole would involve _[_Intimidate_](https://www.notion.so/1b1b0b885c0e8075953cc499b88b921d)
-
-_Let’s say you’re making an _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)_ roll for deciphering the language of an ancient grimoire._
-
-_For this action, the narrator determines the outcome of each potential impact level:_
-
-- _Low impact: You can’t really make heads or tails of what’s written._
-
-- _Medium impact: you know what language it is, but it uses a lot of unfamiliar, arcane vocabulary. Deciphering the meaning of the text proves difficult._
-
-- _High impact: You can read and interpret the text in great detail._
-
-_The attribute for _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)_ is _[_Intellect_](https://www.notion.so/1b2b0b885c0e8097891bc55d3cadb9dd)_. You have a 3 in _[_Intellect_](https://www.notion.so/1b2b0b885c0e8097891bc55d3cadb9dd)_, and a 2 in _[_Intuit_](https://www.notion.so/1b2b0b885c0e8038b664c18ebf6eab56)_; the total is 5, and that’s how many dice you’ll roll. You get 2 + 1 + 1 + 3 + 2 = 9, for medium impact._
-
-_The narrator says that you can decipher the language, but not much more beyond that. Maybe there’s an expert on the language you can bring this to._
-
-##### Push Yourself
+#### Push Yourself
 
 After you make an action roll, once per roll, you may take 2 fatigue to **push yourself** and reroll it, then take the new result if it’s higher than the previous.
 
-##### Assist
+#### Assist
 
 When another player makes an action roll, once per roll, you may take 1 fatigue to **assist** them. For each skill point **you** have in the same skill that they’re rolling with, add that many dice to their roll.
 
 This does not apply to rerolls from Push Yourself, but you may spend fatigue **again** to assist with a reroll.
 
-##### Contested Rolls
+#### Contested Rolls
 
 Use contested rolls to determine the victor of an adversarial situation. Both characters make a roll using the most appropriate attribute for their action. The character with more successes wins the contest.
 
 If there's a tie in successes, the character with the higher attribute score wins. If there's still a tie, both characters may choose to either back down or make another roll.
 
 _Example: A thief tries to pickpocket a merchant in a crowded marketplace. The thief rolls _[_Dexterity_](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995)_ to attempt the theft stealthily, while the merchant rolls _[_Sense_](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10)_ to notice the attempt. If the thief rolls higher, they successfully steal the item without being noticed. If the merchant rolls higher, they catch the thief in the act._
-
-### Unarmed Combat
-
-At any time, you may make the following [actions](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4), each with the dice bonus from its associated [skill](https://www.notion.so/1b8b0b885c0e802e837ef397dbac439a):
-
-- [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381): Make an action roll. Deal damage equal to the result to a nearby target.
-
-- [Block](https://www.notion.so/1b1b0b885c0e80c3baede9bc830d6ece): As a reaction, before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1.
-
-- [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be): As a reaction, before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage.
-
-_Example: You currently have no weapon, and you want to punch another nearby character. You would make the unarmed _[_Strike_](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381)_ action. If you have skill points assigned to the _[_Strike_](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381)_ skill, add that many dice to your action roll._
-
-### Items
-
-You may possess a number of **items** which are used in various ways to various ends.
-
-Each item has a **size** representing how large and heavy it is. The sum of your carried item sizes must be equal to or less than your **carrying capacity**, which is equal to:
-
-4 + your [Strength](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee) score + your [skill points](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1c8b0b885c0e8015812fda2be0aa71ba) in [Endure](https://www.notion.so/1b1b0b885c0e80d68ac8e515eec2363b)
-
-Items may have a number of limited **uses**, which can represent a number of servings, doses, durability, ammo, and so on, depending on the item itself.
-
-The described effects of items are written and interpreted narratively. When using an item, players should make their case for how the item applies to the current situation, and it’s up to the narrator whether that item use is valid.
-
-_Example: a medkit would be to help heal physical injuries. Players could use it to heal a “wounded” _[_condition_](https://www.notion.so/1e5b0b885c0e801da514d402a2a15a37)_, but not to cure the effects of sickness or poisoning._
-
-Likewise, modify item inventories on a sensible bases, even if item descriptions don’t state to do so.
-
-_Example: throwing a weapon would remove it from your inventory, even if the weapon itself doesn’t say “removed from your inventory when thrown”._
-
-The **cost** of an item is the minimum [expense tier](https://www.notion.so/1c8b0b885c0e80c680d1d4411eef8ede) you need to buy it in a setting of commerce or trade.
-
-**Consumable** items are removed from your inventory after they have run out of uses. You may use a consumable item at any time while you are _able_ to make actions—being down would prevent you from using them.
-
-**Tools** may be held, used, and used while they have at least 1 use. They continue to stay in your inventory, even while they have run out of uses.
-
-**Wearable** items may be worn for a persistent effect that applies until you stop wearing it.
-
-Items are designed to be created by players in collaboration with the narrator. To define an custom item, define the item’s name, type (Consumable, Tool, or Wearable), size, and effect. Always consult the narrator for custom items.
-
-Use this list of items as a reference for your own custom items.
-
-| Item                | Uses | Price          | Type       | Size | Description                                                                                                                                                                              |
-| ------------------- | ---- | -------------- | ---------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sledgehammer        |      | 5. Expensive   | Tool       | 5    | A large, heavy hammer. Good for smashing things                                                                                                                                          |
-| Medkit              | 5    | 3. Inexpensive | Tool       | 1    | A kit of medical supplies for treating physical injuries. Make an action with the [Aid](https://www.notion.so/1b2b0b885c0e8050a229d448b895eb92) skill to heal damage equal to the result |
-| Dagger              |      | 3. Inexpensive | Tool       | 1    | A light, throwable blade, often used for offensive purposes, or for slicing bread                                                                                                        |
-| Bow & Arrows        | 20   | 4. Steep       | Tool       | 2    | A shortbow and quiver of arrows. Make an action with the [Shoot](https://www.notion.so/1b1b0b885c0e80e7913cccd5f36843c4) skill to fire and deal damage equal to the result               |
-| Swimsuit            |      | 5. Expensive   | Wearable   | 1    | Makes the wearer more visually attractive and charming when worn with nothing else. Or, it may be offputting outside of socially accepted settings, such as beaches and pools.           |
-| Pouch of Tea Leaves | 4    | 2. Cheap       | Consumable | 1    | When made into tea, helps improve calmness and focus                                                                                                                                     |
-| Flashlight          |      | 3. Inexpensive | Tool       | 1    | Helps to see things in the dark                                                                                                                                                          |
-| Binoculars          |      | 3. Inexpensive | Tool       | 1    | Helps to see things far away                                                                                                                                                             |
-| Canteen of Water    | 12   | 3. Inexpensive | Consumable | 2    | A container which holds up to 12 servings of drinking water (or any liquid)                                                                                                              |
 
 ### Aspects
 
@@ -648,7 +580,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 - Gives +1 impact point to Enchantment arts.
 
-- Non-enchantments have -1 impact point in dark spaces.
+- Non-enchantment arts have -1 impact point in dark spaces.
 
 ###### [Darkness](https://www.notion.so/1b1b0b885c0e8011bb89e175042f5180)
 
@@ -656,7 +588,7 @@ Aspect arts are modified by the aspects used in them in various ways, such as ad
 
 - Gives +1 impact point outdoors at night.
 
-- Non-enchantments have -1 impact point in well-lit spaces.
+- Non-enchantment arts have -1 impact point in well-lit spaces.
 
 ##### Minor Aspect Art
 
@@ -773,6 +705,164 @@ Aspects each have their own **aura**. Eisenkind find themselves more attuned wit
 🚧 TODO: do Auras have some other purpose or place in the system?
 
 </aside>
+
+### Items
+
+You may possess a number of **items** which are used in various ways to various ends.
+
+Each item has a **size** representing how large and heavy it is. The sum of your carried item sizes must be equal to or less than your **carrying capacity**, which is equal to:
+
+4 + your [Strength](https://www.notion.so/1b1b0b885c0e80028c4cd651eb7aceee) score + your [skill points](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4#1c8b0b885c0e8015812fda2be0aa71ba) in [Endure](https://www.notion.so/1b1b0b885c0e80d68ac8e515eec2363b)
+
+Items may have a number of limited **uses**, which can represent a number of servings, doses, durability, ammo, and so on, depending on the item itself.
+
+The described effects of items are written and interpreted narratively. When using an item, players should make their case for how the item applies to the current situation, and it’s up to the narrator whether that item use is valid.
+
+_Example: a medkit would be to help heal physical injuries. Players could use it to heal a “wounded” _[_condition_](https://www.notion.so/1e5b0b885c0e801da514d402a2a15a37)_, but not to cure the effects of sickness or poisoning._
+
+Likewise, modify item inventories on a sensible bases, even if item descriptions don’t state to do so.
+
+_Example: throwing a weapon would remove it from your inventory, even if the weapon itself doesn’t say “removed from your inventory when thrown”._
+
+The **cost** of an item is the minimum [expense tier](https://www.notion.so/1c8b0b885c0e80c680d1d4411eef8ede) you need to buy it in a setting of commerce or trade.
+
+**Consumable** items are removed from your inventory after they have run out of uses. You may use a consumable item at any time while you are _able_ to make actions—being down would prevent you from using them.
+
+**Tools** may be held, used, and used while they have at least 1 use. They continue to stay in your inventory, even while they have run out of uses.
+
+**Wearable** items may be worn for a persistent effect that applies until you stop wearing it.
+
+Items are designed to be created by players in collaboration with the narrator. To define an custom item, define the item’s name, type (Consumable, Tool, or Wearable), size, and effect. Always consult the narrator for custom items.
+
+Use this list of items as a reference for your own custom items.
+
+| Item                | Uses | Price          | Type       | Size | Description                                                                                                                                                                              |
+| ------------------- | ---- | -------------- | ---------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sledgehammer        |      | 5. Expensive   | Tool       | 5    | A large, heavy hammer. Good for smashing things                                                                                                                                          |
+| Medkit              | 5    | 3. Inexpensive | Tool       | 1    | A kit of medical supplies for treating physical injuries. Make an action with the [Aid](https://www.notion.so/1b2b0b885c0e8050a229d448b895eb92) skill to heal damage equal to the result |
+| Dagger              |      | 3. Inexpensive | Tool       | 1    | A light, throwable blade, often used for offensive purposes, or for slicing bread                                                                                                        |
+| Bow & Arrows        | 20   | 4. Steep       | Tool       | 2    | A shortbow and quiver of arrows. Make an action with the [Shoot](https://www.notion.so/1b1b0b885c0e80e7913cccd5f36843c4) skill to fire and deal damage equal to the result               |
+| Swimsuit            |      | 5. Expensive   | Wearable   | 1    | Makes the wearer more visually attractive and charming when worn with nothing else. Or, it may be offputting outside of socially accepted settings, such as beaches and pools.           |
+| Pouch of Tea Leaves | 4    | 2. Cheap       | Consumable | 1    | When made into tea, helps improve calmness and focus                                                                                                                                     |
+| Flashlight          |      | 3. Inexpensive | Tool       | 1    | Helps to see things in the dark                                                                                                                                                          |
+| Binoculars          |      | 3. Inexpensive | Tool       | 1    | Helps to see things far away                                                                                                                                                             |
+| Canteen of Water    | 12   | 3. Inexpensive | Consumable | 2    | A container which holds up to 12 servings of drinking water (or any liquid)                                                                                                              |
+
+### Resting
+
+<aside>
+
+🚧 this will change significantly
+
+</aside>
+
+You may heal 1 fatigue per 1 in-game hour spent resting. If you rest for 8 consecutive hours or more, heal all fatigue.
+
+Resting for any amount of time will also restore 1 [bond activation](https://www.notion.so/1bdb0b885c0e80a88e37d34e61d7f01f), to a max of 3.
+
+#### Eventful Rests
+
+Mind your time! The longer you rest, the more likely something may happen in the meantime.
+
+When resting, the narrator makes a [dice roll](https://www.notion.so/201b0b885c0e803d9b05f8fa5a3301da) with **one die per hour rested**. The result determines whether an event occurs, and the significance thereof:
+
+- 1-11 → **uneventful**; nothing notable happens.
+
+  _You sleep peacefully. Maybe a butterfly comes to land on your nose, and you shift a bit in your bedroll, but not much else happens._
+
+- 12-15 → **eventful**; a slight change occurs while resting
+
+  _You check your backpack, noticing that a few of your snacks are missing. You find a group of squirrels nearby munching on said snacks._
+
+- 16+ → **significant**, and your rest is interrupted: divide your resting time in half, rounded down. An event takes place that requires your immediate attention.
+
+  _You wake to the crackling thunder of a raging storm of biblical proportions. Hailstones shatter the window, and the wind flings your belongings about the room._
+
+<aside>
+
+🚧 idea: probably put a roll table here or something with generic event prompts
+
+</aside>
+
+### Conditions
+
+The **conditions** listed on your character sheet represent your changing state over time. This includes various forms of physical and mental stress, or boons that amplify your abilities.
+
+The narrator adds conditions in response to various events, such as taking damage from an attack, exhausting yourself from a taxing action, or using an [item](https://www.notion.so/1b8b0b885c0e801ba751e644e7841a85) and gaining its benefits.
+
+**Variable conditions** (denoted by “Condition X”) have an **intensity,** a _positive whole number_ (a condition can’t have an intensity of 0, or a negative number) that represents the impact of the condition.
+
+The following conditions exist as a part of the system with special meanings and mechanical purposes:
+
+**Damage X** - physical harm resulting from attacks, hazards, or other external forces
+
+    _By default, damage is represented in a more abstract, cartoonish sort of way, as opposed to a  “medical” approach that describes bleeding or broken bones in detail._
+
+**Fatigue X** - exhaustion accumulated from physically or mentally taxing activities
+
+**Unconscious** - a state in which the character cannot move, act, or perceive the surrounding world in any way
+
+**Burn X** - when taking damage, take X additional damage
+
+**Cold X** - when taking fatigue, take X additional fatigue
+
+<aside>
+
+ℹ️ Damage and Fatigue both fall under a stress system. See [Stress](https://www.notion.so/1edb0b885c0e807ab0b5f881a026cac3) for more details.
+
+</aside>
+
+However, the narrator may apply other unlisted, custom conditions to characters when built-in conditions don’t fit, such as a specific type of “poisoned” condition, which impairs a certain set of abilities.
+
+You can have any number of conditions at once, but any condition may only be listed once. Receiving some level of the condition when it already exists will increase the intensity of the existing condition instead of adding a new one.
+
+Language for modifying conditions is loose; to “take 2 fatigue” would mean to add the Fatigue condition with an intensity of 2. Similarly, “heal 2 damage” would mean to reduce the intensity of the Damage condition. Other examples:
+
+- “Become unconscious” - take the **Unconscious** condition
+
+- “Become blinded” - take the **Blinded** condition
+
+_Example: a character could have Damage 5 and Fatigue 3 conditions. This would mean that they’ve taken a decent bit of damage, as well as having physically exhausted themselves. Taking 2 damage from an attack would increase the intensity of their existing Damage condition to 7._
+
+### Positioning, Movement & Distance
+
+Positions of entities (characters or objects) and distances from one another are determined on a logical, narrative basis. An entity can be **nearby** another entity, or **far away** from them.
+
+Moving closer or far away should also be handled on a narrative basis. If nothing logically impedes a character from reaching their destination, they should be able to freely move there.
+
+Obstacles that would impede movement should be handled situationally:
+
+- smaller hurdles like fences or gaps require a [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9) action to overcome
+
+- barriers that can’t simply be walked through would require breaking it down, such as with [Strike](https://www.notion.so/1b1b0b885c0e80a5896febd5968d4381), or you could [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9) by climbing over it
+
+_Example: You’re playing as a member of a group of assassins, and you infiltrate a warehouse to find your target. Your target hired bodyguards to patrol the place and keep watch. Your allies and bodyguards on the ground floor close to the entrance would be nearby, and others elsewhere would be far away._
+
+### Combat
+
+Combat in **Aspects of Nature** isn’t handled in any special way. However, as an optional rule to make things fair and reduce confusion, you may want to establish a fixed turn order:
+
+- The character who instigated the conflict is the one who goes first
+
+- Next, the person who was impacted
+
+Then, order follows on a logical basis, depending on factors such as:
+
+- Distance to the source of conflict (those closer would go sooner)
+
+- A character’s speed or reaction time, represented by their [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) (those with a higher score would go sooner)
+
+For a more concretely determined order, you may also make competing [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls, going in order of highest to lowest rolls.
+
+Optionally, you can have **teams** of characters—those who are narratively allied and working towards or against the same goal—take their turns one after another, where initiative is counted on a per-team basis by adding the success count for everyone’s [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls. Your party would take their turns in any order, your adversaries would do the same, as well as any third-party groups that are neutral or enemies to either groups.
+
+You can make up to one [action](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4) during your turn. If you make a reaction (such as using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be)), you forfeit your action for your following turn.
+
+Once per turn, you may use **adrenaline**, which allows you to take 2 fatigue for an additional action.
+
+Using a [consumable item](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e80ad878adbfcdac08b20) does _not_ use an action, but you may only use one item per turn.
+
+Wearing or holding [equipment](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e809281b9c25d3608bd5f) does _not_ use an action, but you may only switch your equipped or wielded item once per turn.
 
 ### Bonds
 
@@ -903,6 +993,21 @@ Your desperation to save them allows you to activate the bond, gaining 4 additio
 
 </aside>
 
+### Lineage
+
+Your lineage determines many of your character’s physical characteristics and traits. Each lineage represents a broad umbrella of member species within, and comes with a unique special ability.
+
+_Click each entry below for more details!_
+
+| Lineage     | Ability                                                                                                                                                                                                                                                                     | Member Creatures                                             |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Umbral      | **Push the Odds** - While making a skill check, any time you roll a 3, you may take 1 stress to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                       | _demons, succubus/incubus, vampires_                         |
+| Arthropod   | **Double-Edged Senses** - You may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) check _(once per check)_. When you do, take 1 stress for every die in that roll with a value of 3.                                                      | _insects, arachnids, bugs, most creatures with exoskeletons_ |
+| Avian       | **Momentum** - After using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following skill check gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       |
+| Aquatic     | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the roll.                                                | _fish, dolphins, other water-bound creatures_                |
+| Scalebearer | **Reflection** - When you take stress from an attack, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to a skill check.                                                                                             | _dragons, lizard, snake, alligator, crocodile_               |
+| Furbearer   | **Adaptation** - After you make a low-impact skill check, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to a skill check _(except rolls that gave you those points)_.                                             | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  |
+
 ### Expenses
 
 [Items](https://www.notion.so/1b8b0b885c0e801ba751e644e7841a85) belong to one of many **expense tiers**, which determine how much is needed to purchase and trade them in the world.
@@ -971,46 +1076,29 @@ A player could _theoretically_ try to buy 100 daggers at tier 5, but the shop mi
 
 </aside>
 
-### Combat
+### Date & Time
 
-Combat in **Aspects of Nature** isn’t handled in any special way. However, as an optional rule to make things fair and reduce confusion, you may want to establish a fixed turn order:
+Scenes play out and progress between different **times of day**, tracked by players and the narrator:
 
-- The character who instigated the conflict is the one who goes first
+- **Daylight** - from the start of sunrise, through noon and afternoon
 
-- Next, the person who was impacted
+- **Evening** - from the start of afternoon, through sunset
 
-Then, order follows on a logical basis, depending on factors such as:
+- **Nightfall** - from the end of sunset, through midnight, up to sunrise
 
-- Distance to the source of conflict (those closer would go sooner)
+Time tracking is mostly for informative purposes, and it may also affect things tangibly, such as [the strength of certain aspect arts](https://www.notion.so/1b8b0b885c0e80809c18c6e0ccc7ab05#1ebb0b885c0e809aa3eff6d917ecb36e).
 
-- A character’s speed or reaction time, represented by their [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) (those with a higher score would go sooner)
+When a scene starts, determine the time of day in which it takes place. When it ends, decide whether the scene should progress to a new time of day.
 
-For a more concretely determined order, you may also make competing [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls, going in order of highest to lowest rolls.
+_Example:_
 
-Optionally, you can have **teams** of characters—those who are narratively allied and working towards or against the same goal—take their turns one after another, where initiative is counted on a per-team basis by adding the success count for everyone’s [Dexterity](https://www.notion.so/1b1b0b885c0e80039d7fe6cdf5acf995) rolls. Your party would take their turns in any order, your adversaries would do the same, as well as any third-party groups that are neutral or enemies to either groups.
+- _You play out a scene where you visit the market during daylight. After you’ve shopped around for a bit, you and the narrator decide that afternoon sets in; the scene ends at evening._
 
-You can make up to one [action](https://www.notion.so/1b1b0b885c0e80d5bb9ce5178ed7b7f4) during your turn. If you make a reaction (such as using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be)), you forfeit your action for your following turn.
+- _At the start of evening, while walking through the town you’re in, you get briefly stopped by a girl giving away flowers from her parents’ garden. A brief conversation ensues before she runs off to another. You decide that, since this conversation didn’t last very long, it’s still evening._
 
-Once per turn, you may use **adrenaline**, which allows you to take 2 fatigue for an additional action.
+- _You stop by the town’s knights guild to visit someone in detention for information. Since the conversation lasts a while, you decide that the time passes to nightfall._
 
-Using a [consumable item](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e80ad878adbfcdac08b20) does _not_ use an action, but you may only use one item per turn.
-
-Wearing or holding [equipment](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e809281b9c25d3608bd5f) does _not_ use an action, but you may only switch your equipped or wielded item once per turn.
-
-### Lineage
-
-Your lineage determines many of your character’s physical characteristics and traits. Each lineage represents a broad umbrella of member species within, and comes with a unique special ability.
-
-_Click each entry below for more details!_
-
-| Lineage     | Ability                                                                                                                                                                                                                                                                                     | Member Creatures                                             |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Umbral      | **Push the Odds** - While making an action roll, any time you roll a 3, you may take 1 fatigue to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                                     | _demons, succubus/incubus, vampires_                         |
-| Arthropod   | **Double-Edged Senses** - Once per roll, you may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) action roll. Take 1 fatigue for every die in that roll with a value of 3.                                                                                | _insects, arachnids, bugs, most creatures with exoskeletons_ |
-| Avian       | **Momentum** - After making an action with [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following action roll gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       |
-| Aquatic     | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the action roll.                                                         | _fish, dolphins, other water-bound creatures_                |
-| Scalebearer | **Reflection** - When you take damage, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to an action roll.                                                                                                                           | _dragons, lizard, snake, alligator, crocodile_               |
-| Furbearer   | **Adaptation** - After you make a low-impact action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                            | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  |
+- _Having accomplished all you want to do, you decide to _[_rest_](https://www.notion.so/1b8b0b885c0e80f78124e5e0be0f55bf)_ during nightfall. The next scene takes place at daylight._
 
 ### Character Creation
 
@@ -1071,14 +1159,14 @@ Now complete the following steps in any order.
 
 Update the lineage section heading and also specify your member species, then copy the lineage ability to the body of that section.
 
-| Ability                                                                                                                                                                                                                                                                                     | Member Creatures                                             | Lineage     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------- |
-| **Push the Odds** - While making an action roll, any time you roll a 3, you may take 1 fatigue to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                                     | _demons, succubus/incubus, vampires_                         | Umbral      |
-| **Double-Edged Senses** - Once per roll, you may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) action roll. Take 1 fatigue for every die in that roll with a value of 3.                                                                                | _insects, arachnids, bugs, most creatures with exoskeletons_ | Arthropod   |
-| **Momentum** - After making an action with [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following action roll gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       | Avian       |
-| **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the action roll.                                                         | _fish, dolphins, other water-bound creatures_                | Aquatic     |
-| **Reflection** - When you take damage, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to an action roll.                                                                                                                           | _dragons, lizard, snake, alligator, crocodile_               | Scalebearer |
-| **Adaptation** - After you make a low-impact action roll, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to an action roll _(except rolls that gave you those points)_.                                                            | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  | Furbearer   |
+| Ability                                                                                                                                                                                                                                                                     | Member Creatures                                             | Lineage     |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------- |
+| **Push the Odds** - While making a skill check, any time you roll a 3, you may take 1 stress to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                       | _demons, succubus/incubus, vampires_                         | Umbral      |
+| **Double-Edged Senses** - You may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) check _(once per check)_. When you do, take 1 stress for every die in that roll with a value of 3.                                                      | _insects, arachnids, bugs, most creatures with exoskeletons_ | Arthropod   |
+| **Momentum** - After using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following skill check gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       | Avian       |
+| **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the roll.                                                | _fish, dolphins, other water-bound creatures_                | Aquatic     |
+| **Reflection** - When you take stress from an attack, gain one **reflection point**. At any time, spend any number of reflection points to add that many dice to a skill check.                                                                                             | _dragons, lizard, snake, alligator, crocodile_               | Scalebearer |
+| **Adaptation** - After you make a low-impact skill check, gain one **adaptation point**. At any time, spend any number of adaptation points to add that many dice to a skill check _(except rolls that gave you those points)_.                                             | _dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons_  | Furbearer   |
 
 <aside>
 
@@ -1243,12 +1331,6 @@ Darkness: 3
 
 ##### Assign [skill points](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1c8b0b885c0e8015812fda2be0aa71ba).
 
-Your character’s skillset is informed by the **skill points** assigned to each **skill**.
-
-**Players start with 5 skill points**, and skills may have **up to 5 points** assigned to them.
-
-You may reassign any number of skill points at the start or end of sessions.
-
 <aside>
 
 ###### Example
@@ -1263,27 +1345,27 @@ Surge: +1
 
 </aside>
 
-| Attribute | Effect                                                                                                      | Flavor                                                                                                    | Skill      | Activation |
-| --------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------- | ---------- |
-| Intellect |                                                                                                             | _Apply understanding to solve a logical problem_                                                          | Intuit     |            |
-| Intellect |                                                                                                             | _Influence another character through reasoning_                                                           | Persuade   |            |
-| Intellect |                                                                                                             | _Offer first aid to someone else_                                                                         | Aid        |            |
-| Dexterity |                                                                                                             | _Jumping, climbing, swimming, and other movements requiring precision and/or balance_                     | Maneuver   |            |
-| Presence  |                                                                                                             | _Try to see through lies or glean someone's intent_                                                       | Read       |            |
-| Presence  |                                                                                                             | _Try to lie convincingly_                                                                                 | Deceive    |            |
-| Presence  |                                                                                                             | _Influence another character with threats or blackmail_                                                   | Intimidate |            |
-| Presence  |                                                                                                             | _Influence another character with bribery, flattery, or amusement_                                        | Charm      |            |
-| Dexterity | Make an action roll. Deal damage equal to the result to a far away target.                                  | _Fire a weapon to strike at a range_                                                                      | Shoot      |            |
-| Dexterity |                                                                                                             | _Stay hidden and/or quiet_                                                                                | Sneak      |            |
-| Dexterity |                                                                                                             | _Move swiftly to get to your destination quicker_                                                         | Dash       |            |
-| Dexterity | Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage. | _Evade an incoming attack_                                                                                | Dodge      | Reaction   |
-| Sense     |                                                                                                             | _Perform meticulous and/or complex tasks requiring concentration_                                         | Focus      |            |
-| Sense     |                                                                                                             | _Reactively see, hear, or feel something_                                                                 | Notice     |            |
-| Sense     |                                                                                                             | _Proactively find something with your senses_                                                             | Locate     |            |
-| Strength  |                                                                                                             | _Resist external physical forces_                                                                         | Endure     | Reaction   |
-| Strength  |                                                                                                             | _Any general application of force: lifting things, pushing things, holding another character still, etc._ | Exert      |            |
-| Strength  | Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1. | _Guard against an incoming attack_                                                                        | Block      | Reaction   |
-| Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                    | _Attack a character with your fist or a weapon_                                                           | Strike     |            |
+| Attribute | Effect                                                                                                                | Flavor                                                                                                    | Skill      | Activation             |
+| --------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------- | ---------------------- |
+| Intellect |                                                                                                                       | _Apply understanding to solve a logical problem_                                                          | Intuit     |                        |
+| Intellect |                                                                                                                       | _Influence another character through reasoning_                                                           | Persuade   |                        |
+| Intellect |                                                                                                                       | _Offer first aid to someone else_                                                                         | Aid        | Requires Medical Item  |
+| Dexterity |                                                                                                                       | _Jumping, climbing, swimming, and other movements requiring precision and/or balance_                     | Maneuver   |                        |
+| Presence  |                                                                                                                       | _Try to see through lies or glean someone's intent_                                                       | Read       |                        |
+| Presence  |                                                                                                                       | _Try to lie convincingly_                                                                                 | Deceive    |                        |
+| Presence  |                                                                                                                       | _Influence another character with threats or blackmail_                                                   | Intimidate |                        |
+| Presence  |                                                                                                                       | _Influence another character with bribery, flattery, or amusement_                                        | Charm      |                        |
+| Dexterity | Deal damage equal to the result of the action roll to a far away target.                                              | _Fire a weapon to strike at a range_                                                                      | Shoot      | Requires Ranged Weapon |
+| Dexterity |                                                                                                                       | _Stay hidden and/or quiet_                                                                                | Sneak      |                        |
+| Dexterity |                                                                                                                       | _Move swiftly to get to your destination quicker_                                                         | Dash       |                        |
+| Dexterity | Use this action before taking damage. If the action roll result is higher than the damage taken, avoid all damage.    | _Evade an incoming attack_                                                                                | Dodge      | Reaction               |
+| Sense     |                                                                                                                       | _Perform meticulous and/or complex tasks requiring concentration_                                         | Focus      |                        |
+| Sense     |                                                                                                                       | _Reactively see, hear, or feel something_                                                                 | Notice     | Reaction               |
+| Sense     |                                                                                                                       | _Proactively find something with your senses_                                                             | Locate     |                        |
+| Strength  |                                                                                                                       | _Resist external physical forces_                                                                         | Endure     | Reaction               |
+| Strength  |                                                                                                                       | _Any general application of force: lifting things, pushing things, holding another character still, etc._ | Exert      |                        |
+| Strength  | Use this action before taking damage. Reduce the incoming damage by the result of the action roll, to no less than 1. | _Guard against an incoming attack_                                                                        | Block      | Reaction               |
+| Strength  | Make an action roll. Deal damage equal to the result to a nearby target.                                              | _Attack a character with your fist or a weapon_                                                           | Strike     |                        |
 
 ##### Choose your starting [items](https://www.notion.so/1b1b0b885c0e803d8566fb10e0b5130c#1b8b0b885c0e801ba751e644e7841a85).
 

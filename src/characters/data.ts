@@ -18,6 +18,14 @@ export const ASPECT_NAMES = [
 	"Darkness",
 ] as const
 
+export const ASPECT_ATTRIBUTES: Record<AspectName, AttributeName> = {
+	Fire: "Strength",
+	Water: "Sense",
+	Wind: "Dexterity",
+	Light: "Intellect",
+	Darkness: "Presence",
+}
+
 export const ITEM_TYPES = [
 	{
 		value: "consumable",
@@ -25,15 +33,20 @@ export const ITEM_TYPES = [
 		description: "Goes away when there are no more uses",
 	},
 	{
-		value: "tool",
-		label: "Tool",
-		description: "Can be used and reused while held",
+		value: "reusable",
+		label: "Reusable",
+		description: "Can be used and reused",
 	},
-	{
-		value: "wearable",
-		label: "Wearable",
-		description: "Can be worn for a persistent effect",
-	},
+	// {
+	// 	value: "tool",
+	// 	label: "Tool",
+	// 	description: "Can be used and reused while held",
+	// },
+	// {
+	// 	value: "wearable",
+	// 	label: "Wearable",
+	// 	description: "Can be worn for a persistent effect",
+	// },
 ]
 
 export const ASPECT_AURAS = [

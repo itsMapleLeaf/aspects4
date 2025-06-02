@@ -6,21 +6,34 @@ import {
 	resolveTextField,
 	type ResolvedSelectChoice,
 } from "../characters/sheet/fields.ts"
+import { ATTRIBUTE_NAMES } from "./data.ts"
 
-const MILESTONE_BONUS_TYPES: ResolvedSelectChoice[] = [
+const MILESTONE_BONUS_TYPES = [
+	// {
+	// 	label: "+3 skill points",
+	// 	value: "skillPoints",
+	// },
+	// {
+	// 	label: "+5 damage limit",
+	// 	value: "damageLimitIncrease",
+	// },
+	// {
+	// 	label: "+5 fatigue limit",
+	// 	value: "fatigueLimitIncrease",
+	// },
 	{
-		label: "+3 skill points",
-		value: "skillPoints",
+		label: "+1 attribute point (once per attribute)",
+		value: "attributePoint",
 	},
 	{
-		label: "+5 damage limit",
-		value: "damageLimitIncrease",
+		label: "+2 to any skill",
+		value: "singleSkillBonus",
 	},
 	{
-		label: "+5 fatigue limit",
-		value: "fatigueLimitIncrease",
+		label: "+1 to any two skills",
+		value: "doubleSkillBonus",
 	},
-]
+] as const satisfies ResolvedSelectChoice[]
 
 export type ResolvedMilestoneFields = ReturnType<typeof resolveMilestoneFields>
 
@@ -34,6 +47,12 @@ export function resolveMilestoneFields(context: FieldContext) {
 		notes: resolveTextField(context, {
 			id: "notes",
 			defaultValue: "",
+		}),
+		attributeMilestoneChoice: resolveSelectField(context, {
+			id: "attributeMilestoneChoice",
+			choices: ATTRIBUTE_NAMES.map((name) => ({
+				value: name,
+			})),
 		}),
 	}
 }

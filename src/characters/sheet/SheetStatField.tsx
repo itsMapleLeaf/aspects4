@@ -94,8 +94,8 @@ export function SheetStatField({
 function DiceScoreIcon({ score }: { score: number }) {
 	const scoreColorClass = twMerge(
 		score <= 1 ? "text-red-400"
-		: score <= 4 ? "text-blue-400"
-		: score <= 7 ? "text-green-400"
+		: score <= 2 ? "text-yellow-400"
+		: score <= 4 ? "text-emerald-400"
 		: "text-purple-400",
 	)
 	return (

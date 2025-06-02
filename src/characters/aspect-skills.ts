@@ -1,4 +1,4 @@
-import { ASPECT_ART_TYPES } from "../characters/data.ts"
+import { ASPECT_ART_TYPES, ASPECT_ATTRIBUTES } from "../characters/data.ts"
 import {
 	FieldContext,
 	createResolvedListItemContext,
@@ -20,9 +20,10 @@ export function resolveAspectSkillFields(context: FieldContext) {
 		}),
 		aspect: resolveSelectField(context, {
 			id: "aspect",
-			choices: ASPECTS.map((item) => ({
-				value: item.name,
-				hint: item.material,
+			choices: ASPECTS.map((aspect) => ({
+				value: `${aspect.name}`,
+				label: `${aspect.name} (${ASPECT_ATTRIBUTES[aspect.name]})`,
+				hint: aspect.material,
 			})),
 		}),
 		points: resolveNumberField(context, {

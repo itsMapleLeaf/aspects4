@@ -1,0 +1,135 @@
+[
+  {
+    "attribute": "Intellect",
+    "effect": "",
+    "flavor": "Apply understanding to solve a logical problem",
+    "skill": "Intuit",
+    "activation": ""
+  },
+  {
+    "attribute": "Intellect",
+    "effect": "",
+    "flavor": "Influence another character through reasoning",
+    "skill": "Persuade",
+    "activation": ""
+  },
+  {
+    "attribute": "Intellect",
+    "effect": "",
+    "flavor": "Offer first aid to someone else",
+    "skill": "Aid",
+    "activation": "Requires Medical Item"
+  },
+  {
+    "attribute": "Dexterity",
+    "effect": "",
+    "flavor": "Jumping, climbing, swimming, and other movements requiring precision and/or balance",
+    "skill": "Maneuver",
+    "activation": ""
+  },
+  {
+    "attribute": "Presence",
+    "effect": "",
+    "flavor": "Try to see through lies or glean someone's intent",
+    "skill": "Read",
+    "activation": ""
+  },
+  {
+    "attribute": "Presence",
+    "effect": "",
+    "flavor": "Try to lie convincingly",
+    "skill": "Deceive",
+    "activation": ""
+  },
+  {
+    "attribute": "Presence",
+    "effect": "",
+    "flavor": "Influence another character with threats or blackmail",
+    "skill": "Intimidate",
+    "activation": ""
+  },
+  {
+    "attribute": "Presence",
+    "effect": "",
+    "flavor": "Influence another character with bribery, flattery, or amusement",
+    "skill": "Charm",
+    "activation": ""
+  },
+  {
+    "attribute": "Dexterity",
+    "effect": "Deal damage equal to the result of the action roll to a far away target.",
+    "flavor": "Fire a weapon to strike at a range",
+    "skill": "Shoot",
+    "activation": "Requires Ranged Weapon"
+  },
+  {
+    "attribute": "Dexterity",
+    "effect": "",
+    "flavor": "Stay hidden and/or quiet",
+    "skill": "Sneak",
+    "activation": ""
+  },
+  {
+    "attribute": "Dexterity",
+    "effect": "",
+    "flavor": "Move swiftly to get to your destination quicker",
+    "skill": "Dash",
+    "activation": ""
+  },
+  {
+    "attribute": "Dexterity",
+    "effect": "Use this action before taking damage. If the action roll result is higher than the damage taken, avoid all damage.",
+    "flavor": "Evade an incoming attack",
+    "skill": "Dodge",
+    "activation": "Reaction"
+  },
+  {
+    "attribute": "Sense",
+    "effect": "",
+    "flavor": "Perform meticulous and/or complex tasks requiring concentration",
+    "skill": "Focus",
+    "activation": ""
+  },
+  {
+    "attribute": "Sense",
+    "effect": "",
+    "flavor": "Reactively see, hear, or feel something",
+    "skill": "Notice",
+    "activation": "Reaction"
+  },
+  {
+    "attribute": "Sense",
+    "effect": "",
+    "flavor": "Proactively find something with your senses",
+    "skill": "Locate",
+    "activation": ""
+  },
+  {
+    "attribute": "Strength",
+    "effect": "",
+    "flavor": "Resist external physical forces",
+    "skill": "Endure",
+    "activation": "Reaction"
+  },
+  {
+    "attribute": "Strength",
+    "effect": "",
+    "flavor": "Any general application of force: lifting things, pushing things, holding another character still, etc.",
+    "skill": "Exert",
+    "activation": ""
+  },
+  {
+    "attribute": "Strength",
+    "effect": "Use this action before taking damage. Reduce the incoming damage by the result of the action roll, to no less than 1.",
+    "flavor": "Guard against an incoming attack",
+    "skill": "Block",
+    "activation": "Reaction"
+  },
+  {
+    "attribute": "Strength",
+    "effect": "Make an action roll. Deal damage equal to the result to a nearby target.",
+    "flavor": "Attack a character with your fist or a weapon",
+    "skill": "Strike",
+    "activation": ""
+  }
+]

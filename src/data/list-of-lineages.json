@@ -1,31 +1,31 @@
 [
   {
-    "ability": "Push the Odds - While making an action roll, any time you roll a 3, you may take 1 fatigue to add an additional die to your roll and add it to the result (including any additional 3s that are rolled this way).",
+    "ability": "Push the Odds - While making a skill check, any time you roll a 3, you may take 1 stress to add an additional die to your roll and add it to the result (including any additional 3s that are rolled this way).",
     "memberCreatures": "demons, succubus/incubus, vampires",
     "lineage": "Umbral"
   },
   {
-    "ability": "Double-Edged Senses - Once per roll, you may add 3 dice to any Sense action roll. Take 1 fatigue for every die in that roll with a value of 3.",
+    "ability": "Double-Edged Senses - You may add 3 dice to any Sense check (once per check). When you do, take 1 stress for every die in that roll with a value of 3.",
     "memberCreatures": "insects, arachnids, bugs, most creatures with exoskeletons",
     "lineage": "Arthropod"
   },
   {
-    "ability": "Momentum - After making an action with Dodge, Dash, or Maneuver, your following action roll gains 2 dice.",
+    "ability": "Momentum - After using Dodge, Dash, or Maneuver, your following skill check gains 2 dice.",
     "memberCreatures": "eagles, ravens, penguins, flamingos, all other birds",
     "lineage": "Avian"
   },
   {
-    "ability": "Art of Theseus - When making an aspect art with exactly one aspect changed from your previous art, add 1 die to the action roll.",
+    "ability": "Art of Theseus - When making an aspect art with exactly one aspect changed from your previous art, add 1 die to the roll.",
     "memberCreatures": "fish, dolphins, other water-bound creatures",
     "lineage": "Aquatic"
   },
   {
-    "ability": "Reflection - When you take damage, gain one reflection point. At any time, spend any number of reflection points to add that many dice to an action roll.",
+    "ability": "Reflection - When you take stress from an attack, gain one reflection point. At any time, spend any number of reflection points to add that many dice to a skill check.",
     "memberCreatures": "dragons, lizard, snake, alligator, crocodile",
     "lineage": "Scalebearer"
   },
   {
-    "ability": "Adaptation - After you make a low-impact action roll, gain one adaptation point. At any time, spend any number of adaptation points to add that many dice to an action roll (except rolls that gave you those points).",
+    "ability": "Adaptation - After you make a low-impact skill check, gain one adaptation point. At any time, spend any number of adaptation points to add that many dice to a skill check (except rolls that gave you those points).",
     "memberCreatures": "dogs, foxes, wolves, cats, rabbits, mice, bears, raccoons",
     "lineage": "Furbearer"
   }

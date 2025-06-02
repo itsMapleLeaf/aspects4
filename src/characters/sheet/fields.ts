@@ -58,19 +58,19 @@ export type ResolvedSelectChoice = SelectChoice & {
 	hint?: string
 }
 
-export function resolveSelectField(
+export function resolveSelectField<Value extends string>(
 	context: FieldContext,
 	config: {
 		id: string
 		defaultValue?: string
-		choices: readonly ResolvedSelectChoice[]
+		choices: readonly (ResolvedSelectChoice & { value: Value })[]
 	},
 ) {
 	const value = String(context.values[config.id] ?? config.defaultValue ?? "")
 	const currentOption = config.choices.find((opt) => opt.value === value)
 	return {
 		id: config.id,
-		value: value,
+		value: currentOption?.value ?? ("" as const),
 		choices: config.choices,
 		currentOption,
 		context,

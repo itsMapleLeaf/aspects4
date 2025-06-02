@@ -15,12 +15,7 @@ import {
 	useUpdateEditorCharacter,
 } from "./context.tsx"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
-import {
-	ASPECT_AURAS,
-	ASPECT_NAMES,
-	ATTRIBUTE_NAMES,
-	ITEM_TYPES,
-} from "./data.ts"
+import { ASPECT_AURAS, ATTRIBUTE_NAMES } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
 import { resolveMilestoneFields } from "./milestones.ts"
 import { resolveCharacterScores } from "./scores.ts"
@@ -36,9 +31,8 @@ import {
 	resolveTextField,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
-import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
+import { SheetStatField } from "./sheet/SheetStatField.tsx"
 import { getTotalSkillPoints, getUsedSkillPoints } from "./skills.ts"
-import { getDamageLimit, getFatigueLimit } from "./stress.ts"
 
 export function CharacterEditor({
 	character,
@@ -55,8 +49,8 @@ export function CharacterEditor({
 function CharacterEditorInner() {
 	const sheet = useEditorCharacterSheet()
 	const scores = resolveCharacterScores(sheet)
-	const damageLimit = getDamageLimit(sheet)
-	const fatigueLimit = getFatigueLimit(sheet)
+	// const damageLimit = getDamageLimit(sheet)
+	// const fatigueLimit = getFatigueLimit(sheet)
 	const usedPoints = getUsedSkillPoints(sheet)
 	const totalPoints = getTotalSkillPoints(sheet)
 
@@ -66,6 +60,20 @@ function CharacterEditorInner() {
 			<Ariakit.HeadingLevel>
 				<div className="grid gap-3">
 					<div className="grid gap-6">
+						<div className="grid grid-cols-2 gap-3">
+							{ATTRIBUTE_NAMES.flatMap(
+								(name) => scores.fields.get(name) ?? [],
+							).map((field) => (
+								<SheetStatField
+									key={field.id}
+									label={field.name}
+									tooltip={field.description}
+									score={scores.scoreOf(field.name)}
+									resolved={field}
+								/>
+							))}
+						</div>
+
 						<LineageFieldGroup sheet={sheet} />
 
 						<SheetSelectField
@@ -91,7 +99,7 @@ function CharacterEditorInner() {
 
 						<VisibilityField />
 
-						<div>
+						{/* <div>
 							<Ariakit.Heading className="mb-2 heading-2xl">
 								Conditions
 							</Ariakit.Heading>
@@ -123,7 +131,7 @@ function CharacterEditorInner() {
 									</div>
 								)}
 							</SheetListFieldMinimal>
-						</div>
+						</div> */}
 					</div>
 				</div>
 			</Ariakit.HeadingLevel>
@@ -133,56 +141,44 @@ function CharacterEditorInner() {
 	const skillsTab = {
 		name: "Skills",
 		content: (
-			<Ariakit.HeadingLevel>
-				<section>
-					<div className="grid auto-cols-fr grid-flow-col gap-3">
-						{ATTRIBUTE_NAMES.flatMap(
-							(name) => scores.fields.get(name) ?? [],
-						).map((field) => (
-							<SheetNumberField
-								key={field.id}
-								label={field.name}
-								// tooltip={field.description}
-								// score={scores.scoreOf(field.name)}
-								resolved={field}
-							/>
-						))}
-					</div>
-
-					<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
-						Core Skills
-					</Ariakit.Heading>
-					<CoreSkillsList />
-				</section>
-			</Ariakit.HeadingLevel>
+			<CoreSkillsList />
+			// <Ariakit.HeadingLevel>
+			// 	<section>
+			// 		<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
+			// 			Core Skills
+			// 		</Ariakit.Heading>
+			// 		<CoreSkillsList />
+			// 	</section>
+			// </Ariakit.HeadingLevel>
 		),
 	}
 
 	const aspectsTab = {
 		name: "Aspects",
 		content: (
-			<Ariakit.HeadingLevel>
-				<section>
-					<div className="grid auto-cols-fr grid-flow-col gap-3">
-						{ASPECT_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
-							(field) => (
-								<SheetNumberField
-									key={field.id}
-									label={field.name}
-									// tooltip={field.description}
-									// score={scores.scoreOf(field.name)}
-									resolved={field}
-								/>
-							),
-						)}
-					</div>
+			<AspectSkillsList />
+			// <Ariakit.HeadingLevel>
+			// 	<section>
+			// 		<div className="grid auto-cols-fr grid-flow-col gap-3">
+			// 			{ASPECT_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
+			// 				(field) => (
+			// 					<SheetNumberField
+			// 						key={field.id}
+			// 						label={field.name}
+			// 						// tooltip={field.description}
+			// 						// score={scores.scoreOf(field.name)}
+			// 						resolved={field}
+			// 					/>
+			// 				),
+			// 			)}
+			// 		</div>
 
-					<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
-						Aspect Skills
-					</Ariakit.Heading>
-					<AspectSkillsList />
-				</section>
-			</Ariakit.HeadingLevel>
+			// 		<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
+			// 			Aspect Skills
+			// 		</Ariakit.Heading>
+			// 		<AspectSkillsList />
+			// 	</section>
+			// </Ariakit.HeadingLevel>
 		),
 	}
 
@@ -200,28 +196,28 @@ function CharacterEditorInner() {
 								})}
 								className="flex-1"
 							/>
-							<SheetNumberField
+							{/* <SheetNumberField
 								resolved={resolveNumberField(itemContext, {
 									id: "size",
 									min: 1,
 								})}
 								className="w-16"
-							/>
-							<SheetNumberField
+							/> */}
+							{/* <SheetNumberField
 								resolved={resolveNumberField(itemContext, {
 									id: "uses",
 								})}
 								className="w-16"
-							/>
+							/> */}
 						</div>
 
-						<SheetSelectField
+						{/* <SheetSelectField
 							resolved={resolveSelectField(itemContext, {
 								id: "type",
 								defaultValue: "tool",
 								choices: ITEM_TYPES,
 							})}
-						/>
+						/> */}
 
 						<SheetTextField
 							resolved={resolveTextField(itemContext, {
@@ -279,11 +275,21 @@ function CharacterEditorInner() {
 		name: "Milestones",
 		content: (
 			<SheetListField resolved={resolveListField(sheet, "milestones")}>
-				{(milestoneContext) => {
-					const fields = resolveMilestoneFields(milestoneContext)
+				{(itemContext) => {
+					const fields = resolveMilestoneFields(itemContext)
 					return (
 						<div className="grid gap-2">
-							<SheetSelectField resolved={fields.bonusType} />
+							<SheetSelectField
+								placeholder="Choose a bonus type"
+								resolved={fields.bonusType}
+							/>
+							{fields.bonusType.value === "attributePoint" && (
+								<SheetSelectField
+									label="Attribute"
+									placeholder="Choose an attribute"
+									resolved={fields.attributeMilestoneChoice}
+								/>
+							)}
 							<SheetTextField
 								resolved={fields.notes}
 								label="Notes"
@@ -299,31 +305,37 @@ function CharacterEditorInner() {
 
 	return (
 		<>
-			<div className="flex gap-2">
-				<NameField />
-			</div>
+			<NameField />
 
-			<div className="h-2"></div>
+			<div className="h-3"></div>
 
 			<div className="flex gap-3">
 				<SheetNumberField
-					label={`Damage (limit ${damageLimit})`}
-					resolved={resolveNumberField(sheet, { id: "damage" })}
+					label={`Stress / 10`}
+					resolved={resolveNumberField(sheet, { id: "stress" })}
 					className="flex-1"
 				/>
 				<SheetNumberField
-					label={`Fatigue (limit ${fatigueLimit})`}
-					resolved={resolveNumberField(sheet, { id: "fatigue" })}
+					label={`Critical Injuries / 3`}
+					resolved={resolveNumberField(sheet, { id: "criticalInjuries" })}
 					className="flex-1"
 				/>
 				<SheetNumberField
 					resolved={resolveNumberField(sheet, { id: "bondActivations" })}
 					className="flex-1"
 				/>
-				<InfoField label="Skill points used" className="flex-1">
+				{/* <InfoField label="Skill points used" className="flex-1">
 					{usedPoints}/{totalPoints}
-				</InfoField>
+				</InfoField> */}
 			</div>
+
+			<div className="h-3"></div>
+
+			<SheetTextField
+				description="Track any special statuses on your character."
+				multiline
+				resolved={resolveTextField(sheet, { id: "condition" })}
+			/>
 
 			<div className="h-6"></div>
 

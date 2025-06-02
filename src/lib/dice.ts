@@ -54,6 +54,8 @@ export function rollDice(args: string[]): DiceRollResult {
 	return { success: true, message: rollMessage }
 }
 
+const ASPECT_DIE_FACE_VALUES = [1, 1, 1, 2, 2, 3]
+
 export function rollAspectsDice(count: number): DiceRollResult {
 	if (count <= 0 || count > 100) {
 		return {
@@ -64,8 +66,9 @@ export function rollAspectsDice(count: number): DiceRollResult {
 
 	const values = []
 	for (let i = 0; i < count; i++) {
-		const faceValues = [1, 1, 1, 2, 2, 3]
-		const value = faceValues[randomInt(faceValues.length)] as number
+		const value = ASPECT_DIE_FACE_VALUES[
+			randomInt(ASPECT_DIE_FACE_VALUES.length)
+		] as number
 		values.push(value)
 	}
 
