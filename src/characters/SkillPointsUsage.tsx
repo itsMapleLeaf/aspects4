@@ -1,6 +1,5 @@
 import { useEditorCharacterSheet } from "./context.tsx"
-import { getTotalSkillPoints } from "./milestones.ts"
-import { getUsedSkillPoints } from "./skills.ts"
+import { getTotalSkillPoints, getUsedSkillPoints } from "./skills.ts"
 
 export function SkillPointsUsage() {
 	const sheet = useEditorCharacterSheet()

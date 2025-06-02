@@ -1,14 +1,12 @@
 import * as Ariakit from "@ariakit/react"
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
-import { getTotalSkillPoints } from "~/characters/milestones.ts"
-import { getUsedSkillPoints } from "~/characters/skills.ts"
-import { useLocalStorageState } from "~/hooks/storage.ts"
-import { toTitleCase } from "~/lib/utils.ts"
 import type { NormalizedCharacter } from "../../convex/characters.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
 import { SelectField } from "../components/ui/SelectField.tsx"
 import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
+import { useLocalStorageState } from "../hooks/storage.ts"
+import { toTitleCase } from "../lib/utils.ts"
 import { AspectSkillsList } from "./AspectSkillsList.tsx"
 import {
 	EditorCharacterContext,
@@ -24,11 +22,7 @@ import {
 	ITEM_TYPES,
 } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
-import {
-	getDamageLimit,
-	getFatigueLimit,
-	resolveMilestoneFields,
-} from "./milestones.ts"
+import { resolveMilestoneFields } from "./milestones.ts"
 import { resolveCharacterScores } from "./scores.ts"
 import {
 	SheetNumberField,
@@ -43,6 +37,8 @@ import {
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
 import { SheetListFieldMinimal } from "./sheet/SheetListFieldMinimal.tsx"
+import { getTotalSkillPoints, getUsedSkillPoints } from "./skills.ts"
+import { getDamageLimit, getFatigueLimit } from "./stress.ts"
 
 export function CharacterEditor({
 	character,
