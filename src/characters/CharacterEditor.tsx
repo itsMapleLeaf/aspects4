@@ -15,7 +15,7 @@ import {
 	useUpdateEditorCharacter,
 } from "./context.tsx"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
-import { ASPECT_AURAS, ATTRIBUTE_NAMES } from "./data.ts"
+import { ASPECT_AURAS, ATTRIBUTE_ASPECTS, ATTRIBUTE_NAMES } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
 import { resolveMilestoneFields } from "./milestones.ts"
 import { resolveCharacterScores } from "./scores.ts"
@@ -59,20 +59,6 @@ function CharacterEditorInner() {
 			<Ariakit.HeadingLevel>
 				<div className="grid gap-3">
 					<div className="grid gap-6">
-						<div className="grid grid-cols-2 gap-3">
-							{ATTRIBUTE_NAMES.flatMap(
-								(name) => scores.fields.get(name) ?? [],
-							).map((field) => (
-								<SheetStatField
-									key={field.id}
-									label={field.name}
-									tooltip={field.description}
-									score={scores.scoreOf(field.name)}
-									resolved={field}
-								/>
-							))}
-						</div>
-
 						<LineageFieldGroup sheet={sheet} />
 
 						<SheetSelectField
@@ -328,7 +314,24 @@ function CharacterEditorInner() {
 				</InfoField> */}
 			</div>
 
-			<div className="h-3"></div>
+			<div className="h-4"></div>
+
+			<div className="grid grid-cols-2 gap-3">
+				{ATTRIBUTE_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
+					(field) => (
+						<SheetStatField
+							key={field.id}
+							label={field.name}
+							description={ATTRIBUTE_ASPECTS[field.name]}
+							tooltip={field.description}
+							score={scores.scoreOf(field.name)}
+							resolved={field}
+						/>
+					),
+				)}
+			</div>
+
+			<div className="h-4"></div>
 
 			<SheetTextField
 				description="Track any special statuses on your character."

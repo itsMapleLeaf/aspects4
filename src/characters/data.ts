@@ -26,6 +26,10 @@ export const ASPECT_ATTRIBUTES: Record<AspectName, AttributeName> = {
 	Darkness: "Presence",
 }
 
+export const ATTRIBUTE_ASPECTS = Object.fromEntries(
+	Object.entries(ASPECT_ATTRIBUTES).map((it) => [it[1], it[0] as AspectName]),
+) as Record<AttributeName, AspectName>
+
 export const ITEM_TYPES = [
 	{
 		value: "consumable",
