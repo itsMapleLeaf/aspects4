@@ -104,7 +104,7 @@ export function Room({ slug }: { slug: string }) {
 					<main className="pointer-events-children flex min-h-0 flex-1 gap-2">
 						<SidebarPanels tabs={sidebarTabs} />
 						<Chat
-							roomId={room._id}
+							room={room}
 							playerName={playerName}
 							chatInputRef={chatInputRef}
 							className="ml-auto w-72"

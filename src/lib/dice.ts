@@ -1,8 +1,6 @@
 import { randomInt, sum } from "es-toolkit"
 
-type DiceRollResult =
-	| { success: true; message: string }
-	| { success: false; error: string }
+type DiceRollResult = { success: boolean; message: string }
 
 export function rollDice(args: string[]): DiceRollResult {
 	const rollArg = args.join(" ")
@@ -31,7 +29,7 @@ export function rollDice(args: string[]): DiceRollResult {
 	if (!rollMatch || !rollMatch[1] || !rollMatch[2]) {
 		return {
 			success: false,
-			error: `Error: Invalid roll format.`,
+			message: `Error: Invalid roll format.`,
 		}
 	}
 
@@ -41,7 +39,7 @@ export function rollDice(args: string[]): DiceRollResult {
 	if (diceCount <= 0 || diceCount > 100 || sides <= 0) {
 		return {
 			success: false,
-			error: `Error: Invalid dice parameters.`,
+			message: `Error: Invalid dice parameters.`,
 		}
 	}
 
@@ -60,7 +58,7 @@ export function rollAspectsDice(count: number): DiceRollResult {
 	if (count <= 0 || count > 100) {
 		return {
 			success: false,
-			error: "Error: Invalid dice count. Must be from 1 to 100.",
+			message: "Error: Invalid dice count. Must be from 1 to 100.",
 		}
 	}
 

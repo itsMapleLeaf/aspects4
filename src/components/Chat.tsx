@@ -6,6 +6,25 @@ import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import type { ChatInputHandle } from "./ChatInputContext.tsx"
+import { Icon } from "./ui/Icon.tsx"
+
+type LocalMessage = {
+	_id: string
+	_creationTime: number
+	sender: string
+	content: string
+	isLocal: true
+}
+
+function createLocalMessage(playerName: string, content: string): LocalMessage {
+	return {
+		_id: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+		_creationTime: Date.now(),
+		sender: playerName,
+		content,
+		isLocal: true,
+	}
+}
 
 const shortTimeFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
@@ -16,37 +35,28 @@ const fullDateFormat = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "medium",
 })
 
-type LocalMessage = {
-	_id: string
-	_creationTime: number
-	sender: string
-	content: string
-	isLocal: true
-}
-
 export function Chat({
-	roomId,
+	room,
 	playerName,
 	chatInputRef,
 	className,
 }: {
-	roomId: Id<"rooms">
+	room: { _id: Id<"rooms">; name: string }
 	playerName: string
 	chatInputRef: React.RefObject<ChatInputHandle | null>
 	className?: string
 }) {
-	const remoteMessages = useQuery(api.messages.list, { roomId })
+	const remoteMessages = useQuery(api.messages.list, { roomId: room._id })
 	const createMessage = useMutation(api.messages.create)
-	const [localMessages, setLocalMessages] = useState<LocalMessage[]>([])
+	const [localMessages, setLocalMessages] = useState<LocalMessage[]>(() => [
+		createLocalMessage(
+			playerName,
+			`Welcome to ${room.name}!\nType /help to see available commands.`,
+		),
+	])
 
 	const addLocalMessage = (content: string) => {
-		const newMessage: LocalMessage = {
-			_id: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-			_creationTime: Date.now(),
-			sender: playerName,
-			content,
-			isLocal: true,
-		}
+		const newMessage: LocalMessage = createLocalMessage(playerName, content)
 		setLocalMessages((prev) => [...prev, newMessage])
 	}
 
@@ -89,10 +99,10 @@ export function Chat({
 					await createMessage({
 						sender: playerName,
 						content: result.message,
-						roomId,
+						roomId: room._id,
 					})
 				} else {
-					addLocalMessage(result.error)
+					addLocalMessage(result.message)
 				}
 			},
 		},
@@ -106,7 +116,7 @@ export function Chat({
 				if (result.success) {
 					addLocalMessage(result.message)
 				} else {
-					addLocalMessage(result.error)
+					addLocalMessage(result.message)
 				}
 			},
 		},
@@ -152,7 +162,7 @@ export function Chat({
 					await createMessage({
 						sender: playerName,
 						content,
-						roomId,
+						roomId: room._id,
 					})
 				}
 			} catch (error) {
@@ -207,14 +217,15 @@ export function Chat({
 							</p>
 						))}
 						{"isLocal" in message && (
-							<div className="flex translate-y-0.5 items-center gap-1 text-gray-400">
+							<div className="flex translate-y-0.5 items-center gap-1 font-medium text-gray-400">
+								<Icon icon="mingcute:eye-2-fill" className="text-gray-600" />
 								<p className="text-xs">Only you can see this</p>
 								<span aria-hidden>&bull;</span>
 								<button
 									className="text-xs text-primary-400 hover:text-primary-300 hover:underline"
 									onClick={() => removeLocalMessage(message._id)}
 								>
-									Remove
+									Dismiss
 								</button>
 							</div>
 						)}
