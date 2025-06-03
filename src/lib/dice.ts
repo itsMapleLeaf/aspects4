@@ -6,20 +6,22 @@ export function rollDice(args: string[]): DiceRollResult {
 	const rollArg = args.join(" ")
 
 	// Check for Aspects of Nature format: "aspects X" or "aX"
-	const aspectsPattern = /^aspects\s+(\d+)$/i
+	const aspectsPattern = /^aspects\s+(\d+)(?:\s*\[([^\]]+)\])?$/i
 	const aspectsMatch = rollArg.match(aspectsPattern)
 
 	if (aspectsMatch && aspectsMatch[1]) {
 		const diceCount = parseInt(aspectsMatch[1], 10)
-		return rollAspectsDice(diceCount)
+		const label = aspectsMatch[2]
+		return rollAspectsDice(diceCount, label)
 	}
 
-	const aspectsShortPattern = /^a(\d+)$/i
+	const aspectsShortPattern = /^a(\d+)(?:\s*\[([^\]]+)\])?$/i
 	const aspectsShortMatch = rollArg.match(aspectsShortPattern)
 
 	if (aspectsShortMatch && aspectsShortMatch[1]) {
 		const diceCount = parseInt(aspectsShortMatch[1], 10)
-		return rollAspectsDice(diceCount)
+		const label = aspectsShortMatch[2]
+		return rollAspectsDice(diceCount, label)
 	}
 
 	// Standard dice rolling format: XdY
@@ -52,7 +54,7 @@ export function rollDice(args: string[]): DiceRollResult {
 	return { success: true, message: rollMessage }
 }
 
-export function rollAspectsDice(count: number): DiceRollResult {
+export function rollAspectsDice(count: number, label?: string): DiceRollResult {
 	if (count <= 0 || count > 100) {
 		return {
 			success: false,
@@ -71,6 +73,9 @@ export function rollAspectsDice(count: number): DiceRollResult {
 		: max >= 9 ? "Partial success."
 		: "Failure."
 
-	const rollMessage = `Rolled ${count} dice: ${values.join(", ")}\n${result}`
+	const prefix =
+		label ? `Rolled ${label} (${count} dice)` : `Rolled ${count} dice`
+
+	const rollMessage = `${prefix}: ${values.join(", ")}\n${result}`
 	return { success: true, message: rollMessage }
 }

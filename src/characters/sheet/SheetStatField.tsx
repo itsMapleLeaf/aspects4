@@ -60,7 +60,9 @@ export function SheetStatField({
 						className="flex h-full w-14 rounded-none p-0"
 						align="center"
 						onClick={() => {
-							chatInputRef.current?.prefill(`/roll aspects ${score}`)
+							chatInputRef.current?.prefill(
+								`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
+							)
 						}}
 					>
 						<DiceScoreIcon score={score} />

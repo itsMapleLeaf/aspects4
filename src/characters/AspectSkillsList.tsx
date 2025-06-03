@@ -123,7 +123,9 @@ function AspectSkillCard({ fields }: { fields: ResolvedAspectSkillFields }) {
 					<button
 						type="button"
 						onClick={() => {
-							chatInputRef.current?.prefill(`/roll aspects ${totalScore}`)
+							chatInputRef.current?.prefill(
+								`/roll aspects ${totalScore} [${fields.name.value}]`,
+							)
 						}}
 						className="text-lg font-semibold transition hover:text-primary-300"
 					>
