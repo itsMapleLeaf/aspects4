@@ -1,4 +1,4 @@
-import { randomInt, sum } from "es-toolkit"
+import { randomInt, range } from "es-toolkit"
 
 type DiceRollResult = { success: boolean; message: string }
 
@@ -52,8 +52,6 @@ export function rollDice(args: string[]): DiceRollResult {
 	return { success: true, message: rollMessage }
 }
 
-const ASPECT_DIE_FACE_VALUES = [1, 1, 1, 2, 2, 3]
-
 export function rollAspectsDice(count: number): DiceRollResult {
 	if (count <= 0 || count > 100) {
 		return {
@@ -62,15 +60,17 @@ export function rollAspectsDice(count: number): DiceRollResult {
 		}
 	}
 
-	const values = []
-	for (let i = 0; i < count; i++) {
-		const value = ASPECT_DIE_FACE_VALUES[
-			randomInt(ASPECT_DIE_FACE_VALUES.length)
-		] as number
-		values.push(value)
-	}
+	const values = range(count)
+		.map(() => randomInt(12) + 1)
+		.sort((a, b) => b - a)
+	const max = Math.max(...values)
 
-	const result = sum(values)
-	const rollMessage = `Rolled ${count} dice. Result: ${result} (${values.join(", ")})`
+	const result =
+		values.filter((v) => v === 12).length >= 2 ? "Critical success!"
+		: max === 12 ? "Success."
+		: max >= 9 ? "Partial success."
+		: "Failure."
+
+	const rollMessage = `Rolled ${count} dice: ${values.join(", ")}\n${result}`
 	return { success: true, message: rollMessage }
 }
