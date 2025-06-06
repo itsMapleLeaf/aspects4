@@ -63,14 +63,14 @@ export function rollAspectsDice(count: number, label?: string): DiceRollResult {
 	}
 
 	const values = range(count)
-		.map(() => randomInt(12) + 1)
+		.map(() => randomInt(6) + 1)
 		.sort((a, b) => b - a)
 	const max = Math.max(...values)
 
 	const result =
-		values.filter((v) => v === 12).length >= 2 ? "Critical success!"
-		: max === 12 ? "Success."
-		: max >= 9 ? "Partial success."
+		values.filter((v) => v === 6).length >= 2 ? "Critical success!"
+		: max === 6 ? "Success."
+		: max >= 4 ? "Partial success."
 		: "Failure."
 
 	const prefix =

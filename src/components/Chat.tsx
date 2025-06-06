@@ -143,7 +143,9 @@ export function Chat({
 		if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey) {
 			event.preventDefault()
 
-			const content = event.currentTarget.value
+			const content = event.currentTarget.value.trim()
+			if (!content) return
+
 			event.currentTarget.value = ""
 
 			try {

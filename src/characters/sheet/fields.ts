@@ -48,6 +48,19 @@ export function resolveNumberField(
 	}
 }
 
+export type ResolvedBooleanField = ReturnType<typeof resolveBooleanField>
+export function resolveBooleanField(
+	context: FieldContext,
+	options: { id: string; defaultValue?: boolean },
+) {
+	const currentValue = context.values[options.id]
+	return {
+		id: options.id,
+		value: currentValue == null ? options.defaultValue : !!currentValue,
+		context,
+	}
+}
+
 export type ResolvedSelectField = ReturnType<typeof resolveSelectField>
 
 export type ResolvedSelectChoice = SelectChoice & {

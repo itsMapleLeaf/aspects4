@@ -1,12 +1,10 @@
 import { useEditorCharacterSheet } from "./context.tsx"
-import { resolveCharacterScores } from "./scores.ts"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
 import { resolveCoreSkillFields } from "./skills.ts"
 
 export function CoreSkillsList() {
 	const sheet = useEditorCharacterSheet()
 	const fields = resolveCoreSkillFields(sheet)
-	const scores = resolveCharacterScores(sheet)
 
 	return (
 		<div className="@container grid gap-3">
@@ -17,7 +15,7 @@ export function CoreSkillsList() {
 						resolved={field}
 						label={field.info.skill}
 						description={field.info.attribute}
-						score={scores.scoreOf(field.info.attribute) + field.value}
+						score={field.value}
 						tooltip={field.info.flavor}
 					/>
 				))}

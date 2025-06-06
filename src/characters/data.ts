@@ -57,30 +57,27 @@ export const ASPECT_AURAS = [
 	{
 		value: "Fire",
 		label: "Fire",
-		description:
-			"Indicates an adversarial, heated, conflict-heavy relationship.",
+		hint: "Indicates an adversarial, heated, conflict-heavy relationship.",
 	},
 	{
 		value: "Water",
 		label: "Water",
-		description: "Comes from notions of comfort, peace, and protection.",
+		hint: "Comes from notions of comfort, peace, and protection.",
 	},
 	{
 		value: "Wind",
 		label: "Wind",
-		description:
-			"Exhibits in turbulent relationships full of excitement and change.",
+		hint: "Exhibits in turbulent relationships full of excitement and change.",
 	},
 	{
 		value: "Light",
 		label: "Light",
-		description:
-			"Represents diplomatic relationships built on fairness and respect.",
+		hint: "Represents diplomatic relationships built on fairness and respect.",
 	},
 	{
 		value: "Darkness",
 		label: "Darkness",
-		description: "Manifests from tension, mistrust, and uncertainty.",
+		hint: "Manifests from tension, mistrust, and uncertainty.",
 	},
 ]
 

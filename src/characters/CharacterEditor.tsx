@@ -3,11 +3,11 @@ import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { NormalizedCharacter } from "../../convex/characters.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
+import { Checkbox } from "../components/ui/Checkbox.tsx"
+import { Field } from "../components/ui/Field.tsx"
 import { SelectField } from "../components/ui/SelectField.tsx"
-import EXPENSE_TIERS from "../data/list-of-expense-tiers.json"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { toTitleCase } from "../lib/utils.ts"
-import { AspectSkillsList } from "./AspectSkillsList.tsx"
 import {
 	EditorCharacterContext,
 	useEditorCharacter,
@@ -15,16 +15,16 @@ import {
 	useUpdateEditorCharacter,
 } from "./context.tsx"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
-import { ASPECT_AURAS, ATTRIBUTE_ASPECTS, ATTRIBUTE_NAMES } from "./data.ts"
+import { ASPECT_AURAS, ASPECT_NAMES } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
 import { resolveMilestoneFields } from "./milestones.ts"
-import { resolveCharacterScores } from "./scores.ts"
 import {
 	SheetNumberField,
 	SheetSelectField,
 	SheetTextField,
 } from "./sheet/components.tsx"
 import {
+	resolveBooleanField,
 	resolveListField,
 	resolveNumberField,
 	resolveSelectField,
@@ -47,312 +47,189 @@ export function CharacterEditor({
 
 function CharacterEditorInner() {
 	const sheet = useEditorCharacterSheet()
-	const scores = resolveCharacterScores(sheet)
-	// const damageLimit = getDamageLimit(sheet)
-	// const fatigueLimit = getFatigueLimit(sheet)
-	// const usedPoints = getUsedSkillPoints(sheet)
-	// const totalPoints = getTotalSkillPoints(sheet)
-
-	const characterTab = {
-		name: "Character",
-		content: (
-			<Ariakit.HeadingLevel>
-				<div className="grid gap-3">
-					<div className="grid gap-6">
-						<LineageFieldGroup sheet={sheet} />
-
-						<SheetSelectField
-							resolved={resolveSelectField(sheet, {
-								id: "budget",
-								choices: EXPENSE_TIERS.sort((a, b) =>
-									a.name.localeCompare(b.name),
-								).map((tier) => ({
-									label: tier.name,
-									value: tier.name,
-									description: tier.examples,
-								})),
-								defaultValue: "dirt",
-							})}
-							description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
-						/>
-
-						<SheetTextField
-							description="Add any other important details, and/or use this to track other important information."
-							multiline
-							resolved={resolveTextField(sheet, { id: "details" })}
-						/>
-
-						<VisibilityField />
-
-						{/* <div>
-							<Ariakit.Heading className="mb-2 heading-2xl">
-								Conditions
-							</Ariakit.Heading>
-							<SheetListFieldMinimal context={sheet} id="conditions">
-								{(itemContext, index) => (
-									<div className="flex gap-2" key={index}>
-										<SheetTextField
-											resolved={resolveTextField(itemContext, {
-												id: "name",
-											})}
-											className="flex-1"
-											label={
-												index > 0 ?
-													<span className="sr-only">Condition</span>
-												:	"Condition"
-											}
-										/>
-										<SheetNumberField
-											resolved={resolveNumberField(itemContext, {
-												id: "intensity",
-											})}
-											className="w-20"
-											label={
-												index > 0 ?
-													<span className="sr-only">Intensity</span>
-												:	undefined
-											}
-										/>
-									</div>
-								)}
-							</SheetListFieldMinimal>
-						</div> */}
-					</div>
-				</div>
-			</Ariakit.HeadingLevel>
-		),
-	}
-
-	const skillsTab = {
-		name: "Skills",
-		content: (
-			<CoreSkillsList />
-			// <Ariakit.HeadingLevel>
-			// 	<section>
-			// 		<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
-			// 			Core Skills
-			// 		</Ariakit.Heading>
-			// 		<CoreSkillsList />
-			// 	</section>
-			// </Ariakit.HeadingLevel>
-		),
-	}
-
-	const aspectsTab = {
-		name: "Aspects",
-		content: (
-			<AspectSkillsList />
-			// <Ariakit.HeadingLevel>
-			// 	<section>
-			// 		<div className="grid auto-cols-fr grid-flow-col gap-3">
-			// 			{ASPECT_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
-			// 				(field) => (
-			// 					<SheetNumberField
-			// 						key={field.id}
-			// 						label={field.name}
-			// 						// tooltip={field.description}
-			// 						// score={scores.scoreOf(field.name)}
-			// 						resolved={field}
-			// 					/>
-			// 				),
-			// 			)}
-			// 		</div>
-
-			// 		<Ariakit.Heading className="mt-6 mb-2 heading-2xl">
-			// 			Aspect Skills
-			// 		</Ariakit.Heading>
-			// 		<AspectSkillsList />
-			// 	</section>
-			// </Ariakit.HeadingLevel>
-		),
-	}
-
-	const itemsTab = {
-		name: "Items",
-		content: (
-			<SheetListField resolved={resolveListField(sheet, "items")}>
-				{(itemContext) => (
-					<div className="grid gap-2">
-						<div className="flex gap-2">
-							<SheetTextField
-								resolved={resolveTextField(itemContext, {
-									id: "name",
-									defaultValue: "New Item",
-								})}
-								className="flex-1"
-							/>
-							{/* <SheetNumberField
-								resolved={resolveNumberField(itemContext, {
-									id: "size",
-									min: 1,
-								})}
-								className="w-16"
-							/> */}
-							{/* <SheetNumberField
-								resolved={resolveNumberField(itemContext, {
-									id: "uses",
-								})}
-								className="w-16"
-							/> */}
-						</div>
-
-						{/* <SheetSelectField
-							resolved={resolveSelectField(itemContext, {
-								id: "type",
-								defaultValue: "tool",
-								choices: ITEM_TYPES,
-							})}
-						/> */}
-
-						<SheetTextField
-							resolved={resolveTextField(itemContext, {
-								id: "description",
-							})}
-							multiline
-						/>
-					</div>
-				)}
-			</SheetListField>
-		),
-	}
-
-	const bondsTab = {
-		name: "Bonds",
-		content: (
-			<SheetListField resolved={resolveListField(sheet, "bonds")}>
-				{(bondContext) => (
-					<div className="grid gap-2">
-						<div className="flex gap-2">
-							<SheetTextField
-								resolved={resolveTextField(bondContext, {
-									id: "name",
-									defaultValue: "New Bond",
-								})}
-								className="flex-1"
-							/>
-							<SheetNumberField
-								resolved={resolveNumberField(bondContext, {
-									id: "strength",
-									min: 1,
-								})}
-								className="w-24"
-							/>
-						</div>
-						<SheetSelectField
-							resolved={resolveSelectField(bondContext, {
-								id: "aura",
-								choices: ASPECT_AURAS,
-							})}
-						/>
-						<SheetTextField
-							resolved={resolveTextField(bondContext, {
-								id: "description",
-							})}
-							multiline
-						/>
-					</div>
-				)}
-			</SheetListField>
-		),
-	}
-
-	const milestonesTab = {
-		name: "Milestones",
-		content: (
-			<SheetListField resolved={resolveListField(sheet, "milestones")}>
-				{(itemContext) => {
-					const fields = resolveMilestoneFields(itemContext)
-					return (
-						<div className="grid gap-2">
-							<SheetSelectField
-								placeholder="Choose a bonus type"
-								resolved={fields.bonusType}
-							/>
-							{fields.bonusType.value === "attributePoint" && (
-								<SheetSelectField
-									label="Attribute"
-									placeholder="Choose an attribute"
-									resolved={fields.attributeMilestoneChoice}
-								/>
-							)}
-							<SheetTextField
-								resolved={fields.notes}
-								label="Notes"
-								multiline
-								description="Add context for this milestone"
-							/>
-						</div>
-					)
-				}}
-			</SheetListField>
-		),
-	}
 
 	return (
-		<>
-			<NameField />
+		<div className="grid gap-6">
+			<div className="grid gap-4">
+				<div className="flex gap-3">
+					<div className="flex-1">
+						<NameField />
+					</div>
+					<div className="w-32">
+						<VisibilityField />
+					</div>
+				</div>
 
-			<div className="h-3"></div>
+				<div className="flex gap-3">
+					<SheetNumberField
+						label={`Damage / 10`}
+						resolved={resolveNumberField(sheet, { id: "damage" })}
+						className="flex-1"
+					/>
+					<SheetNumberField
+						label={`Critical Injuries / 3`}
+						resolved={resolveNumberField(sheet, { id: "criticalInjuries" })}
+						className="flex-1"
+					/>
+				</div>
 
-			<div className="flex gap-3">
-				<SheetNumberField
-					label={`Stress / 10`}
-					resolved={resolveNumberField(sheet, { id: "stress" })}
-					className="flex-1"
-				/>
-				<SheetNumberField
-					label={`Critical Injuries / 3`}
-					resolved={resolveNumberField(sheet, { id: "criticalInjuries" })}
-					className="flex-1"
-				/>
-				<SheetNumberField
-					resolved={resolveNumberField(sheet, { id: "bondActivations" })}
-					className="flex-1"
-				/>
-				{/* <InfoField label="Skill points used" className="flex-1">
-					{usedPoints}/{totalPoints}
-				</InfoField> */}
+				<Field label="Essence">
+					<div className="grid grid-cols-3 gap-3">
+						{ASPECT_NAMES.map((name) => (
+							<SheetStatField
+								key={name}
+								label={name}
+								resolved={resolveNumberField(sheet, { id: `aspect:${name}` })}
+								score={0}
+							/>
+						))}
+					</div>
+				</Field>
 			</div>
-
-			<div className="h-4"></div>
-
-			<div className="grid grid-cols-2 gap-3">
-				{ATTRIBUTE_NAMES.flatMap((name) => scores.fields.get(name) ?? []).map(
-					(field) => (
-						<SheetStatField
-							key={field.id}
-							label={field.name}
-							description={ATTRIBUTE_ASPECTS[field.name]}
-							tooltip={field.description}
-							score={scores.scoreOf(field.name)}
-							resolved={field}
-						/>
-					),
-				)}
-			</div>
-
-			<div className="h-4"></div>
-
-			<SheetTextField
-				description="Track any special statuses on your character."
-				multiline
-				resolved={resolveTextField(sheet, { id: "condition" })}
-			/>
-
-			<div className="h-6"></div>
 
 			<Tabs
 				persistenceKey="mainTabs"
 				tabs={[
-					characterTab,
-					skillsTab,
-					aspectsTab,
-					itemsTab,
-					bondsTab,
-					milestonesTab,
+					tab(
+						"Character",
+						<Ariakit.HeadingLevel>
+							<div className="grid gap-3">
+								<div className="grid gap-6">
+									<LineageFieldGroup sheet={sheet} />
+
+									{/* <SheetSelectField
+										resolved={resolveSelectField(sheet, {
+											id: "budget",
+											choices: EXPENSE_TIERS.sort((a, b) =>
+												a.name.localeCompare(b.name),
+											).map((tier) => ({
+												label: tier.name,
+												value: tier.name,
+												description: tier.examples,
+											})),
+											defaultValue: "dirt",
+										})}
+										description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
+									/> */}
+
+									<SheetTextField
+										description="Add any other important details, and/or use this to track other important information."
+										multiline
+										resolved={resolveTextField(sheet, { id: "details" })}
+									/>
+								</div>
+							</div>
+						</Ariakit.HeadingLevel>,
+					),
+
+					tab("Skills", <CoreSkillsList />),
+
+					// tab("Aspects", <AspectSkillsList />),
+
+					tab(
+						"Items",
+						<SheetListField resolved={resolveListField(sheet, "items")}>
+							{(itemContext) => (
+								<div className="grid gap-2">
+									<div className="flex gap-2">
+										<SheetTextField
+											resolved={resolveTextField(itemContext, {
+												id: "name",
+												defaultValue: "New Item",
+											})}
+											className="flex-1"
+										/>
+									</div>
+
+									<SheetTextField
+										resolved={resolveTextField(itemContext, {
+											id: "description",
+										})}
+										multiline
+									/>
+								</div>
+							)}
+						</SheetListField>,
+					),
+
+					tab(
+						"Bonds",
+						<SheetListField resolved={resolveListField(sheet, "bonds")}>
+							{(bondContext) => {
+								const auraField = resolveSelectField(bondContext, {
+									id: "aura",
+									choices: ASPECT_AURAS,
+								})
+
+								const activatedField = resolveBooleanField(bondContext, {
+									id: "activated",
+								})
+
+								return (
+									<div className="grid gap-4">
+										<div>
+											<div className="flex gap-2">
+												<SheetTextField
+													className="flex-1"
+													resolved={resolveTextField(bondContext, {
+														id: "name",
+														defaultValue: "New Bond",
+													})}
+												/>
+												<SheetSelectField
+													className="w-48"
+													resolved={auraField}
+												/>
+											</div>
+											<p className="mt-1 text-sm font-medium text-gray-300 empty:hidden">
+												{auraField.currentOption?.hint}
+											</p>
+										</div>
+
+										<Checkbox
+											label="Activated"
+											checked={activatedField.value}
+											onChange={(event) => {
+												activatedField.context.updateValue(
+													activatedField.id,
+													event.currentTarget.checked,
+												)
+											}}
+										/>
+
+										<SheetTextField
+											multiline
+											resolved={resolveTextField(bondContext, {
+												id: "description",
+											})}
+										/>
+									</div>
+								)
+							}}
+						</SheetListField>,
+					),
+
+					tab(
+						"Milestones",
+						<SheetListField resolved={resolveListField(sheet, "milestones")}>
+							{(itemContext) => {
+								const fields = resolveMilestoneFields(itemContext)
+								return (
+									<div className="grid gap-2">
+										<SheetTextField
+											resolved={fields.notes}
+											label="Notes"
+											multiline
+											description="Add context for this milestone"
+										/>
+									</div>
+								)
+							}}
+						</SheetListField>,
+					),
 				]}
 			/>
-		</>
+		</div>
 	)
 }
 
@@ -465,4 +342,8 @@ function Tabs({
 			</div>
 		</Ariakit.TabProvider>
 	)
+}
+
+function tab(name: string, content: ReactNode) {
+	return { name, content }
 }

@@ -5,7 +5,6 @@ import {
 } from "../characters/sheet/fields.ts"
 import CORE_SKILLS from "../data/list-of-skills.json"
 import { resolveAspectSkillListFieldItems } from "./aspect-skills.ts"
-import { resolveMilestoneListFieldItems } from "./milestones.ts"
 
 export type CoreSkillInfo = (typeof CORE_SKILLS)[number]
 
@@ -18,7 +17,7 @@ export function resolveCoreSkillFields(
 ): ResolvedCoreSkillField[] {
 	return CORE_SKILLS.sort((a, b) => a.skill.localeCompare(b.skill)).map(
 		(info) => ({
-			...resolveNumberField(sheet, { id: `coreSkills:${info.skill}` }),
+			...resolveNumberField(sheet, { id: `coreSkills:${info.skill}`, min: 1 }),
 			info,
 		}),
 	)
@@ -35,11 +34,7 @@ export function getUsedSkillPoints(sheet: FieldContext) {
 
 export function getTotalSkillPoints(sheet: FieldContext) {
 	const basePoints = 5
-	const milestones = resolveMilestoneListFieldItems(sheet)
-	const bonusPoints =
-		milestones.filter(
-			(milestone) => milestone.bonusType.value === "skillPoints",
-		).length * 3
+	const bonusPoints = 0
 
 	return basePoints + bonusPoints
 }

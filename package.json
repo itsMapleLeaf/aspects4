@@ -24,7 +24,7 @@
 		"@notionhq/client": "^2.3.0",
 		"@tailwindcss/typography": "^0.5.16",
 		"arktype": "^2.1.8",
-		"convex": "^1.23.0",
+		"convex": "^1.24.8",
 		"convex-helpers": "^0.1.79",
 		"date-fns": "^4.1.0",
 		"es-toolkit": "^1.32.0",
