@@ -1,5 +1,12 @@
 [
   {
+    "attribute": "Sense",
+    "effect": "",
+    "flavor": "Mentally steel yourself, guarding against external psychological influence",
+    "skill": "Resolve",
+    "activation": "Reaction"
+  },
+  {
     "attribute": "Intellect",
     "effect": "",
     "flavor": "Apply understanding to solve a logical problem",

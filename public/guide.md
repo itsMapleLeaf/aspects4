@@ -306,6 +306,7 @@ _Example: _[_Shoot_](https://www.notion.so/1b1b0b885c0e80e7913cccd5f36843c4)_ re
 
 | Skill      | Attribute | Effect                                                                                                                | Flavor                                                                                                    | Activation             |
 | ---------- | --------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Resolve    | Sense     |                                                                                                                       | _Mentally steel yourself, guarding against external psychological influence_                              | Reaction               |
 | Intuit     | Intellect |                                                                                                                       | _Apply understanding to solve a logical problem_                                                          |                        |
 | Persuade   | Intellect |                                                                                                                       | _Influence another character through reasoning_                                                           |                        |
 | Aid        | Intellect |                                                                                                                       | _Offer first aid to someone else_                                                                         | Requires Medical Item  |
@@ -1347,6 +1348,7 @@ Surge: +1
 
 | Attribute | Effect                                                                                                                | Flavor                                                                                                    | Skill      | Activation             |
 | --------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------- | ---------------------- |
+| Sense     |                                                                                                                       | _Mentally steel yourself, guarding against external psychological influence_                              | Resolve    | Reaction               |
 | Intellect |                                                                                                                       | _Apply understanding to solve a logical problem_                                                          | Intuit     |                        |
 | Intellect |                                                                                                                       | _Influence another character through reasoning_                                                           | Persuade   |                        |
 | Intellect |                                                                                                                       | _Offer first aid to someone else_                                                                         | Aid        | Requires Medical Item  |
@@ -1588,6 +1590,10 @@ _Banner source: _[_https://www.pixiv.net/en/artworks/128156485_](https://www.pix
 - [Daggerheart](https://www.daggerheart.com/)
 
 - [Dungeons & Dragons](https://www.dndbeyond.com/)
+
+- Feiwonder
+
+- Defining Traits
 
 - [Avatar: The Last Airbender](https://avatar.fandom.com/wiki/Avatar:_The_Last_Airbender)
 
