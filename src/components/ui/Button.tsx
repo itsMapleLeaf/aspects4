@@ -1,6 +1,6 @@
 import * as Ariakit from "@ariakit/react"
 import { omit } from "es-toolkit"
-import { type ReactNode } from "react"
+import { type ReactElement } from "react"
 import { twMerge } from "tailwind-merge"
 import { Icon } from "~/components/ui/Icon.tsx"
 
@@ -37,7 +37,7 @@ export interface ButtonProps extends Ariakit.ButtonProps {
 	appearance?: keyof typeof appearanceClasses
 	size?: keyof typeof sizeClasses
 	shape?: keyof typeof shapeClasses
-	icon?: ReactNode
+	icon?: string | ReactElement
 	as?: "button" | "link"
 	pending?: boolean
 	align?: "start" | "center" | "end"
@@ -70,6 +70,8 @@ export function Button({
 			<div className={twMerge(`empty:hidden`, sizeClasses[size].icon)}>
 				{pending ?
 					<Icon icon="mingcute:loading-3-fill" className="animate-spin" />
+				: typeof icon === "string" ?
+					<Icon icon={icon} className="animate-spin" />
 				:	icon}
 			</div>
 			{children}
