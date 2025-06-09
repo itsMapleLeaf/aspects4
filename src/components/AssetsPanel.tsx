@@ -186,6 +186,7 @@ function AssetCard({
 	roomId: Id<"rooms">
 }) {
 	const removeAsset = useMutation(api.assets.remove)
+	const updateAsset = useMutation(api.assets.update)
 	const createRoomAsset = useMutation(api.roomAssets.place)
 	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
@@ -243,6 +244,19 @@ function AssetCard({
 				>
 					<Icon icon="mingcute:pic-fill" className="size-5" />
 					<span>Set as background</span>
+				</MenuItem>
+				<MenuItem
+					onClick={() => {
+						const newName = prompt("Enter new name:", asset.name)?.trim()
+						if (!newName) return
+						updateAsset({
+							assetId: asset._id,
+							name: newName,
+						})
+					}}
+				>
+					<Icon icon="mingcute:edit-2-fill" className="size-5" />
+					<span>Rename</span>
 				</MenuItem>
 				<MenuItem onClick={() => removeAsset({ assetIds: [asset._id] })}>
 					<Icon icon="mingcute:delete-2-fill" className="size-5" />
