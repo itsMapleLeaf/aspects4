@@ -90,8 +90,7 @@ function CharacterEditorInner() {
 			<Tabs
 				persistenceKey="mainTabs"
 				tabs={[
-					tab(
-						"Character",
+					tab("Character", () => (
 						<Ariakit.HeadingLevel>
 							<div className="grid gap-3">
 								<div className="grid gap-6">
@@ -119,15 +118,14 @@ function CharacterEditorInner() {
 									/>
 								</div>
 							</div>
-						</Ariakit.HeadingLevel>,
-					),
+						</Ariakit.HeadingLevel>
+					)),
 
-					tab("Skills", <CoreSkillsList />),
+					tab("Skills", () => <CoreSkillsList />),
 
-					// tab("Aspects", <AspectSkillsList />),
+					// tab("Aspects", () => <AspectSkillsList />),
 
-					tab(
-						"Items",
+					tab("Items", () => (
 						<SheetListField resolved={resolveListField(sheet, "items")}>
 							{(itemContext) => (
 								<div className="grid gap-2">
@@ -149,11 +147,10 @@ function CharacterEditorInner() {
 									/>
 								</div>
 							)}
-						</SheetListField>,
-					),
+						</SheetListField>
+					)),
 
-					tab(
-						"Bonds",
+					tab("Bonds", () => (
 						<SheetListField resolved={resolveListField(sheet, "bonds")}>
 							{(bondContext) => {
 								const auraField = resolveSelectField(bondContext, {
@@ -206,11 +203,10 @@ function CharacterEditorInner() {
 									</div>
 								)
 							}}
-						</SheetListField>,
-					),
+						</SheetListField>
+					)),
 
-					tab(
-						"Milestones",
+					tab("Milestones", () => (
 						<SheetListField resolved={resolveListField(sheet, "milestones")}>
 							{(itemContext) => {
 								const fields = resolveMilestoneFields(itemContext)
@@ -225,8 +221,8 @@ function CharacterEditorInner() {
 									</div>
 								)
 							}}
-						</SheetListField>,
-					),
+						</SheetListField>
+					)),
 				]}
 			/>
 		</div>
@@ -291,12 +287,17 @@ function VisibilityField() {
 	)
 }
 
+type Tab = {
+	name: string
+	content: () => ReactNode
+}
+
 function Tabs({
 	tabs,
 	defaultTabName = tabs[0]?.name,
 	persistenceKey,
 }: {
-	tabs: ReadonlyArray<{ name: string; content: ReactNode }>
+	tabs: ReadonlyArray<Tab>
 	defaultTabName?: string
 	persistenceKey: string
 }) {
@@ -336,7 +337,7 @@ function Tabs({
 						className="grid gap-3"
 						unmountOnHide
 					>
-						{tab.content}
+						{tab.content()}
 					</Ariakit.TabPanel>
 				))}
 			</div>
@@ -344,6 +345,6 @@ function Tabs({
 	)
 }
 
-function tab(name: string, content: ReactNode) {
+function tab(name: string, content: () => ReactNode) {
 	return { name, content }
 }
