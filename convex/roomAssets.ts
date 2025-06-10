@@ -32,7 +32,13 @@ export const list = query({
 			normalizeRoomAsset(ctx, asset),
 		)
 
-		return normalized.filter((asset) => asset.inScene)
+		return normalized
+			.sort((a, b) =>
+				(a.name ?? "")
+					.toLowerCase()
+					.localeCompare((b.name ?? "").toLowerCase()),
+			)
+			.filter((asset) => asset.inScene)
 	},
 })
 
