@@ -65,7 +65,7 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 										)}
 									</Ariakit.Tab>
 
-									{character.isOwner && (
+									{/* {character.isOwner && (
 										<button
 											type="button"
 											className="flex aspect-square h-full items-center justify-center rounded transition-colors hover:bg-white/5"
@@ -85,7 +85,7 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 											<Icon icon="mingcute:close-fill" />
 											<span className="sr-only">Delete Character</span>
 										</button>
-									)}
+									)} */}
 								</li>
 							))}
 						</ul>
