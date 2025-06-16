@@ -3,13 +3,15 @@ import {
 	SheetSelectField,
 } from "../characters/sheet/components.tsx"
 import {
-	FieldContext,
 	resolveNumberField,
 	resolveSelectField,
 } from "../characters/sheet/fields.ts"
 import LINEAGES from "../data/list-of-lineages.json"
+import { useEditorCharacterSheet } from "./context.tsx"
 
-export function LineageFieldGroup({ sheet }: { sheet: FieldContext }) {
+export function LineageFieldGroup() {
+	const sheet = useEditorCharacterSheet()
+
 	const lineage = resolveSelectField(sheet, {
 		id: "lineage",
 		choices: LINEAGES.sort((a, b) => a.lineage.localeCompare(b.lineage)).map(

@@ -1,4 +1,7 @@
+import { Heading, HeadingLevel } from "@ariakit/react"
 import { useEditorCharacterSheet } from "./context.tsx"
+import { SKILLS } from "./data.ts"
+import { resolveNumberField } from "./sheet/fields.ts"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
 import { resolveCoreSkillFields } from "./skills.ts"
 
@@ -7,8 +10,33 @@ export function CoreSkillsList() {
 	const fields = resolveCoreSkillFields(sheet)
 
 	return (
-		<div className="@container grid gap-3">
-			<div className="grid gap-3 @sm:grid-cols-2">
+		<div className="@container grid gap-4">
+			{Object.entries(SKILLS).map(([category, skills]) => (
+				<HeadingLevel key={category}>
+					<section>
+						<Heading className="mb-1 heading-xl">{category}</Heading>
+						<ul className="grid grid-cols-2 gap-2">
+							{Object.entries(skills)
+								.sort(([a], [b]) =>
+									a.toLowerCase().localeCompare(b.toLowerCase()),
+								)
+								.map(([skillName, skill]) => (
+									<li key={skillName}>
+										<SheetStatField
+											label={skillName}
+											tooltip={skill.description}
+											resolved={resolveNumberField(sheet, {
+												id: `coreSkills:${skillName}`,
+												min: 1,
+											})}
+										/>
+									</li>
+								))}
+						</ul>
+					</section>
+				</HeadingLevel>
+			))}
+			{/* <div className="grid gap-3 @sm:grid-cols-2">
 				{fields.map((field) => (
 					<SheetStatField
 						key={field.id}
@@ -19,7 +47,7 @@ export function CoreSkillsList() {
 						tooltip={field.info.flavor}
 					/>
 				))}
-			</div>
+			</div> */}
 		</div>
 	)
 }

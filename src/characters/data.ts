@@ -1,5 +1,7 @@
 import type { ResolvedSelectChoice } from "./sheet/fields.ts"
 
+export { default as EXPENSE_TIERS } from "../data/list-of-expense-tiers.json"
+
 export type AttributeName = (typeof ATTRIBUTE_NAMES)[number] | (string & {})
 export const ATTRIBUTE_NAMES = [
 	"Strength",
@@ -138,3 +140,80 @@ export const ASPECT_ART_PROPERTIES = [
 		description: `apply this art to other nearby targets`,
 	},
 ]
+
+export type AspectInfo = {
+	description: string
+}
+
+export const ASPECTS: Record<string, AspectInfo> = {
+	Fire: {
+		description: "physical force and aggression",
+	},
+	Water: {
+		description: "perception and constitution",
+	},
+	Wind: {
+		description: "acrobatics and dexterity",
+	},
+	Light: {
+		description: "information collection and examination",
+	},
+	Darkness: {
+		description: "manipulation and trickery",
+	},
+}
+
+export type SkillInfo = {
+	description: string
+	reaction?: boolean
+}
+
+export const SKILLS = {
+	Physical: {
+		Endure: {
+			description: `withstand physical or mental challenges through resilience`,
+		},
+		Exert: {
+			description: `apply physical strength to overcome obstacles or perform feats of power`,
+		},
+		Maneuver: {
+			description: `perform agile movements to navigate or evade obstacles and threats`,
+		},
+		Sneak: {
+			description: `move silently and unseen to avoid detection`,
+		},
+	},
+
+	Mental: {
+		Intuit: {
+			description: `analyze written or visual information to extract meaning or insights`,
+		},
+		Notice: {
+			description: `observe details in your surroundings to gain awareness or insight`,
+		},
+		Aim: {
+			description: `throw or shoot at a target`,
+		},
+		Focus: {
+			description: `carry out a meticulous task while avoiding external infuluence`,
+		},
+	},
+
+	Social: {
+		Sway: {
+			description: `influence others through charisma, charm, or persuasive appeal`,
+		},
+		Trick: {
+			description: `mislead others through lies or misdirection`,
+		},
+		Intimidate: {
+			description: `use forceful presence to influence or frighten others`,
+		},
+		// Persuade: {
+		// 	description: `sway others with logic and reason`,
+		// },
+		Read: {
+			description: `sense intentions through emotions without direct evidence`,
+		},
+	},
+}

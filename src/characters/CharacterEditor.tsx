@@ -15,7 +15,7 @@ import {
 	useUpdateEditorCharacter,
 } from "./context.tsx"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
-import { ASPECT_AURAS, ASPECT_NAMES } from "./data.ts"
+import { ASPECT_AURAS, ASPECTS, EXPENSE_TIERS } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
 import { resolveMilestoneFields } from "./milestones.ts"
 import {
@@ -51,7 +51,7 @@ function CharacterEditorInner() {
 	return (
 		<div className="grid gap-6">
 			<div className="grid gap-4">
-				<div className="flex gap-3">
+				<div className="flex gap-2">
 					<div className="flex-1">
 						<NameField />
 					</div>
@@ -60,7 +60,7 @@ function CharacterEditorInner() {
 					</div>
 				</div>
 
-				<div className="flex gap-3">
+				<div className="flex gap-2">
 					<SheetNumberField
 						label={`Damage / 10`}
 						resolved={resolveNumberField(sheet, { id: "damage" })}
@@ -73,81 +73,73 @@ function CharacterEditorInner() {
 					/>
 				</div>
 
-				<Field label="Essence">
-					<div className="grid grid-cols-3 gap-3">
-						{ASPECT_NAMES.map((name) => (
+				<Field label="Aspects">
+					<div className="grid grid-cols-2 gap-2">
+						{Object.entries(ASPECTS).map(([name, aspect]) => (
 							<SheetStatField
 								key={name}
 								label={name}
-								resolved={resolveNumberField(sheet, { id: `aspect:${name}` })}
-								score={0}
+								tooltip={aspect.description}
+								resolved={resolveNumberField(sheet, {
+									id: `aspect:${name}`,
+									min: 1,
+								})}
 							/>
 						))}
 					</div>
 				</Field>
+
+				<LineageFieldGroup />
 			</div>
 
 			<Tabs
 				persistenceKey="mainTabs"
 				tabs={[
-					tab("Character", () => (
-						<Ariakit.HeadingLevel>
-							<div className="grid gap-3">
-								<div className="grid gap-6">
-									<LineageFieldGroup sheet={sheet} />
-
-									{/* <SheetSelectField
-										resolved={resolveSelectField(sheet, {
-											id: "budget",
-											choices: EXPENSE_TIERS.sort((a, b) =>
-												a.name.localeCompare(b.name),
-											).map((tier) => ({
-												label: tier.name,
-												value: tier.name,
-												description: tier.examples,
-											})),
-											defaultValue: "dirt",
-										})}
-										description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
-									/> */}
-
-									<SheetTextField
-										description="Add any other important details, and/or use this to track other important information."
-										multiline
-										resolved={resolveTextField(sheet, { id: "details" })}
-									/>
-								</div>
-							</div>
-						</Ariakit.HeadingLevel>
-					)),
-
 					tab("Skills", () => <CoreSkillsList />),
 
-					// tab("Aspects", () => <AspectSkillsList />),
+					tab("Inventory", () => (
+						<>
+							<BudgetField />
+							<Ariakit.HeadingLevel>
+								<Ariakit.Heading className="heading-xl">Items</Ariakit.Heading>
+								<SheetListField resolved={resolveListField(sheet, "items")}>
+									{(itemContext) => (
+										<div className="grid gap-2">
+											<div className="flex gap-2">
+												<SheetTextField
+													className="flex-1"
+													resolved={resolveTextField(itemContext, {
+														id: "name",
+														defaultValue: "New Item",
+													})}
+												/>
+												<SheetSelectField
+													className="w-36"
+													resolved={resolveSelectField(itemContext, {
+														id: "price",
+														defaultValue: "4. Steep",
+														choices: EXPENSE_TIERS.sort((a, b) =>
+															a.name.localeCompare(b.name),
+														).map((tier) => ({
+															label: tier.name,
+															value: tier.name,
+															hint: tier.examples,
+														})),
+													})}
+												/>
+											</div>
 
-					tab("Items", () => (
-						<SheetListField resolved={resolveListField(sheet, "items")}>
-							{(itemContext) => (
-								<div className="grid gap-2">
-									<div className="flex gap-2">
-										<SheetTextField
-											resolved={resolveTextField(itemContext, {
-												id: "name",
-												defaultValue: "New Item",
-											})}
-											className="flex-1"
-										/>
-									</div>
-
-									<SheetTextField
-										resolved={resolveTextField(itemContext, {
-											id: "description",
-										})}
-										multiline
-									/>
-								</div>
-							)}
-						</SheetListField>
+											<SheetTextField
+												resolved={resolveTextField(itemContext, {
+													id: "description",
+												})}
+												multiline
+											/>
+										</div>
+									)}
+								</SheetListField>
+							</Ariakit.HeadingLevel>
+						</>
 					)),
 
 					tab("Bonds", () => (
@@ -223,9 +215,39 @@ function CharacterEditorInner() {
 							}}
 						</SheetListField>
 					)),
+
+					tab("Notes", () => (
+						<>
+							<SheetTextField
+								description="Add any other important details, and/or use this to track other important information."
+								multiline
+								resolved={resolveTextField(sheet, { id: "details" })}
+							/>
+						</>
+					)),
 				]}
 			/>
 		</div>
+	)
+}
+
+function BudgetField() {
+	const sheet = useEditorCharacterSheet()
+	return (
+		<SheetSelectField
+			resolved={resolveSelectField(sheet, {
+				id: "budget",
+				defaultValue: "4. Steep",
+				choices: EXPENSE_TIERS.sort((a, b) => a.name.localeCompare(b.name)).map(
+					(tier) => ({
+						label: tier.name,
+						value: tier.name,
+						description: tier.examples,
+					}),
+				),
+			})}
+			description="What's the most expensive thing you can afford? You can freely buy things two tiers down."
+		/>
 	)
 }
 
@@ -323,7 +345,7 @@ function Tabs({
 							<Ariakit.Tab
 								key={tab.name}
 								id={tab.name}
-								className="flex-grow rounded px-3 py-1.5 text-center whitespace-nowrap text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
+								className="flex-1 shrink-0 rounded px-3 py-1.5 text-center whitespace-nowrap text-gray-400 transition hover:text-gray-100 aria-selected:bg-white/10 aria-selected:text-white"
 							>
 								{tab.name || toTitleCase(tab.name)}
 							</Ariakit.Tab>
