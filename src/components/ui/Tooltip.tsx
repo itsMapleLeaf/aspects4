@@ -37,7 +37,7 @@ export function Tooltip({
 					portal
 					unmountOnHide
 					fixed
-					className="max-w-sm translate-y-1 rounded bg-gray-900 px-2 py-1 text-sm text-white opacity-0 shadow transition duration-200 data-[enter]:translate-y-0 data-[enter]:opacity-100 data-[leave]:translate-y-1 data-[leave]:opacity-0 dark:bg-gray-700"
+					className="max-w-sm translate-y-1 rounded bg-gray-900 px-2 py-1 text-center text-sm text-pretty text-white opacity-0 shadow transition duration-200 data-[enter]:translate-y-0 data-[enter]:opacity-100 data-[leave]:translate-y-1 data-[leave]:opacity-0 dark:bg-gray-700"
 				>
 					{content}
 				</Ariakit.Tooltip>
