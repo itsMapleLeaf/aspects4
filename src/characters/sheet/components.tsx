@@ -1,3 +1,4 @@
+import { startCase } from "es-toolkit"
 import { ComponentProps } from "react"
 import { EditableNumberField } from "../../components/EditableNumber.tsx"
 import { EditableTextField } from "../../components/EditableTextField.tsx"
@@ -56,7 +57,7 @@ export function SheetSelectField({
 		props.placeholder ??
 		(typeof props.label === "string" ?
 			`Choose a ${lowerFirst(props.label)}`
-		:	`Choose a ${lowerFirst(toTitleCase(field.id))}`)
+		:	`Choose a ${startCase(field.id).toLowerCase()}`)
 
 	return (
 		<div className={className}>

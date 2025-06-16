@@ -20,7 +20,10 @@ import {
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
 import { ASPECT_AURAS, ASPECTS, EXPENSE_TIERS } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
-import { resolveMilestoneFields } from "./milestones.ts"
+import {
+	resolveMilestoneFields,
+	resolveMilestoneListFieldItems,
+} from "./milestones.ts"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -52,6 +55,8 @@ export function CharacterEditor({
 function CharacterEditorInner() {
 	const sheet = useEditorCharacterSheet()
 
+	const milestones = resolveMilestoneListFieldItems(sheet)
+
 	return (
 		<div className="grid gap-6">
 			<div className="grid gap-4">
@@ -79,17 +84,26 @@ function CharacterEditorInner() {
 
 				<Field label="Aspects">
 					<div className="grid grid-cols-2 gap-2">
-						{Object.entries(ASPECTS).map(([name, aspect]) => (
-							<SheetStatField
-								key={name}
-								label={name}
-								tooltip={aspect.description}
-								resolved={resolveNumberField(sheet, {
-									id: `aspect:${name}`,
-									min: 1,
-								})}
-							/>
-						))}
+						{Object.entries(ASPECTS).map(([name, aspect]) => {
+							const field = resolveNumberField(sheet, {
+								id: `aspect:${name}`,
+								min: 1,
+							})
+
+							const milestoneBonusCount = milestones.filter(
+								(it) => it.aspectBonus.value === name,
+							).length
+
+							return (
+								<SheetStatField
+									key={name}
+									label={name}
+									tooltip={aspect.description}
+									resolved={field}
+									score={field.value + milestoneBonusCount}
+								/>
+							)
+						})}
 					</div>
 				</Field>
 
@@ -116,11 +130,21 @@ function CharacterEditorInner() {
 								const fields = resolveMilestoneFields(itemContext)
 								return (
 									<div className="grid gap-2">
+										<div className="flex gap-2 *:flex-1">
+											<SheetSelectField
+												placeholder="Choose an aspect bonus"
+												resolved={fields.aspectBonus}
+											/>
+											<SheetSelectField
+												placeholder="Choose a skill bonus"
+												resolved={fields.skillBonus}
+											/>
+										</div>
 										<SheetTextField
-											resolved={fields.notes}
 											label="Notes"
 											multiline
 											description="Add context for this milestone"
+											resolved={fields.notes}
 										/>
 									</div>
 								)

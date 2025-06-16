@@ -1,13 +1,14 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
+import { resolveMilestoneListFieldItems } from "~/characters/milestones.ts"
 import { useEditorCharacterSheet } from "./context.tsx"
 import { SKILLS } from "./data.ts"
 import { resolveNumberField } from "./sheet/fields.ts"
 import { SheetStatField } from "./sheet/SheetStatField.tsx"
-import { resolveCoreSkillFields } from "./skills.ts"
 
 export function CoreSkillsList() {
 	const sheet = useEditorCharacterSheet()
-	const fields = resolveCoreSkillFields(sheet)
+
+	const milestones = resolveMilestoneListFieldItems(sheet)
 
 	return (
 		<div className="@container grid gap-4">
@@ -20,18 +21,25 @@ export function CoreSkillsList() {
 								.sort(([a], [b]) =>
 									a.toLowerCase().localeCompare(b.toLowerCase()),
 								)
-								.map(([skillName, skill]) => (
-									<li key={skillName}>
-										<SheetStatField
-											label={skillName}
-											tooltip={skill.description}
-											resolved={resolveNumberField(sheet, {
-												id: `coreSkills:${skillName}`,
-												min: 1,
-											})}
-										/>
-									</li>
-								))}
+								.map(([skillName, skill]) => {
+									const field = resolveNumberField(sheet, {
+										id: `coreSkills:${skillName}`,
+										min: 1,
+									})
+									const milestoneBonusCount = milestones.filter(
+										(it) => it.skillBonus.value === skillName,
+									).length
+									return (
+										<li key={skillName}>
+											<SheetStatField
+												label={skillName}
+												tooltip={skill.description}
+												resolved={field}
+												score={field.value + milestoneBonusCount}
+											/>
+										</li>
+									)
+								})}
 						</ul>
 					</section>
 				</HeadingLevel>

@@ -54,7 +54,7 @@ export function SelectField({
 			</div>
 
 			<Ariakit.SelectPopover
-				className="menu-panel"
+				className="menu-panel max-h-96"
 				unmountOnHide
 				fixed
 				gutter={8}
