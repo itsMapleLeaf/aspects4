@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Button } from "../../components/ui/Button.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
 import {
@@ -10,35 +10,61 @@ import {
 export function SheetListField({
 	resolved,
 	description,
+	renderViewModeItem,
+	renderEditModeItem,
 	children,
-	extraActions,
 }: {
 	resolved: ResolvedListField
 	description?: string
-	children: (item: FieldContext) => ReactNode
-	extraActions?: ReactNode
+	renderViewModeItem?: (item: FieldContext) => ReactNode
+	renderEditModeItem?: (item: FieldContext) => ReactNode
+	/** @deprecated */
+	children?: (item: FieldContext) => ReactNode
 }) {
+	const [mode, setMode] = useState<"view" | "edit">(
+		resolved.items.length > 0 ? "view" : "edit",
+	)
+
 	return (
 		<div className="grid gap-3">
 			<p className="text-sm whitespace-pre-line text-gray-300 empty:hidden">
 				{description}
 			</p>
 
-			{resolved.items.map((item, index) => (
-				<ListFieldItemLayout
-					key={index}
-					onRemove={() => {
-						resolved.setItems(resolved.items.toSpliced(index, 1))
-					}}
-					onDuplicate={() => {
-						resolved.setItems(resolved.items.toSpliced(index + 1, 0, item))
-					}}
-				>
-					{children(createResolvedListItemContext(item, resolved, index))}
-				</ListFieldItemLayout>
-			))}
+			{resolved.items.map((item, index) =>
+				(renderViewModeItem || renderEditModeItem) && mode === "view" ?
+					(renderViewModeItem ?? children)?.(
+						createResolvedListItemContext(item, resolved, index),
+					)
+				:	<ListFieldItemLayout
+						key={index}
+						onRemove={() => {
+							resolved.setItems(resolved.items.toSpliced(index, 1))
+						}}
+						onDuplicate={() => {
+							resolved.setItems(resolved.items.toSpliced(index + 1, 0, item))
+						}}
+					>
+						{(renderEditModeItem ?? children)?.(
+							createResolvedListItemContext(item, resolved, index),
+						)}
+					</ListFieldItemLayout>,
+			)}
 
 			<div className="flex flex-wrap justify-between gap-2">
+				<div>
+					{(renderViewModeItem || renderEditModeItem) &&
+						(mode === "view" ?
+							<Button
+								icon="mingcute:edit-2-fill"
+								onClick={() => setMode("edit")}
+							>
+								Edit
+							</Button>
+						:	<Button icon="mingcute:check-fill" onClick={() => setMode("view")}>
+								Done
+							</Button>)}
+				</div>
 				<Button
 					icon={<Icon icon="mingcute:plus-fill" />}
 					onClick={() => {
@@ -47,7 +73,6 @@ export function SheetListField({
 				>
 					Add New
 				</Button>
-				<div className="flex flex-wrap gap-2">{extraActions}</div>
 			</div>
 		</div>
 	)

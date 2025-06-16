@@ -33,17 +33,7 @@ export function AspectSkillsList() {
 	if (mode === "edit") {
 		return (
 			<section>
-				<SheetListField
-					resolved={resolvedList}
-					extraActions={
-						<Button
-							icon={<Icon icon="mingcute:check-fill" />}
-							onClick={() => setMode("view")}
-						>
-							Done
-						</Button>
-					}
-				>
+				<SheetListField resolved={resolvedList}>
 					{(listContext) => (
 						<AspectSkillForm fields={resolveAspectSkillFields(listContext)} />
 					)}
