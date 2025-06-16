@@ -71,7 +71,7 @@ export function Button({
 				{pending ?
 					<Icon icon="mingcute:loading-3-fill" className="animate-spin" />
 				: typeof icon === "string" ?
-					<Icon icon={icon} className="animate-spin" />
+					<Icon icon={icon} />
 				:	icon}
 			</div>
 			{children}
