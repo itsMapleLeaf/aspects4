@@ -81,7 +81,7 @@ export const ASPECT_AURAS = [
 		label: "Darkness",
 		hint: "Manifests from tension, mistrust, and uncertainty.",
 	},
-]
+] as const
 
 export const ASPECT_ART_TYPES: ResolvedSelectChoice[] = [
 	{
