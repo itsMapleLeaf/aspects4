@@ -68,10 +68,10 @@ export function rollAspectsDice(count: number, label?: string): DiceRollResult {
 	const max = Math.max(...values)
 
 	const result =
-		values.filter((v) => v === 6).length >= 2 ? "Critical success!"
-		: max === 6 ? "Success."
-		: max >= 4 ? "Partial success."
-		: "Failure."
+		values.filter((v) => v === 6).length >= 2 ? "Critical impact!"
+		: max === 6 ? "High impact."
+		: max >= 4 ? "Medium impact."
+		: "Low impact."
 
 	const prefix =
 		label ? `Rolled ${label} (${count} dice)` : `Rolled ${count} dice`
