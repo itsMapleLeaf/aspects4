@@ -75,7 +75,7 @@ export function resolveSelectField<Value extends string>(
 	context: FieldContext,
 	config: {
 		id: string
-		defaultValue?: string
+		defaultValue?: Value
 		choices: readonly (ResolvedSelectChoice & { value: Value })[]
 	},
 ) {
