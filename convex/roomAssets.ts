@@ -77,15 +77,20 @@ export const place = mutation({
 			throw new Error("Asset not found")
 		}
 
+		const defaultSize = {
+			x: 200,
+			y: 200,
+		}
+
 		await ctx.db.insert("roomAssets", {
-			size: assetDoc.size,
+			size: defaultSize,
 			rotation: 0,
 			locked: false,
 			updateTime: Date.now(),
 			...args,
 			position: {
-				x: position.x - assetDoc.size.x / 2,
-				y: position.y - assetDoc.size.y / 2,
+				x: position.x - defaultSize.x / 2,
+				y: position.y - defaultSize.y / 2,
 			},
 			inScene: true,
 			roomId,
