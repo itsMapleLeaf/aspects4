@@ -167,6 +167,7 @@ function CharacterEditorInner() {
 												/>
 												<SheetSelectField
 													className="w-48"
+													placeholder="Choose an aura"
 													resolved={auraField}
 												/>
 											</div>
