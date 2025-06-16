@@ -1,6 +1,6 @@
 [
   {
-    "ability": "Push the Odds - While making a skill check, any time you roll a 3, you may take 1 stress to add an additional die to your roll and add it to the result (including any additional 3s that are rolled this way).",
+    "ability": "Push the Odds - Once per phase: after making a skill check, you may increase the impact of the check by one (e.g. Medium to High, or High to Crit). When you do so, the impact of your following roll is decreased by one.",
     "memberCreatures": "demons, succubus/incubus, vampires",
     "lineage": "Umbral"
   },
