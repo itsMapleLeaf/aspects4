@@ -3,7 +3,11 @@ import { Link } from "wouter"
 
 export function AppLogoLink() {
 	return (
-		<Link to="/" className="transition hover:text-primary-300">
+		<Link
+			to="/"
+			className="transition hover:text-primary-300"
+			aria-label="Home"
+		>
 			<Ariakit.Heading className="heading-xl">AspectsVTT</Ariakit.Heading>
 		</Link>
 	)

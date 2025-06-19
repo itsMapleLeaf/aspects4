@@ -15,7 +15,8 @@ export function UserButton() {
 	return (
 		<Menu placement="bottom-end">
 			<MenuButton className="-mx-3 flex h-10 items-center gap-3 rounded px-3 hover:bg-white/10">
-				<span>{user.name}</span>
+				<div className="span sr-only">Account actions</div>
+				<span aria-hidden>{user.name}</span>
 				{user.image ?
 					<img src={user?.image} alt="" className="size-8 rounded-full" />
 				:	<Icon icon="mingcute:user-4-line" className="-mx-1 size-6" />}
