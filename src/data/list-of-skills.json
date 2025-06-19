@@ -1,5 +1,12 @@
 [
   {
+    "attribute": "Sense",
+    "effect": "",
+    "flavor": "Mentally steel yourself, guarding against external psychological influence",
+    "skill": "Resolve",
+    "activation": "Reaction"
+  },
+  {
     "attribute": "Intellect",
     "effect": "",
     "flavor": "Apply understanding to solve a logical problem",
@@ -18,7 +25,7 @@
     "effect": "",
     "flavor": "Offer first aid to someone else",
     "skill": "Aid",
-    "activation": ""
+    "activation": "Requires Medical Item"
   },
   {
     "attribute": "Dexterity",
@@ -57,10 +64,10 @@
   },
   {
     "attribute": "Dexterity",
-    "effect": "Make an action roll. Deal damage equal to the result to a far away target.",
+    "effect": "Deal damage equal to the result of the action roll to a far away target.",
     "flavor": "Fire a weapon to strike at a range",
     "skill": "Shoot",
-    "activation": ""
+    "activation": "Requires Ranged Weapon"
   },
   {
     "attribute": "Dexterity",
@@ -78,7 +85,7 @@
   },
   {
     "attribute": "Dexterity",
-    "effect": "Before taking damage, make an action roll. If the result is higher than the damage taken, avoid all damage.",
+    "effect": "Use this action before taking damage. If the action roll result is higher than the damage taken, avoid all damage.",
     "flavor": "Evade an incoming attack",
     "skill": "Dodge",
     "activation": "Reaction"
@@ -95,7 +102,7 @@
     "effect": "",
     "flavor": "Reactively see, hear, or feel something",
     "skill": "Notice",
-    "activation": ""
+    "activation": "Reaction"
   },
   {
     "attribute": "Sense",
@@ -120,7 +127,7 @@
   },
   {
     "attribute": "Strength",
-    "effect": "Before taking damage, make an action roll. Reduce the incoming damage by the result, but to no less than 1.",
+    "effect": "Use this action before taking damage. Reduce the incoming damage by the result of the action roll, to no less than 1.",
     "flavor": "Guard against an incoming attack",
     "skill": "Block",
     "activation": "Reaction"

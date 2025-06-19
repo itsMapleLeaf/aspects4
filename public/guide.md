@@ -1,5 +1,25 @@
 # Aspects of Nature: Guidebook
 
+<aside>
+
+🚧 Right now, I’m undergoing a significant refactor of the system. The current contents of the book do not reflect how the system is currently played.
+
+See the current work-in-progress outline: [Untitled](https://www.notion.so/205b0b885c0e802eb29ef8d6a10c3506)
+
+</aside>
+
+<aside>
+
+🚧 This guidebook is a work in progress! Anywhere you see this construction sign emoji, that part of the book is still WIP.
+
+</aside>
+
+<aside>
+
+ℹ️ Interested in chatting about the game and playtesting? Join the [Discord](https://discord.gg/Zeshef8sh5)!
+
+</aside>
+
 ## Gameplay
 
 ### Story First
@@ -1002,7 +1022,7 @@ _Click each entry below for more details!_
 
 | Lineage     | Ability                                                                                                                                                                                                                                                                     | Member Creatures                                             |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Umbral      | **Push the Odds** - While making a skill check, any time you roll a 3, you may take 1 stress to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                       | _demons, succubus/incubus, vampires_                         |
+| Umbral      | **Push the Odds** - Once per phase: after making a skill check, you may increase the impact of the check by one (e.g. Medium to High, or High to Crit). When you do so, the impact of your following roll is decreased by one.                                              | _demons, succubus/incubus, vampires_                         |
 | Arthropod   | **Double-Edged Senses** - You may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) check _(once per check)_. When you do, take 1 stress for every die in that roll with a value of 3.                                                      | _insects, arachnids, bugs, most creatures with exoskeletons_ |
 | Avian       | **Momentum** - After using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following skill check gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       |
 | Aquatic     | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the roll.                                                | _fish, dolphins, other water-bound creatures_                |
@@ -1013,15 +1033,15 @@ _Click each entry below for more details!_
 
 [Items](https://www.notion.so/1b8b0b885c0e801ba751e644e7841a85) belong to one of many **expense tiers**, which determine how much is needed to purchase and trade them in the world.
 
-| Name           | Examples                                                             |
-| -------------- | -------------------------------------------------------------------- |
-| 1. Dirt        | Water and other freely-available resources                           |
-| 4. Steep       | Premium tools and weapons, extravagant clothing, comfortable lodging |
-| 2. Cheap       | Common meals, simple clothing                                        |
-| 5. Expensive   | A house, luxurious lodging                                           |
-| 6. Valuable    | A mansion                                                            |
-| 7. Priceless   | An extremely rare, precious, powerful artifact                       |
-| 3. Inexpensive | Five-star meals, basic tools and weapons, reasonable lodging         |
+| Name           | Examples                                                                 |
+| -------------- | ------------------------------------------------------------------------ |
+| 1. Dirt        | Water and other freely-available resources                               |
+| 4. Steep       | Premium tools and weapons, comfortable lodging, durable clothing         |
+| 2. Cheap       | Common meals, simple clothing                                            |
+| 5. Expensive   | A house, luxurious lodging, extravagant clothing, an expensive appliance |
+| 6. Valuable    | A mansion                                                                |
+| 7. Priceless   | An extremely rare, precious, powerful artifact                           |
+| 3. Inexpensive | Five-star meals, basic tools and weapons, reasonable lodging             |
 
 Your **budget** is the expense tier representing the most expensive item you can buy.
 
@@ -1162,7 +1182,7 @@ Update the lineage section heading and also specify your member species, then co
 
 | Ability                                                                                                                                                                                                                                                                     | Member Creatures                                             | Lineage     |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------- |
-| **Push the Odds** - While making a skill check, any time you roll a 3, you may take 1 stress to add an additional die to your roll and add it to the result _(including any additional 3s that are rolled this way)_.                                                       | _demons, succubus/incubus, vampires_                         | Umbral      |
+| **Push the Odds** - Once per phase: after making a skill check, you may increase the impact of the check by one (e.g. Medium to High, or High to Crit). When you do so, the impact of your following roll is decreased by one.                                              | _demons, succubus/incubus, vampires_                         | Umbral      |
 | **Double-Edged Senses** - You may add 3 dice to any [Sense](https://www.notion.so/1b1b0b885c0e80ab9d0cfad4b7eb2f10) check _(once per check)_. When you do, take 1 stress for every die in that roll with a value of 3.                                                      | _insects, arachnids, bugs, most creatures with exoskeletons_ | Arthropod   |
 | **Momentum** - After using [Dodge](https://www.notion.so/1b1b0b885c0e80b0bb34ee96169251be), [Dash](https://www.notion.so/1b1b0b885c0e8091a84edefa55e0ef92), or [Maneuver](https://www.notion.so/1b2b0b885c0e80d8808fff1f3c9325e9), your following skill check gains 2 dice. | _eagles, ravens, penguins, flamingos, all other birds_       | Avian       |
 | **Art of Theseus** - When making an aspect art with [**exactly one aspect changed**](https://www.notion.so/1b1b0b885c0e8060879ff4746a09cd8f#1f2b0b885c0e80fabafefa5ec376552a) from your previous art, add 1 die to the roll.                                                | _fish, dolphins, other water-bound creatures_                | Aquatic     |
@@ -1552,18 +1572,6 @@ While Eisenkind do not use family names in the traditional sense, relatives ofte
 - academies: primary/secondary school equivalent, grades 1 through 12
 
 - universities: 4-year higher education
-
-<aside>
-
-🚧 This guidebook is a work in progress! Anywhere you see this construction sign emoji, that part of the book is still WIP.
-
-</aside>
-
-<aside>
-
-ℹ️ Interested in chatting about the game and playtesting? Join the [Discord](https://discord.gg/Zeshef8sh5)!
-
-</aside>
 
 Welcome to **Aspects of Nature, **a story-focused TTRPG, set in a contemporary setting, interspersed with supernatural elements and pockets of fantasy.
 

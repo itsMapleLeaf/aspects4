@@ -8,7 +8,7 @@ import {
 } from "@notionhq/client"
 import { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints"
 import { invariant, sortBy } from "es-toolkit"
-import { flattenPageProperties, formatPage } from "./notion-page.ts"
+import { NotionPage } from "./notion-page.ts"
 import { formatRichText } from "./notion-rich-text.ts"
 import { compactJoin, prettify } from "./utils.ts"
 
@@ -200,7 +200,8 @@ export async function formatBlock(
 
 		for (const item of rawItems) {
 			if (isFullPage(item)) {
-				rows.push(await flattenPageProperties(notion, item))
+				const page = new NotionPage(item, notion)
+				rows.push(await page.flattenProperties())
 			} else {
 				console.warn(`Unsupported database item:`, item)
 			}
@@ -218,9 +219,8 @@ export async function formatBlock(
 	}
 
 	if (block.type === "child_page") {
-		const page = await notion.pages.retrieve({ page_id: block.id })
-		invariant(isFullPage(page), `expected full page: ${prettify(page)}`)
-		return await formatPage(notion, page, baseHeadingLevel + 1)
+		const page = await NotionPage.cache.fetch(block.id, notion)
+		return await page.toMarkdown(baseHeadingLevel + 1)
 	}
 
 	// catch-all for generic "container" blocks, like synced blocks and columns
@@ -233,7 +233,10 @@ export async function formatBlock(
 	return `<!-- unsupported block type: ${block.type} -->`
 }
 
-function formatMarkdownTable(columnNames: string[], rows: string[][]): string {
+function formatMarkdownTable(
+	columnNames: string[],
+	rows: (string | number)[][],
+): string {
 	return compactJoin("\n", [
 		`| ${columnNames.join(" | ")} |`,
 		`| ${columnNames.map(() => "---").join(" | ")} |`,
