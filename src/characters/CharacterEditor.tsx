@@ -71,13 +71,18 @@ function CharacterEditorInner() {
 
 				<div className="flex gap-2">
 					<SheetNumberField
-						label={`Damage / 10`}
+						label={`Damage`}
 						resolved={resolveNumberField(sheet, { id: "damage" })}
 						className="flex-1"
 					/>
 					<SheetNumberField
-						label={`Critical Injuries / 3`}
-						resolved={resolveNumberField(sheet, { id: "criticalInjuries" })}
+						label={`Fatigue`}
+						resolved={resolveNumberField(sheet, { id: "fatigue" })}
+						className="flex-1"
+					/>
+					<SheetNumberField
+						label={`Anxiety`}
+						resolved={resolveNumberField(sheet, { id: "anxiety" })}
 						className="flex-1"
 					/>
 				</div>
