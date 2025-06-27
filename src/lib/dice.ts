@@ -55,26 +55,27 @@ export function rollDice(args: string[]): DiceRollResult {
 }
 
 export function rollAspectsDice(count: number, label?: string): DiceRollResult {
-	if (count <= 0 || count > 100) {
+	if (count < 0 || count > 100) {
 		return {
 			success: false,
 			message: "Error: Invalid dice count. Must be from 1 to 100.",
 		}
 	}
 
-	const values = range(count)
+	const values = range(count === 0 ? 2 : count)
 		.map(() => randomInt(6) + 1)
 		.sort((a, b) => b - a)
-	const max = Math.max(...values)
+
+	const resolved = count === 0 ? Math.min(...values) : Math.max(...values)
 
 	const result =
 		values.filter((v) => v === 6).length >= 2 ? "Critical impact!"
-		: max === 6 ? "High impact."
-		: max >= 4 ? "Medium impact."
+		: resolved === 6 ? "High impact."
+		: resolved >= 4 ? "Medium impact."
 		: "Low impact."
 
 	const prefix =
-		label ? `Rolled ${label} (${count} dice)` : `Rolled ${count} dice`
+		label ? `Rolled ${label} (${count} potential)` : `Rolled ${count} dice`
 
 	const rollMessage = `${prefix}: ${values.join(", ")}\n${result}`
 	return { success: true, message: rollMessage }
