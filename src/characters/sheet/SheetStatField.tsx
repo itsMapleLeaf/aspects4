@@ -32,7 +32,7 @@ export function SheetStatField({
 		onChange: (value) => field.context.updateValue(field.id, value),
 	})
 
-	const score = scoreOverride ?? editable.value
+	const score = Math.max(0, scoreOverride ?? editable.value)
 
 	return (
 		<div
@@ -53,21 +53,19 @@ export function SheetStatField({
 						{description}
 					</div>
 				</Tooltip>
-				{score > 0 && (
-					<Button
-						type="button"
-						appearance="ghost"
-						className="flex h-full w-14 rounded-none p-0"
-						align="center"
-						onClick={() => {
-							chatInputRef.current?.prefill(
-								`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
-							)
-						}}
-					>
-						<DiceScoreIcon score={score} />
-					</Button>
-				)}
+				<Button
+					type="button"
+					appearance="ghost"
+					className="flex h-full w-14 rounded-none p-0"
+					align="center"
+					onClick={() => {
+						chatInputRef.current?.prefill(
+							`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
+						)
+					}}
+				>
+					<DiceScoreIcon score={score} />
+				</Button>
 			</div>
 
 			<div
