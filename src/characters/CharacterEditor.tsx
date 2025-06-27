@@ -87,7 +87,7 @@ function CharacterEditorInner() {
 						{Object.entries(ASPECTS).map(([name, aspect]) => {
 							const field = resolveNumberField(sheet, {
 								id: `aspect:${name}`,
-								min: 1,
+								min: 0,
 							})
 
 							const milestoneBonusCount = milestones.filter(

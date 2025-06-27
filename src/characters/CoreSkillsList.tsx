@@ -24,7 +24,7 @@ export function CoreSkillsList() {
 								.map(([skillName, skill]) => {
 									const field = resolveNumberField(sheet, {
 										id: `coreSkills:${skillName}`,
-										min: 1,
+										min: 0,
 									})
 									const milestoneBonusCount = milestones.filter(
 										(it) => it.skillBonus.value === skillName,
