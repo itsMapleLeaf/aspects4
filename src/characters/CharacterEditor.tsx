@@ -124,7 +124,7 @@ function CharacterEditorInner() {
 						</>
 					)),
 
-					tab("Bonds", () => <BondListField />),
+					tab("Experiences", () => <ExperienceListField />),
 
 					tab("Milestones", () => (
 						<SheetListField resolved={resolveListField(sheet, "milestones")}>
@@ -225,14 +225,14 @@ function ItemListField() {
 	)
 }
 
-function BondListField() {
+function ExperienceListField() {
 	const sheet = useEditorCharacterSheet()
 
 	return (
 		<SheetListField
 			resolved={resolveListField(sheet, "bonds")}
 			renderViewModeItem={(bondContext) => {
-				const fields = resolveBondFields(bondContext)
+				const fields = resolveExperienceFields(bondContext)
 
 				const auraProps = {
 					"Fire": {
@@ -296,7 +296,7 @@ function BondListField() {
 				)
 			}}
 			renderEditModeItem={(bondContext) => {
-				const fields = resolveBondFields(bondContext)
+				const fields = resolveExperienceFields(bondContext)
 
 				return (
 					<div className="grid gap-4">
@@ -310,22 +310,29 @@ function BondListField() {
 								/>
 							</div>
 							<p className="mt-1 text-sm font-medium text-gray-300 empty:hidden">
+								{fields.aura.currentOption?.value} -{" "}
 								{fields.aura.currentOption?.hint}
 							</p>
 						</div>
-
-						<Checkbox
-							label="Activated"
-							checked={fields.activated.value}
-							onChange={(event) => {
-								fields.activated.context.updateValue(
-									fields.activated.id,
-									event.currentTarget.checked,
-								)
-							}}
+						<SheetTextField
+							multiline
+							resolved={fields.description}
+							label={
+								<div className="mb-1 flex justify-between">
+									<div>Description</div>
+									<Checkbox
+										label="Activated"
+										checked={fields.activated.value}
+										onChange={(event) => {
+											fields.activated.context.updateValue(
+												fields.activated.id,
+												event.currentTarget.checked,
+											)
+										}}
+									/>
+								</div>
+							}
 						/>
-
-						<SheetTextField multiline resolved={fields.description} />
 					</div>
 				)
 			}}
@@ -333,20 +340,20 @@ function BondListField() {
 	)
 }
 
-function resolveBondFields(bondContext: FieldContext) {
+function resolveExperienceFields(itemContext: FieldContext) {
 	return {
-		name: resolveTextField(bondContext, {
+		name: resolveTextField(itemContext, {
 			id: "name",
-			defaultValue: "New Bond",
+			defaultValue: "New Experience",
 		}),
-		aura: resolveSelectField(bondContext, {
+		aura: resolveSelectField(itemContext, {
 			id: "aura",
 			choices: ASPECT_AURAS,
 		}),
-		description: resolveTextField(bondContext, {
+		description: resolveTextField(itemContext, {
 			id: "description",
 		}),
-		activated: resolveBooleanField(bondContext, {
+		activated: resolveBooleanField(itemContext, {
 			id: "activated",
 		}),
 	}

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react"
+import { Fragment, useState, type ReactNode } from "react"
 import { Button } from "../../components/ui/Button.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
 import {
@@ -31,25 +31,28 @@ export function SheetListField({
 				{description}
 			</p>
 
-			{resolved.items.map((item, index) =>
-				(renderViewModeItem || renderEditModeItem) && mode === "view" ?
-					(renderViewModeItem ?? children)?.(
-						createResolvedListItemContext(item, resolved, index),
-					)
-				:	<ListFieldItemLayout
-						key={index}
-						onRemove={() => {
-							resolved.setItems(resolved.items.toSpliced(index, 1))
-						}}
-						onDuplicate={() => {
-							resolved.setItems(resolved.items.toSpliced(index + 1, 0, item))
-						}}
-					>
-						{(renderEditModeItem ?? children)?.(
+			{resolved.items.map((item, index) => (
+				// eslint-disable-next-line react-x/no-array-index-key
+				<Fragment key={index}>
+					{(renderViewModeItem || renderEditModeItem) && mode === "view" ?
+						(renderViewModeItem ?? children)?.(
 							createResolvedListItemContext(item, resolved, index),
-						)}
-					</ListFieldItemLayout>,
-			)}
+						)
+					:	<ListFieldItemLayout
+							onRemove={() => {
+								resolved.setItems(resolved.items.toSpliced(index, 1))
+							}}
+							onDuplicate={() => {
+								resolved.setItems(resolved.items.toSpliced(index + 1, 0, item))
+							}}
+						>
+							{(renderEditModeItem ?? children)?.(
+								createResolvedListItemContext(item, resolved, index),
+							)}
+						</ListFieldItemLayout>
+					}
+				</Fragment>
+			))}
 
 			<div className="flex flex-wrap justify-between gap-2">
 				<div>
