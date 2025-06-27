@@ -4,7 +4,6 @@ import { twMerge } from "tailwind-merge"
 import type { NormalizedCharacter } from "../../convex/characters.ts"
 import { EditableTextField } from "../components/EditableTextField.tsx"
 import { Checkbox } from "../components/ui/Checkbox.tsx"
-import { Field } from "../components/ui/Field.tsx"
 import { Icon } from "../components/ui/Icon.tsx"
 import { SelectField } from "../components/ui/SelectField.tsx"
 import { SummaryCard } from "../components/ui/SummaryCard.tsx"
@@ -38,7 +37,6 @@ import {
 	type FieldContext,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
-import { SheetStatField } from "./sheet/SheetStatField.tsx"
 
 export function CharacterEditor({
 	character,
@@ -87,30 +85,29 @@ function CharacterEditorInner() {
 					/>
 				</div>
 
-				<Field label="Aspects">
-					<div className="grid grid-cols-2 gap-2">
-						{Object.entries(ASPECTS).map(([name, aspect]) => {
-							const field = resolveNumberField(sheet, {
-								id: `aspect:${name}`,
-								min: 0,
-							})
+				<div className="flex gap-2">
+					{Object.entries(ASPECTS).map(([name]) => {
+						const field = resolveNumberField(sheet, {
+							id: `aspect:${name}`,
+							min: 0,
+						})
 
-							const milestoneBonusCount = milestones.filter(
-								(it) => it.aspectBonus.value === name,
-							).length
+						const milestoneBonusCount = milestones.filter(
+							(it) => it.aspectBonus.value === name,
+						).length
 
-							return (
-								<SheetStatField
-									key={name}
-									label={name}
-									tooltip={aspect.description}
-									resolved={field}
-									score={field.value + milestoneBonusCount}
-								/>
-							)
-						})}
-					</div>
-				</Field>
+						return (
+							<SheetNumberField
+								className="flex-1"
+								key={name}
+								label={`${name} (${field.value + milestoneBonusCount})`}
+								resolved={field}
+							/>
+						)
+					})}
+				</div>
+				{/* <Field label="Aspects">
+				</Field> */}
 
 				<LineageFieldGroup />
 			</div>
