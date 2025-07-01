@@ -135,6 +135,14 @@ export function Chat({
 				textareaRef.current.focus()
 			}
 		},
+		async sendMessage(text) {
+			await createMessage({
+				roomId: room._id,
+				sender: playerName,
+				content: text,
+			})
+		},
+		addLocalMessage,
 	}))
 
 	const handleKeyDown = async (
