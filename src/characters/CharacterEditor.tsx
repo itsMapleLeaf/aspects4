@@ -173,7 +173,19 @@ function StressSection() {
 			</div>
 
 			<Checkbox
-				label="Unconscious"
+				label={
+					!unconsciousField.value && stress.perilSum >= 5 ?
+						<span className="flex items-center gap-1 text-red-300">
+							Unconscious
+							<Icon icon="mingcute:warning-fill" />
+						</span>
+					: unconsciousField.value && stress.perilSum <= 3 ?
+						<span className="flex items-center gap-1 text-blue-300">
+							Unconscious
+							<Icon icon="mingcute:star-fill" />
+						</span>
+					:	"Unconscious"
+				}
 				checked={unconsciousField.value}
 				onChange={() => {
 					unconsciousField.context.updateValue(
