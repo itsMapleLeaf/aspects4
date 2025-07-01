@@ -24,6 +24,7 @@ import {
 	resolveMilestoneFields,
 	resolveMilestoneListFieldItems,
 } from "./milestones.ts"
+import { RecoveryDialogButton } from "./RecoveryDialogButton.tsx"
 import {
 	SheetNumberField,
 	SheetSelectField,
@@ -170,7 +171,7 @@ function StressFields() {
 
 	return (
 		<div className="grid gap-2">
-			<div className="flex gap-2">
+			<div className="flex items-end gap-2">
 				{fields.map((field) => (
 					<SheetNumberField
 						key={field.resolved.id}
@@ -179,6 +180,7 @@ function StressFields() {
 						className="flex-1"
 					/>
 				))}
+				<RecoveryDialogButton />
 			</div>
 
 			<Checkbox
@@ -192,7 +194,7 @@ function StressFields() {
 				}}
 			/>
 
-			<p className="-my-1 text-sm text-gray-300">
+			<p className="-my-1 muted-sm">
 				You become unconscious at <strong>5 total</strong> peril, then you
 				regain consciousness once you're healed to <strong>3 or fewer</strong>{" "}
 				peril.
@@ -200,6 +202,7 @@ function StressFields() {
 		</div>
 	)
 }
+
 
 function ItemListField() {
 	const sheet = useEditorCharacterSheet()
