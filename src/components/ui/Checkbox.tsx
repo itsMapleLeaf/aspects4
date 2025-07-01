@@ -22,10 +22,7 @@ export function Checkbox({
 				className={`size-4 accent-pink-300`}
 				{...props}
 			/>
-			<label
-				htmlFor={id}
-				className="text-sm font-semibold text-gray-300 select-none"
-			>
+			<label htmlFor={id} className="text-sm font-semibold select-none">
 				{label}
 			</label>
 		</div>
