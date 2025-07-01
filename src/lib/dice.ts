@@ -1,4 +1,4 @@
-import { randomInt, range } from "es-toolkit"
+import { randomInt, range, sum } from "es-toolkit"
 
 type DiceRollResult = { success: boolean; message: string }
 
@@ -45,16 +45,44 @@ export function rollDice(args: string[]): DiceRollResult {
 		}
 	}
 
-	const rolls = []
-	for (let i = 0; i < diceCount; i++) {
-		rolls.push(Math.floor(Math.random() * sides) + 1)
-	}
-
-	const rollMessage = `Rolled ${diceCount}d${sides}: ${rolls.join(", ")}`
+	const numericRollResult = rollNumericDice(diceCount, sides)
+	const rollMessage = `Rolled ${diceCount}d${sides}: ${numericRollResult.values.join(", ")} = ${numericRollResult.sum}`
 	return { success: true, message: rollMessage }
 }
 
-export function rollAspectsDice(count: number, label?: string): DiceRollResult {
+export function rollNumericDice(count: number, sides: number) {
+	const values = []
+	for (let i = 0; i < count; i++) {
+		values.push(Math.floor(Math.random() * sides) + 1)
+	}
+	return { values, sum: sum(values) }
+}
+
+export type AspectsDiceImpact = "low" | "medium" | "high" | "critical"
+
+export const aspectsDiceImpactDescriptions: Record<AspectsDiceImpact, string> =
+	{
+		low: "Low impact.",
+		medium: "Medium impact.",
+		high: "High impact.",
+		critical: "Critical impact!",
+	}
+
+export type AspectsDiceSuccessResult = {
+	success: true
+	message: string
+	values: readonly number[]
+	impact: AspectsDiceImpact
+}
+
+export type AspectsDiceResult =
+	| AspectsDiceSuccessResult
+	| { success: false; message: string }
+
+export function rollAspectsDice(
+	count: number,
+	label?: string,
+): AspectsDiceResult {
 	if (count < 0 || count > 100) {
 		return {
 			success: false,
@@ -68,15 +96,23 @@ export function rollAspectsDice(count: number, label?: string): DiceRollResult {
 
 	const resolved = count === 0 ? Math.min(...values) : Math.max(...values)
 
-	const result =
-		values.filter((v) => v === 6).length >= 2 ? "Critical impact!"
-		: resolved === 6 ? "High impact."
-		: resolved >= 4 ? "Medium impact."
-		: "Low impact."
+	const impact: AspectsDiceImpact =
+		values.filter((v) => v === 6).length >= 2 ? "critical"
+		: resolved === 6 ? "high"
+		: resolved >= 4 ? "medium"
+		: "low"
 
 	const prefix =
 		label ? `Rolled ${label} (${count} potential)` : `Rolled ${count} dice`
 
-	const rollMessage = `${prefix}: ${values.join(", ")}\n${result}`
-	return { success: true, message: rollMessage }
+	const impactDescription = aspectsDiceImpactDescriptions[impact]
+
+	const rollMessage = `${prefix}: ${values.join(", ")}\n${impactDescription}`
+
+	return {
+		success: true,
+		message: rollMessage,
+		values,
+		impact,
+	}
 }
