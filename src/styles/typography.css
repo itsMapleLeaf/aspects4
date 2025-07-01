@@ -13,3 +13,11 @@
 @utility heading-4xl {
 	@apply text-4xl font-light;
 }
+
+@utility muted {
+	@apply text-gray-300;
+}
+
+@utility muted-sm {
+	@apply text-gray-300 text-sm;
+}
