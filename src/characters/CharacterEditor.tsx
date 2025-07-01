@@ -1,4 +1,5 @@
 import * as Ariakit from "@ariakit/react"
+import { startCase } from "es-toolkit"
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { NormalizedCharacter } from "../../convex/characters.ts"
@@ -67,23 +68,7 @@ function CharacterEditorInner() {
 					</div>
 				</div>
 
-				<div className="flex gap-2">
-					<SheetNumberField
-						label={`Damage`}
-						resolved={resolveNumberField(sheet, { id: "damage" })}
-						className="flex-1"
-					/>
-					<SheetNumberField
-						label={`Fatigue`}
-						resolved={resolveNumberField(sheet, { id: "fatigue" })}
-						className="flex-1"
-					/>
-					<SheetNumberField
-						label={`Anxiety`}
-						resolved={resolveNumberField(sheet, { id: "anxiety" })}
-						className="flex-1"
-					/>
-				</div>
+				<StressFields />
 
 				<div className="flex gap-2">
 					{Object.entries(ASPECTS).map(([name]) => {
@@ -106,8 +91,6 @@ function CharacterEditorInner() {
 						)
 					})}
 				</div>
-				{/* <Field label="Aspects">
-				</Field> */}
 
 				<LineageFieldGroup />
 			</div>
@@ -165,6 +148,55 @@ function CharacterEditorInner() {
 					)),
 				]}
 			/>
+		</div>
+	)
+}
+
+function StressFields() {
+	const sheet = useEditorCharacterSheet()
+
+	const fields = ["damage", "fatigue", "anxiety"].map((id) => {
+		const resolved = resolveNumberField(sheet, { id })
+		const perilAmount = Math.floor(resolved.value / 5)
+		return {
+			resolved,
+			label:
+				startCase(id) + (perilAmount === 0 ? "" : ` - ${perilAmount} peril`),
+			peril: perilAmount,
+		}
+	})
+
+	const unconsciousField = resolveBooleanField(sheet, { id: "isUnconscious" })
+
+	return (
+		<div className="grid gap-2">
+			<div className="flex gap-2">
+				{fields.map((field) => (
+					<SheetNumberField
+						key={field.resolved.id}
+						label={field.label}
+						resolved={field.resolved}
+						className="flex-1"
+					/>
+				))}
+			</div>
+
+			<Checkbox
+				label="Unconscious"
+				checked={unconsciousField.value}
+				onChange={() => {
+					unconsciousField.context.updateValue(
+						"isUnconscious",
+						!unconsciousField.value,
+					)
+				}}
+			/>
+
+			<p className="-my-1 text-sm text-gray-300">
+				You become unconscious at <strong>5 total</strong> peril, then you
+				regain consciousness once you're healed to <strong>3 or fewer</strong>{" "}
+				peril.
+			</p>
 		</div>
 	)
 }
