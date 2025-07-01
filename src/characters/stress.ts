@@ -1,34 +1,23 @@
-import { resolveMilestoneListFieldItems } from "./milestones.ts"
-import { resolveCharacterScores } from "./scores.ts"
+import { startCase, sum } from "es-toolkit"
+import { resolveNumberField } from "~/characters/sheet/fields.ts"
 import type { FieldContext } from "./sheet/fields.ts"
 
-export function getDamageLimit(sheet: FieldContext) {
-	const scores = resolveCharacterScores(sheet)
-
-	const baseLimit = scores.scoreOf("Strength") + scores.scoreOf("Dexterity")
-
-	const milestones = resolveMilestoneListFieldItems(sheet)
-	const bonusAmount =
-		milestones.filter(
-			(milestone) => milestone.bonusType.value === "damageLimitIncrease",
-		).length * 5
-
-	return baseLimit + bonusAmount
-}
-
-export function getFatigueLimit(sheet: FieldContext) {
-	const scores = resolveCharacterScores(sheet)
-
-	const baseLimit =
-		scores.scoreOf("Sense") +
-		scores.scoreOf("Intellect") +
-		scores.scoreOf("Presence")
-
-	const milestones = resolveMilestoneListFieldItems(sheet)
-	const bonusAmount =
-		milestones.filter(
-			(milestone) => milestone.bonusType.value === "fatigueLimitIncrease",
-		).length * 5
-
-	return baseLimit + bonusAmount
+export function resolveStress(sheet: FieldContext) {
+	const pools = [
+		{ id: "damage", skillCategory: "Physical" },
+		{ id: "fatigue", skillCategory: "Mental" },
+		{ id: "anxiety", skillCategory: "Social" },
+	].map((pool) => {
+		const field = resolveNumberField(sheet, { id: pool.id })
+		const perilAmount = Math.floor(field.value / 5)
+		return {
+			field: field,
+			label:
+				startCase(pool.id) +
+				(perilAmount === 0 ? "" : ` - ${perilAmount} peril`),
+			peril: perilAmount,
+			skillCategory: pool.skillCategory,
+		}
+	})
+	return { pools, perilSum: sum(pools.map((it) => it.peril)) }
 }

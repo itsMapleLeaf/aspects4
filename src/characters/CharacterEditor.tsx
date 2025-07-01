@@ -1,5 +1,4 @@
 import * as Ariakit from "@ariakit/react"
-import { startCase } from "es-toolkit"
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { NormalizedCharacter } from "../../convex/characters.ts"
@@ -39,6 +38,7 @@ import {
 	type FieldContext,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
+import { resolveStress } from "./stress.ts"
 
 export function CharacterEditor({
 	character,
@@ -69,7 +69,7 @@ function CharacterEditorInner() {
 					</div>
 				</div>
 
-				<StressFields />
+				<StressSection />
 
 				<div className="flex gap-2">
 					{Object.entries(ASPECTS).map(([name]) => {
@@ -153,30 +153,19 @@ function CharacterEditorInner() {
 	)
 }
 
-function StressFields() {
+function StressSection() {
 	const sheet = useEditorCharacterSheet()
-
-	const fields = ["damage", "fatigue", "anxiety"].map((id) => {
-		const resolved = resolveNumberField(sheet, { id })
-		const perilAmount = Math.floor(resolved.value / 5)
-		return {
-			resolved,
-			label:
-				startCase(id) + (perilAmount === 0 ? "" : ` - ${perilAmount} peril`),
-			peril: perilAmount,
-		}
-	})
-
+	const stress = resolveStress(sheet)
 	const unconsciousField = resolveBooleanField(sheet, { id: "isUnconscious" })
 
 	return (
 		<div className="grid gap-2">
 			<div className="flex items-end gap-2">
-				{fields.map((field) => (
+				{stress.pools.map((pool) => (
 					<SheetNumberField
-						key={field.resolved.id}
-						label={field.label}
-						resolved={field.resolved}
+						key={pool.field.id}
+						label={pool.label}
+						resolved={pool.field}
 						className="flex-1"
 					/>
 				))}
@@ -202,7 +191,6 @@ function StressFields() {
 		</div>
 	)
 }
-
 
 function ItemListField() {
 	const sheet = useEditorCharacterSheet()
