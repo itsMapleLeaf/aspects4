@@ -1,8 +1,8 @@
-import type { ComponentProps } from "react"
+import type { ComponentProps, ReactNode } from "react"
 import { useId } from "react"
 
 type CheckboxProps = {
-	label: string
+	label: ReactNode
 } & Omit<ComponentProps<"input">, "type">
 
 export function Checkbox({
