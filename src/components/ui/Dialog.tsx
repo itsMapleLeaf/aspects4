@@ -30,7 +30,7 @@ export function DialogPanel({
 				<div className="fixed inset-0 bg-black/50 opacity-0 backdrop-blur-sm transition data-enter:opacity-100" />
 			}
 			className={twMerge(
-				"fixed top-1/2 left-1/2 flex h-dvh max-h-[720px] w-dvw max-w-xl -translate-x-1/2 -translate-y-1/2 scale-95 flex-col gap-4 rounded-lg border border-gray-800 bg-gray-900 p-4 opacity-0 shadow-lg transition data-enter:scale-100 data-enter:opacity-100",
+				"fixed top-1/2 left-1/2 flex h-fit max-h-[720px] w-dvw max-w-xl -translate-x-1/2 -translate-y-1/2 scale-95 flex-col gap-4 rounded-lg border border-gray-800 bg-gray-900 p-4 opacity-0 shadow-lg transition data-enter:scale-100 data-enter:opacity-100",
 				className,
 			)}
 			preventBodyScroll={false} // this just doesn't work correctly lol
