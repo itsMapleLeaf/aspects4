@@ -97,7 +97,7 @@ export function rollAspectsDice(
 	const resolved = count === 0 ? Math.min(...values) : Math.max(...values)
 
 	const impact: AspectsDiceImpact =
-		values.filter((v) => v === 6).length >= 2 ? "critical"
+		values.filter((v) => v === 6).length >= 2 && count > 0 ? "critical"
 		: resolved === 6 ? "high"
 		: resolved >= 4 ? "medium"
 		: "low"
