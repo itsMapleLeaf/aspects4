@@ -20,7 +20,7 @@ export function SheetStatField({
 	label?: ReactNode
 	description?: ReactNode
 	tooltip?: ReactNode
-	score?: number
+	score?: number | null
 } & ComponentProps<"div">) {
 	const chatInputRef = use(ChatInputContext)
 	const fieldId = useId()
@@ -53,19 +53,21 @@ export function SheetStatField({
 						{description}
 					</div>
 				</Tooltip>
-				<Button
-					type="button"
-					appearance="ghost"
-					className="flex h-full w-14 rounded-none p-0"
-					align="center"
-					onClick={() => {
-						chatInputRef.current?.prefill(
-							`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
-						)
-					}}
-				>
-					<DiceScoreIcon score={score} />
-				</Button>
+				{scoreOverride === null ? null : (
+					<Button
+						type="button"
+						appearance="ghost"
+						className="flex h-full w-14 rounded-none p-0"
+						align="center"
+						onClick={() => {
+							chatInputRef.current?.prefill(
+								`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
+							)
+						}}
+					>
+						<DiceScoreIcon score={score} />
+					</Button>
+				)}
 			</div>
 
 			<div

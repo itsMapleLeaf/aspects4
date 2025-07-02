@@ -1,4 +1,5 @@
 import * as Ariakit from "@ariakit/react"
+import { sumBy } from "es-toolkit"
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { NormalizedCharacter } from "../../convex/characters.ts"
@@ -10,6 +11,7 @@ import { SummaryCard } from "../components/ui/SummaryCard.tsx"
 import { Tooltip } from "../components/ui/Tooltip.tsx"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { toTitleCase } from "../lib/utils.ts"
+import { resolveAspectFields } from "./aspects.ts"
 import {
 	EditorCharacterContext,
 	useEditorCharacter,
@@ -17,12 +19,9 @@ import {
 	useUpdateEditorCharacter,
 } from "./context.tsx"
 import { CoreSkillsList } from "./CoreSkillsList.tsx"
-import { ASPECT_AURAS, ASPECTS, EXPENSE_TIERS } from "./data.ts"
+import { ASPECT_AURAS, EXPENSE_TIERS } from "./data.ts"
 import { LineageFieldGroup } from "./LineageFieldGroup.tsx"
-import {
-	resolveMilestoneFields,
-	resolveMilestoneListFieldItems,
-} from "./milestones.ts"
+import { resolveMilestoneFields } from "./milestones.ts"
 import { RecoveryDialogButton } from "./RecoveryDialogButton.tsx"
 import {
 	SheetNumberField,
@@ -32,12 +31,12 @@ import {
 import {
 	resolveBooleanField,
 	resolveListField,
-	resolveNumberField,
 	resolveSelectField,
 	resolveTextField,
 	type FieldContext,
 } from "./sheet/fields.ts"
 import { SheetListField } from "./sheet/SheetListField.tsx"
+import { SheetStatField } from "./sheet/SheetStatField.tsx"
 import { resolveStress } from "./stress.ts"
 
 export function CharacterEditor({
@@ -55,8 +54,6 @@ export function CharacterEditor({
 function CharacterEditorInner() {
 	const sheet = useEditorCharacterSheet()
 
-	const milestones = resolveMilestoneListFieldItems(sheet)
-
 	return (
 		<div className="grid gap-6">
 			<div className="grid gap-4">
@@ -71,27 +68,7 @@ function CharacterEditorInner() {
 
 				<StressSection />
 
-				<div className="flex gap-2">
-					{Object.entries(ASPECTS).map(([name]) => {
-						const field = resolveNumberField(sheet, {
-							id: `aspect:${name}`,
-							min: 0,
-						})
-
-						const milestoneBonusCount = milestones.filter(
-							(it) => it.aspectBonus.value === name,
-						).length
-
-						return (
-							<SheetNumberField
-								className="flex-1"
-								key={name}
-								label={`${name} (${field.value + milestoneBonusCount})`}
-								resolved={field}
-							/>
-						)
-					})}
-				</div>
+				<AspectsSection />
 
 				<LineageFieldGroup />
 			</div>
@@ -149,6 +126,55 @@ function CharacterEditorInner() {
 					)),
 				]}
 			/>
+		</div>
+	)
+}
+
+function AspectsSection() {
+	const sheet = useEditorCharacterSheet()
+	const aspects = resolveAspectFields(sheet)
+
+	const usedPoints = sumBy(
+		Object.entries(aspects),
+		([_name, aspect]) => aspect.resolved.value,
+	)
+	const availablePoints = 8
+	const remainingPoints = availablePoints - usedPoints
+
+	return (
+		<div>
+			<div className="grid grid-cols-2 gap-2">
+				{Object.entries(aspects).map(([name, aspect]) => {
+					const className = {
+						Fire: twMerge(`border-red-800/50 bg-red-950/25 text-red-200`),
+						Water: twMerge(`border-blue-800/50 bg-blue-950/25 text-blue-200`),
+						Wind: twMerge(`border-green-800/50 bg-green-950/25 text-green-200`),
+						Light: twMerge(
+							`border-yellow-800/50 bg-yellow-950/25 text-yellow-200`,
+						),
+						Darkness: twMerge(
+							`border-purple-800/50 bg-purple-950/25 text-purple-200`,
+						),
+					}[name]
+
+					return (
+						<SheetStatField
+							className={twMerge("flex-1", className)}
+							key={name}
+							label={`${name} (${aspect.computedScore})`}
+							description={
+								aspect.milestoneBonus > 0 &&
+								`+${aspect.milestoneBonus} from milestones`
+							}
+							resolved={aspect.resolved}
+							score={null}
+						/>
+					)
+				})}
+			</div>
+			{remainingPoints > 0 && (
+				<p className="mt-1 muted-sm">{remainingPoints} point(s) remaining</p>
+			)}
 		</div>
 	)
 }

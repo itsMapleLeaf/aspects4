@@ -18,9 +18,11 @@ export function resolveAspectFields(sheet: FieldContext) {
 			id: `aspect:${name}`,
 			min: 0,
 		})
+		const milestoneBonus = aspectMilestoneBonuses[name] ?? 0
 		return {
-			resolved: resolved,
-			computedScore: resolved.value + (aspectMilestoneBonuses[name] ?? 0),
+			resolved,
+			milestoneBonus,
+			computedScore: resolved.value + milestoneBonus,
 		}
 	})
 }
