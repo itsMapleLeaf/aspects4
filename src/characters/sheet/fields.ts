@@ -57,7 +57,9 @@ export function resolveBooleanField(
 	return {
 		id: options.id,
 		value: currentValue == null ? options.defaultValue : !!currentValue,
-		context,
+		set: (value: boolean) => {
+			context.updateValue(options.id, value)
+		},
 	}
 }
 

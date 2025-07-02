@@ -188,10 +188,7 @@ function StressSection() {
 				}
 				checked={unconsciousField.value}
 				onChange={() => {
-					unconsciousField.context.updateValue(
-						"isUnconscious",
-						!unconsciousField.value,
-					)
+					unconsciousField.set(!unconsciousField.value)
 				}}
 			/>
 
@@ -321,10 +318,7 @@ function ExperienceListField() {
 							label="Activated"
 							checked={fields.activated.value}
 							onChange={(event) => {
-								fields.activated.context.updateValue(
-									fields.activated.id,
-									event.currentTarget.checked,
-								)
+								fields.activated.set(event.currentTarget.checked)
 							}}
 						/>
 					</SummaryCard>
@@ -359,10 +353,7 @@ function ExperienceListField() {
 										label="Activated"
 										checked={fields.activated.value}
 										onChange={(event) => {
-											fields.activated.context.updateValue(
-												fields.activated.id,
-												event.currentTarget.checked,
-											)
+											fields.activated.set(event.currentTarget.checked)
 										}}
 									/>
 								</div>
