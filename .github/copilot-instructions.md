@@ -92,8 +92,16 @@ return <AuthenticatedContent user={user} />
 - **Use useActionState for form handling** with proper error states
 - **Return meaningful error messages** from action functions
 - **Show pending states** using the `pending` prop on buttons
+- **Prefer useActionState over useState for error handling** - Return errors from action callbacks instead of separate error state
+- **Group simple state declarations together** - Keep 1-3 line useState declarations at the top, before complex useActionState calls
 
 ```tsx
+// ✅ Group simple state together
+const [name, setName] = useState("")
+const [email, setEmail] = useState("")
+const [imageToCrop, setImageToCrop] = useState<string | null>(null)
+
+// ✅ Use useActionState for error handling instead of separate useState
 const [error, formAction, isPending] = useActionState(async () => {
 	try {
 		// Form logic
@@ -101,6 +109,10 @@ const [error, formAction, isPending] = useActionState(async () => {
 		return err instanceof Error ? err.message : "An error occurred"
 	}
 }, null)
+
+// ❌ Avoid separate error state when useActionState can handle it
+const [error, setError] = useState<string | null>(null)
+const [isPending, startTransition] = useTransition()
 ```
 
 ### Backend Patterns

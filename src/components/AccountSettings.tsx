@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { AppHeader } from "./AppHeader.tsx"
 import { Button } from "./ui/Button.tsx"
+import { CropperDialog } from "./ui/CropperDialog.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
 import { Input } from "./ui/Input.tsx"
@@ -40,6 +41,7 @@ function AccountSettingsForm({
 
 	const [name, setName] = useState(user.name ?? "")
 	const [email, setEmail] = useState(user.email ?? "")
+	const [imageToCrop, setImageToCrop] = useState<string | null>(null)
 
 	const [updateError, saveAction, isSaving] = useActionState(async () => {
 		try {
@@ -67,23 +69,33 @@ function AccountSettingsForm({
 		}
 	}, null)
 
-	const [avatarError, handleAvatarChange, isUploadingAvatar] = useActionState(
-		async (
-			_state: string | void,
-			event: React.ChangeEvent<HTMLInputElement>,
-		) => {
-			const file = event.target.files?.[0]
-			if (!file) return
+	const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		if (!file) return
 
+		// Create object URL for cropping
+		const imageUrl = URL.createObjectURL(file)
+		setImageToCrop(imageUrl)
+	}
+
+	const [avatarError, handleCropComplete, isUploadingAvatar] = useActionState(
+		async (_state: string | void, croppedImageBlob: Blob) => {
 			try {
-				const storageId = await uploadFile(file)
+				const storageId = await uploadFile(croppedImageBlob)
 				await updateAvatar({ storageId })
-				// The user data will be updated via the query reactivity
+				setImageToCrop(null)
 			} catch (error) {
 				return error instanceof Error ? error.message : String(error)
 			}
 		},
 	)
+
+	const handleCropCancel = () => {
+		if (imageToCrop) {
+			URL.revokeObjectURL(imageToCrop)
+		}
+		setImageToCrop(null)
+	}
 
 	return (
 		<div className="flex min-h-screen w-full flex-col">
@@ -201,6 +213,15 @@ function AccountSettingsForm({
 					</div>
 				</Ariakit.HeadingLevel>
 			</main>
+
+			{imageToCrop && (
+				<CropperDialog
+					imageSrc={imageToCrop}
+					onCropComplete={(blob) => handleCropComplete(blob)}
+					onCancel={handleCropCancel}
+					aspectRatio={1}
+				/>
+			)}
 		</div>
 	)
 }
