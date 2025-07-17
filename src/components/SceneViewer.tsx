@@ -223,7 +223,7 @@ function AssetImage({
 	return (
 		<div
 			className={twMerge(
-				"absolute top-0 left-0 origin-top-left transition-[translate_rotate] ease-out",
+				"absolute top-0 left-0 origin-top-left touch-none transition-[translate_rotate] ease-out",
 				isIdle ? "duration-300" : "duration-50",
 				asset.locked ? "" : "cursor-move",
 			)}
