@@ -223,7 +223,7 @@ function AssetImage({
 	return (
 		<div
 			className={twMerge(
-				"absolute top-0 left-0 origin-top-left touch-none transition-[translate_rotate] ease-out",
+				"absolute top-0 left-0 origin-top-left touch-none transition-[translate_rotate] ease-out [:root:has(&)]:overscroll-none",
 				isIdle ? "duration-300" : "duration-50",
 				asset.locked ? "" : "cursor-move",
 			)}
@@ -234,9 +234,10 @@ function AssetImage({
 				height: `${asset.size.y + resizeOffset.y}px`,
 			}}
 			onPointerDown={(event) => {
+				event.preventDefault()
+
 				if (event.button !== 0) return
 
-				event.preventDefault()
 				onPrimaryPointerDown()
 
 				if (asset.locked) return
