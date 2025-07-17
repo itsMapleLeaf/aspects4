@@ -16,7 +16,7 @@ import { Chat } from "./Chat.tsx"
 import { ChatInputContext, ChatInputHandle } from "./ChatInputContext.tsx"
 import { DocumentTitle } from "./DocumentTitle.tsx"
 import { EditableText } from "./EditableText.tsx"
-import { SceneViewer } from "./SceneViewer.tsx"
+import { SceneViewer, SceneViewerHelpButton } from "./SceneViewer.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
@@ -104,13 +104,20 @@ export function Room({ slug }: { slug: string }) {
 							<UserButton />
 						</div>
 					</header>
-					<main className="pointer-events-children flex min-h-0 flex-1 gap-2">
-						<SidebarPanels tabs={sidebarTabs} />
+					<main className="pointer-events-children flex min-h-0 flex-1 items-end gap-2">
+						<div className="[&,&>*]:h-full">
+							<SidebarPanels tabs={sidebarTabs} />
+						</div>
+
+						<div className="ml-auto">
+							<SceneViewerHelpButton />
+						</div>
+
 						<Chat
 							room={room}
 							playerName={user.name || "Anonymous"}
 							chatInputRef={chatInputRef}
-							className="ml-auto w-72"
+							className="w-72"
 						/>
 					</main>
 				</div>

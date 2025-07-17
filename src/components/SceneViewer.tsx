@@ -1,8 +1,10 @@
+import { Heading, HeadingLevel } from "@ariakit/react"
 import { ArkErrors, type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { isEqual } from "es-toolkit"
 import { useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
+import { Dialog, DialogButton, DialogPanel } from "~/components/ui/Dialog.tsx"
 import { useValueRef } from "~/hooks/common.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
@@ -401,5 +403,51 @@ function useRemoveRoomAsset(roomId: Id<"rooms">) {
 				items?.filter((item) => item._id !== args.roomAssetId),
 			)
 		},
+	)
+}
+
+export function SceneViewerHelpButton() {
+	return (
+		<Dialog>
+			<DialogButton
+				render={
+					<button className="opacity-50 transition-opacity hover:opacity-100" />
+				}
+				aria-label="Help"
+			>
+				<div className="group relative">
+					<div className="rounded-full border border-gray-700 bg-gray-800 p-3 shadow-lg">
+						<Icon
+							icon="mingcute:question-fill"
+							className="size-5 text-gray-300"
+						/>
+					</div>
+					<div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
+						Help
+					</div>
+				</div>
+			</DialogButton>
+			<DialogPanel title="Scene Controls">
+				<HeadingLevel>
+					<div>
+						<Heading className="mb-2 heading-xl">Navigation</Heading>
+						<ul className="list-disc space-y-1 pl-6">
+							<li>Right-click and drag to pan the scene</li>
+							<li>Scroll wheel to zoom in/out</li>
+							<li>Ctrl+0 to reset view to center</li>
+						</ul>
+						<Heading className="mt-4 mb-2 heading-xl">Assets</Heading>
+						<ul className="list-disc space-y-1 pl-6">
+							<li>Drag assets from the Assets panel to place them</li>
+							<li>Click an asset to select it</li>
+							<li>Drag selected assets to move them</li>
+							<li>Drag the resize handle to change size</li>
+							<li>Press Delete to remove selected asset</li>
+							<li>Press L to lock/unlock selected asset</li>
+						</ul>
+					</div>
+				</HeadingLevel>
+			</DialogPanel>
+		</Dialog>
 	)
 }
