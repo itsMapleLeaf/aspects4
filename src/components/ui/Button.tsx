@@ -43,6 +43,25 @@ export interface ButtonProps extends Ariakit.ButtonProps {
 	align?: "start" | "center" | "end"
 }
 
+/**
+ * Button component with customizable appearance, size, and icon support.
+ *
+ * ```tsx
+ * // Basic button
+ * const basic = <Button icon="mingcute:save-fill">Save</Button>
+ *
+ * // As a span (useful for file upload labels)
+ * const span = (
+ * 	<label>
+ * 		<Button render={<span />} icon="mingcute:upload-fill">
+ * 			Upload
+ * 		</Button>
+ * 		<input type="file" hidden />
+ * 	</label>
+ * )
+ * ```
+ */
+
 export function Button({
 	appearance = "default",
 	size = "default",
