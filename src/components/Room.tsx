@@ -151,7 +151,7 @@ export function Room({ slug }: { slug: string }) {
 							<SceneViewerHelpButton />
 						</div>
 
-						<div className="h-full *:size-full max-[480px]:flex-1">
+						<div className="pointer-events-children h-full *:size-full max-[480px]:flex-1">
 							<SidebarPanels tabs={sidebarTabs} />
 						</div>
 
