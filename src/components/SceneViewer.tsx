@@ -20,11 +20,13 @@ import { Icon } from "./ui/Icon.tsx"
 
 export function SceneViewer({
 	room,
+	backgroundBrightness,
 }: {
 	room: {
 		_id: Id<"rooms">
 		backgroundUrl: string | null | undefined
 	}
+	backgroundBrightness: number
 }) {
 	const assets = useQuery(api.roomAssets.list, { roomId: room._id })
 	const createRoomAsset = useMutation(api.roomAssets.place)
@@ -155,8 +157,11 @@ export function SceneViewer({
 		>
 			{room.backgroundUrl && (
 				<div
-					className="pointer-events-none fixed inset-0 bg-cover bg-center brightness-25"
-					style={{ backgroundImage: `url(${room.backgroundUrl})` }}
+					className="pointer-events-none fixed inset-0 bg-cover bg-center"
+					style={{
+						backgroundImage: `url(${room.backgroundUrl})`,
+						filter: `brightness(${backgroundBrightness / 100})`,
+					}}
 				/>
 			)}
 			<div

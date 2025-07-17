@@ -28,6 +28,12 @@ export function Room({ slug }: { slug: string }) {
 	const updateRoom = useMutation(api.rooms.update)
 	const chatInputRef = useRef<ChatInputHandle | null>(null)
 
+	const [backgroundBrightness, setBackgroundBrightness] =
+		useLocalStorageState<number>("backgroundBrightness", 25, (input) => {
+			const value = Number(input)
+			return isNaN(value) ? 25 : Math.max(0, Math.min(100, value))
+		})
+
 	if (room === undefined || user === undefined) {
 		return (
 			<div className="flex h-screen items-center justify-center">
@@ -78,6 +84,8 @@ export function Room({ slug }: { slug: string }) {
 				<RoomSettings
 					onUpdateRoom={(name) => updateRoom({ roomId: room._id, name })}
 					room={room}
+					backgroundBrightness={backgroundBrightness}
+					onBackgroundBrightnessChange={setBackgroundBrightness}
 				/>
 			),
 		},
@@ -85,7 +93,7 @@ export function Room({ slug }: { slug: string }) {
 
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
-			<SceneViewer room={room} />
+			<SceneViewer room={room} backgroundBrightness={backgroundBrightness} />
 
 			<SidebarProvider>
 				<div className="pointer-events-children fixed inset-0 flex flex-col gap-2 p-2">
@@ -195,9 +203,16 @@ function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
 interface RoomSettingsProps {
 	room: Doc<"rooms">
 	onUpdateRoom: (name: string) => void
+	backgroundBrightness: number
+	onBackgroundBrightnessChange: (value: number) => void
 }
 
-function RoomSettings({ room, onUpdateRoom }: RoomSettingsProps) {
+function RoomSettings({
+	room,
+	onUpdateRoom,
+	backgroundBrightness,
+	onBackgroundBrightnessChange,
+}: RoomSettingsProps) {
 	const leaveRoom = useMutation(api.rooms.leave)
 	const [, navigate] = useLocation()
 
@@ -232,6 +247,25 @@ function RoomSettings({ room, onUpdateRoom }: RoomSettingsProps) {
 
 				<Field label="Background">
 					<BackgroundUploader roomId={room._id} />
+				</Field>
+
+				<Field label="Background Brightness" htmlFor="backgroundBrightness">
+					<div className="flex items-center gap-3">
+						<input
+							id="backgroundBrightness"
+							type="range"
+							min="0"
+							max="100"
+							value={backgroundBrightness}
+							onChange={(e) =>
+								onBackgroundBrightnessChange(Number(e.target.value))
+							}
+							className="flex-1 accent-primary-500"
+						/>
+						<span className="w-10 text-right text-sm text-gray-400">
+							{backgroundBrightness}%
+						</span>
+					</div>
 				</Field>
 
 				<form action={leaveAction} className="contents">
