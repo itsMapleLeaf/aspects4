@@ -22,6 +22,7 @@ import type * as messages from "../messages.js";
 import type * as roomAssets from "../roomAssets.js";
 import type * as rooms from "../rooms.js";
 import type * as storage from "../storage.js";
+import type * as users from "../users.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   roomAssets: typeof roomAssets;
   rooms: typeof rooms;
   storage: typeof storage;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

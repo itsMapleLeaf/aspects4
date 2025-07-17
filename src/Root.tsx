@@ -6,6 +6,7 @@ import {
 	Unauthenticated,
 } from "convex/react"
 import { Route, Switch } from "wouter"
+import { AccountSettings } from "./components/AccountSettings.tsx"
 import { AuthScreen } from "./components/AuthScreen.tsx"
 import { DocumentTitle } from "./components/DocumentTitle.tsx"
 import { Room } from "./components/Room.tsx"
@@ -30,6 +31,9 @@ export function Root() {
 							</Route>
 							<Route path="/rooms/:slug">
 								{(params) => <Room slug={params.slug} />}
+							</Route>
+							<Route path="/account/settings">
+								<AccountSettings />
 							</Route>
 						</Switch>
 					</Authenticated>

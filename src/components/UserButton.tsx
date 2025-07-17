@@ -1,5 +1,6 @@
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useQuery } from "convex/react"
+import { Link } from "wouter"
 import { api } from "../../convex/_generated/api"
 import { Icon } from "./ui/Icon.tsx"
 import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
@@ -22,6 +23,12 @@ export function UserButton() {
 				:	<Icon icon="mingcute:user-4-line" className="-mx-1 size-6" />}
 			</MenuButton>
 			<MenuPanel>
+				<MenuItem>
+					<Link to="/account/settings" className="flex items-center gap-2">
+						<Icon icon="mingcute:settings-2-fill" />
+						Account Settings
+					</Link>
+				</MenuItem>
 				<MenuItem onClick={signOut}>
 					<Icon icon="mingcute:open-door-fill" />
 					Sign out
