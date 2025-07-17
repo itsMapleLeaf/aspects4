@@ -1,5 +1,5 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
-import { ArkErrors, type } from "arktype"
+import { type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { isEqual } from "es-toolkit"
 import { useEffect, useState } from "react"
@@ -10,10 +10,8 @@ import { useValueRef } from "~/hooks/common.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
-import { useLocalStorageState } from "../hooks/storage.ts"
 import { handleDrag } from "../lib/drag.ts"
 import {
-	defaultViewportTransform,
 	getViewportScale,
 	handleViewportZoom,
 	ViewportTransform,
@@ -24,32 +22,24 @@ import { Icon } from "./ui/Icon.tsx"
 export function SceneViewer({
 	room,
 	backgroundBrightness,
+	viewportTransform,
+	updateViewportTransform: setViewportTransform,
 }: {
 	room: {
 		_id: Id<"rooms">
 		backgroundUrl: string | null | undefined
 	}
 	backgroundBrightness: number
+	viewportTransform: ViewportTransform
+	updateViewportTransform: (
+		next: (prev: ViewportTransform) => ViewportTransform,
+	) => void
 }) {
 	const assets = useQuery(api.roomAssets.list, { roomId: room._id })
 	const createRoomAsset = useMutation(api.roomAssets.place)
 	const removeRoomAsset = useRemoveRoomAsset(room._id)
 	const updateRoomAsset = useUpdateRoomAsset(room._id)
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"roomAssets">>()
-
-	const [viewportTransform, setViewportTransform] =
-		useLocalStorageState<ViewportTransform>(
-			"viewportTransform",
-			defaultViewportTransform,
-			(input) => {
-				const result = ViewportTransform(input)
-				if (result instanceof ArkErrors) {
-					console.warn(result)
-					return defaultViewportTransform
-				}
-				return result
-			},
-		)
 
 	const handlePointerDown = (event: React.PointerEvent) => {
 		if (event.button === 0 && event.target === event.currentTarget) {
@@ -113,7 +103,7 @@ export function SceneViewer({
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === "0" && event.ctrlKey) {
-				setViewportTransform({ offset: { x: 0, y: 0 }, zoom: 0 })
+				setViewportTransform(() => ({ offset: { x: 0, y: 0 }, zoom: 0 }))
 			}
 
 			if (

@@ -10,10 +10,11 @@ import {
 	useState,
 } from "react"
 import { createPortal } from "react-dom"
-import { useFileUpload } from "~/hooks/useFileUpload.ts"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedAsset } from "../../convex/assets.ts"
+import { useFileUpload } from "../hooks/useFileUpload.ts"
+import { getViewportCenter, ViewportTransform } from "../lib/viewport.ts"
 import { Icon } from "./ui/Icon.tsx"
 import { LoadingSpinner } from "./ui/LoadingSpinner.tsx"
 import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
@@ -25,14 +26,16 @@ export const AssetDropData = type("string.json.parse").to({
 
 export function AssetsPanel({
 	roomId,
+	viewportTransform,
 	onAssetAdded,
 }: {
 	roomId: Id<"rooms">
+	viewportTransform: ViewportTransform
 	onAssetAdded?: () => void
 }) {
 	const createAsset = useMutation(api.assets.create)
+	const createRoomAsset = useMutation(api.roomAssets.place)
 	const fileInputRef = useRef<HTMLInputElement>(null)
-
 	const uploadFile = useFileUpload()
 
 	const [, importFiles, isFileImportPending] = useActionState(
@@ -140,7 +143,25 @@ export function AssetsPanel({
 						}}
 					/>
 				</header>
-				<AssetList roomId={roomId} onAssetAdded={onAssetAdded} />
+				<AssetList
+					roomId={roomId}
+					onAssetAdded={async (assetId) => {
+						const viewportSize = {
+							width: window.innerWidth,
+							height: window.innerHeight,
+						}
+						const centerPosition = getViewportCenter(
+							viewportTransform,
+							viewportSize,
+						)
+						await createRoomAsset({
+							assetId,
+							roomId,
+							position: centerPosition,
+						})
+						onAssetAdded?.()
+					}}
+				/>
 			</HeadingLevel>
 
 			{createPortal(
@@ -161,7 +182,7 @@ function AssetList({
 	onAssetAdded,
 }: {
 	roomId: Id<"rooms">
-	onAssetAdded?: () => void
+	onAssetAdded?: (assetId: Id<"assets">) => void
 }) {
 	const originalAssets = useQuery(api.assets.list, {})
 	const assets = useDeferredValue(originalAssets)
@@ -186,7 +207,7 @@ function AssetList({
 						<AssetCard
 							asset={asset}
 							roomId={roomId}
-							onAssetAdded={onAssetAdded}
+							onAddToScene={() => onAssetAdded?.(asset._id)}
 						/>
 					</li>
 				))}
@@ -197,15 +218,14 @@ function AssetList({
 function AssetCard({
 	asset,
 	roomId,
-	onAssetAdded,
+	onAddToScene,
 }: {
 	asset: NormalizedAsset
 	roomId: Id<"rooms">
-	onAssetAdded?: () => void
+	onAddToScene?: () => void
 }) {
 	const removeAsset = useMutation(api.assets.remove)
 	const updateAsset = useMutation(api.assets.update)
-	const createRoomAsset = useMutation(api.roomAssets.place)
 	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 
@@ -241,15 +261,7 @@ function AssetCard({
 				</p>
 			</MenuButton>
 			<MenuPanel gutter={0} getAnchorRect={() => menuPosition}>
-				<MenuItem
-					onClick={async () => {
-						await createRoomAsset({
-							assetId: asset._id,
-							roomId,
-						})
-						onAssetAdded?.()
-					}}
-				>
+				<MenuItem onClick={onAddToScene}>
 					<Icon icon="mingcute:classify-add-2-fill" className="size-5" />
 					<span>Add to scene</span>
 				</MenuItem>

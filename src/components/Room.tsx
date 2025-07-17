@@ -1,4 +1,5 @@
 import * as Ariakit from "@ariakit/react"
+import { ArkErrors } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useActionState, useRef } from "react"
@@ -10,6 +11,7 @@ import type { ClientRoom } from "../../convex/rooms.ts"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { useMediaQuery } from "../hooks/useMediaQuery.ts"
+import { defaultViewportTransform, ViewportTransform } from "../lib/viewport.ts"
 import { panel } from "../styles/panel.ts"
 import { AppLogoLink } from "./AppLogoLink.tsx"
 import { AssetsPanel } from "./AssetsPanel.tsx"
@@ -36,14 +38,29 @@ export function Room({ slug }: { slug: string }) {
 			return isNaN(value) ? 50 : Math.max(0, Math.min(100, value))
 		})
 
+	// const isSmallViewport = useMediaQuery("(width < 480px)")
+	const isMediumViewport = useMediaQuery("(width < 960px)")
 	const isLargeViewport = useMediaQuery("(width > 1280px)")
-	const isSmallViewport = useMediaQuery("(width < 480px)")
 
 	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
 		string | undefined | null
 	>("Sidebar:selectedTabId", null, (input) =>
 		input == null ? null : String(input),
 	)
+
+	const [viewportTransform, setViewportTransform] =
+		useLocalStorageState<ViewportTransform>(
+			"viewportTransform",
+			defaultViewportTransform,
+			(input) => {
+				const result = ViewportTransform(input)
+				if (result instanceof ArkErrors) {
+					console.warn(result)
+					return defaultViewportTransform
+				}
+				return result
+			},
+		)
 
 	if (room === undefined || user === undefined) {
 		return (
@@ -89,8 +106,9 @@ export function Room({ slug }: { slug: string }) {
 			content: (
 				<AssetsPanel
 					roomId={room._id}
+					viewportTransform={viewportTransform}
 					onAssetAdded={() => {
-						if (isSmallViewport) {
+						if (isMediumViewport) {
 							setSelectedTabId(null)
 						}
 					}}
@@ -131,7 +149,12 @@ export function Room({ slug }: { slug: string }) {
 
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
-			<SceneViewer room={room} backgroundBrightness={backgroundBrightness} />
+			<SceneViewer
+				room={room}
+				backgroundBrightness={backgroundBrightness}
+				viewportTransform={viewportTransform}
+				updateViewportTransform={setViewportTransform}
+			/>
 
 			<Ariakit.TabProvider
 				selectedId={selectedTabId}

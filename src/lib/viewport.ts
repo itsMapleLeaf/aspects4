@@ -33,3 +33,13 @@ export function handleViewportZoom(
 
 	return { zoom: newZoom, offset: { x: newOffsetX, y: newOffsetY } }
 }
+
+export function getViewportCenter(
+	transform: ViewportTransform,
+	viewportSize: { width: number; height: number },
+): { x: number; y: number } {
+	const scale = getViewportScale(transform.zoom)
+	const centerX = (viewportSize.width / 2 - transform.offset.x) / scale
+	const centerY = (viewportSize.height / 2 - transform.offset.y) / scale
+	return { x: centerX, y: centerY }
+}

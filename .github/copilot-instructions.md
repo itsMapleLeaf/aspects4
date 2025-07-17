@@ -74,6 +74,48 @@ return <AuthenticatedContent user={user} />
 
 ### Component Architecture
 
+#### Prop Management
+
+- **Lift state strategically** to minimize prop drilling while keeping components focused
+- **Use callback patterns** to handle complex operations at the appropriate level
+- **Pass simple callbacks down** rather than complex state objects when possible
+
+```tsx
+// ✅ Good - lift logic to appropriate level to avoid deep prop drilling
+function ParentComponent() {
+	const mutation = useMutation(api.action)
+	const [state, setState] = useState()
+
+	return (
+		<ChildComponent
+			onAction={async (id) => {
+				const result = await mutation({ id, ...state })
+				handleResult(result)
+			}}
+		/>
+	)
+}
+
+// ❌ Avoid - excessive prop drilling
+function ChildComponent({ mutation, state, handleResult }) {
+	// Props drilled through multiple levels unnecessarily
+}
+```
+
+#### Media Queries
+
+- **Use modern media query syntax** with logical operators
+- **Prefer semantic breakpoint names** that describe the viewport size
+
+```tsx
+// ✅ Modern syntax - uses logical operators
+const isLargeViewport = useMediaQuery("(width > 1280px)")
+const isMediumViewport = useMediaQuery("(width < 960px)")
+
+// ❌ Avoid - older syntax
+const isLargeViewport = useMediaQuery("(min-width: 1280px)")
+```
+
 #### File Upload Buttons
 
 - **Use render prop for file uploads in labels**:
