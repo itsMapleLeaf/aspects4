@@ -225,6 +225,53 @@ export const updateProfile = mutation({
 - **Follow ESLint configuration**
 - **Use Prettier for formatting**
 - **Write self-documenting code** with clear variable names
+- **Use descriptive event parameter names**: Always use `event` instead of `e` for event handlers
+- **Avoid redundant comments**: Don't add comments that simply restate what the code does
+- **Prefer AbortController for DOM event listeners**: Use `signal` option to inline event handlers and simplify cleanup
+
+```tsx
+// ✅ Good - descriptive parameter name
+const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	setValue(event.target.value)
+}
+
+// ❌ Avoid - single letter parameter
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	setValue(e.target.value)
+}
+
+// ✅ Good - AbortController with inline event handler
+useEffect(() => {
+	const abortController = new AbortController()
+
+	mediaQuery.addEventListener(
+		"change",
+		(event) => {
+			setMatches(event.matches)
+		},
+		{ signal: abortController.signal },
+	)
+
+	return () => abortController.abort()
+}, [])
+
+// ❌ Avoid - separate function and manual removeEventListener
+useEffect(() => {
+	const handleChange = (event: MediaQueryListEvent) => {
+		setMatches(event.matches)
+	}
+
+	mediaQuery.addEventListener("change", handleChange)
+	return () => mediaQuery.removeEventListener("change", handleChange)
+}, [])
+
+// ✅ Good - clear code without redundant comments
+mediaQuery.addEventListener("change", handleChange)
+
+// ❌ Avoid - redundant comments
+// Add listener
+mediaQuery.addEventListener("change", handleChange)
+```
 
 ## Common Patterns
 

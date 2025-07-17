@@ -8,6 +8,7 @@ import { Id, type Doc } from "../../convex/_generated/dataModel"
 import type { ClientRoom } from "../../convex/rooms.ts"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
+import { useMediaQuery } from "../hooks/useMediaQuery.ts"
 import { panel } from "../styles/panel.ts"
 import { AppLogoLink } from "./AppLogoLink.tsx"
 import { AssetsPanel } from "./AssetsPanel.tsx"
@@ -33,6 +34,9 @@ export function Room({ slug }: { slug: string }) {
 			const value = Number(input)
 			return isNaN(value) ? 25 : Math.max(0, Math.min(100, value))
 		})
+
+	// Track viewport size to determine if we should show chat as tab or panel
+	const isLargeViewport = useMediaQuery("(min-width: 1280px)")
 
 	if (room === undefined || user === undefined) {
 		return (
@@ -62,7 +66,7 @@ export function Room({ slug }: { slug: string }) {
 		return <RoomInvitation room={room} />
 	}
 
-	const sidebarTabs = [
+	const baseSidebarTabs = [
 		{
 			name: "Characters",
 			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
@@ -91,6 +95,25 @@ export function Room({ slug }: { slug: string }) {
 		},
 	]
 
+	const sidebarTabs =
+		isLargeViewport ? baseSidebarTabs : (
+			[
+				...baseSidebarTabs,
+				{
+					name: "Chat",
+					icon: <Icon icon="mingcute:message-2-fill" className="size-5" />,
+					content: (
+						<Chat
+							room={room}
+							playerName={user.name || "Anonymous"}
+							chatInputRef={chatInputRef}
+							className="h-full"
+						/>
+					),
+				},
+			]
+		)
+
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
 			<SceneViewer room={room} backgroundBrightness={backgroundBrightness} />
@@ -109,16 +132,18 @@ export function Room({ slug }: { slug: string }) {
 							<SidebarPanels tabs={sidebarTabs} />
 						</div>
 
-						<div className="ml-auto">
+						<div className={isLargeViewport ? "ml-auto xl:mr-2" : "ml-auto"}>
 							<SceneViewerHelpButton />
 						</div>
 
-						<Chat
-							room={room}
-							playerName={user.name || "Anonymous"}
-							chatInputRef={chatInputRef}
-							className="w-72"
-						/>
+						{isLargeViewport && (
+							<Chat
+								room={room}
+								playerName={user.name || "Anonymous"}
+								chatInputRef={chatInputRef}
+								className="w-72"
+							/>
+						)}
 					</main>
 				</div>
 			</SidebarProvider>
