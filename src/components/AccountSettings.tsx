@@ -1,6 +1,6 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
-import { useActionState, useState } from "react"
+import { startTransition, useActionState, useRef, useState } from "react"
 import { Link } from "wouter"
 import { api } from "../../convex/_generated/api"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
@@ -42,6 +42,7 @@ function AccountSettingsForm({
 	const [name, setName] = useState(user.name ?? "")
 	const [email, setEmail] = useState(user.email ?? "")
 	const [imageToCrop, setImageToCrop] = useState<string | null>(null)
+	const avatarInputRef = useRef<HTMLInputElement>(null)
 
 	const [updateError, saveAction, isSaving] = useActionState(async () => {
 		try {
@@ -113,25 +114,31 @@ function AccountSettingsForm({
 
 					<div className="panel rounded-lg p-6">
 						<div className="mb-6">
-							<h2 className="mb-4 text-xl font-light text-white">
-								Profile Picture
-							</h2>
+							<Ariakit.Heading className="mb-2 text-xl font-light text-white">
+								Avatar
+							</Ariakit.Heading>
 							<div className="flex items-center gap-4">
-								{user.image ?
-									<img
-										src={user.image}
-										alt="Profile"
-										className="size-16 rounded-full object-cover"
-									/>
-								:	<div className="flex size-16 items-center justify-center rounded-full bg-gray-700">
-										<Icon
-											icon="mingcute:user-4-line"
-											className="size-8 text-gray-400"
+								<button
+									type="button"
+									onClick={() => avatarInputRef.current?.click()}
+									className="overflow-clip rounded-full border border-transparent bg-gray-950 p-px transition hover:border-primary-400 hover:brightness-75"
+								>
+									{user.image ?
+										<img
+											src={user.image}
+											alt="Profile"
+											className="size-16 rounded-full object-cover"
 										/>
-									</div>
-								}
-								<div className="flex flex-col gap-2">
-									<label className="cursor-pointer">
+									:	<div className="flex size-16 items-center justify-center rounded-full bg-gray-700">
+											<Icon
+												icon="mingcute:user-4-line"
+												className="size-8 text-gray-400"
+											/>
+										</div>
+									}
+								</button>
+								<div className="flex flex-col gap-1">
+									<label>
 										<Button
 											render={<span />}
 											icon={
@@ -152,6 +159,7 @@ function AccountSettingsForm({
 											className="hidden"
 											onChange={handleAvatarChange}
 											disabled={isUploadingAvatar}
+											ref={avatarInputRef}
 										/>
 									</label>
 									{user.image && (
@@ -217,7 +225,11 @@ function AccountSettingsForm({
 			{imageToCrop && (
 				<CropperDialog
 					imageSrc={imageToCrop}
-					onCropComplete={(blob) => handleCropComplete(blob)}
+					onCropComplete={(blob) => {
+						startTransition(() => {
+							handleCropComplete(blob)
+						})
+					}}
 					onCancel={handleCropCancel}
 					aspectRatio={1}
 				/>

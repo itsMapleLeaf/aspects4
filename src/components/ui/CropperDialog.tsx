@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react"
 import Cropper, { Area } from "react-easy-crop"
 import { Button } from "./Button.tsx"
+import { Dialog, DialogPanel } from "./Dialog.tsx"
 import { Icon } from "./Icon.tsx"
 
 /**
@@ -70,22 +71,18 @@ export function CropperDialog({
 	}, [croppedAreaPixels, imageSrc, onCropComplete])
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-			<div className="flex h-full w-full max-w-2xl flex-col bg-gray-900 p-6">
-				<div className="mb-4 flex items-center justify-between">
-					<h2 className="text-xl font-light text-white">Crop Avatar</h2>
-					<Button
-						appearance="ghost"
-						icon={<Icon icon="mingcute:close-fill" />}
-						onClick={onCancel}
-					/>
-				</div>
-
-				<div className="relative flex-1 bg-black">
+		<Dialog open>
+			<DialogPanel
+				title="Crop Avatar"
+				className="h-fit max-h-[80vh] w-dvw max-w-2xl"
+				onClose={onCancel}
+			>
+				<div className="relative h-96 bg-black">
 					<Cropper
 						image={imageSrc}
 						crop={crop}
 						zoom={zoom}
+						maxZoom={5}
 						aspect={aspectRatio}
 						onCropChange={setCrop}
 						onCropComplete={onCropCompleteCallback}
@@ -95,25 +92,19 @@ export function CropperDialog({
 					/>
 				</div>
 
-				<div className="mt-4 flex items-center gap-4">
+				<div className="flex items-center justify-between gap-4">
 					<label className="flex items-center gap-2 text-white">
 						<span className="text-sm">Zoom:</span>
 						<input
 							type="range"
 							value={zoom}
 							min={1}
-							max={3}
+							max={5}
 							step={0.1}
 							onChange={(e) => setZoom(Number(e.target.value))}
-							className="flex-1"
+							className="flex-1 accent-primary-500"
 						/>
 					</label>
-				</div>
-
-				<div className="mt-6 flex justify-end gap-2">
-					<Button appearance="ghost" onClick={onCancel}>
-						Cancel
-					</Button>
 					<Button
 						icon={<Icon icon="mingcute:check-fill" />}
 						onClick={handleSave}
@@ -122,8 +113,8 @@ export function CropperDialog({
 						Save
 					</Button>
 				</div>
-			</div>
-		</div>
+			</DialogPanel>
+		</Dialog>
 	)
 }
 

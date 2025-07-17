@@ -177,6 +177,12 @@ export const updateProfile = mutation({
 </Button>
 ```
 
+### Native Form Controls
+
+- **Use `accent-primary-500` class** for native controls to match design system
+- **Apply to all interactive controls**: `<input type="range">`, `<input type="checkbox">`, `<input type="radio">`
+- **Maintains consistency** with the primary color theme across all form elements
+
 ## File Organization
 
 ### Structure
