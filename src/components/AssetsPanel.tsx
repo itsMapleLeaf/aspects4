@@ -23,7 +23,13 @@ export const AssetDropData = type("string.json.parse").to({
 	assetId: "string",
 })
 
-export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
+export function AssetsPanel({
+	roomId,
+	onAssetAdded,
+}: {
+	roomId: Id<"rooms">
+	onAssetAdded?: () => void
+}) {
 	const createAsset = useMutation(api.assets.create)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -134,7 +140,7 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 						}}
 					/>
 				</header>
-				<AssetList roomId={roomId} />
+				<AssetList roomId={roomId} onAssetAdded={onAssetAdded} />
 			</HeadingLevel>
 
 			{createPortal(
@@ -150,7 +156,13 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	)
 }
 
-function AssetList({ roomId }: { roomId: Id<"rooms"> }) {
+function AssetList({
+	roomId,
+	onAssetAdded,
+}: {
+	roomId: Id<"rooms">
+	onAssetAdded?: () => void
+}) {
 	const originalAssets = useQuery(api.assets.list, {})
 	const assets = useDeferredValue(originalAssets)
 	const isPending = assets !== originalAssets
@@ -171,7 +183,11 @@ function AssetList({ roomId }: { roomId: Id<"rooms"> }) {
 				?.filter((asset) => !roomAssetsByAssetId.has(asset._id))
 				?.map((asset) => (
 					<li key={asset._id}>
-						<AssetCard asset={asset} roomId={roomId} />
+						<AssetCard
+							asset={asset}
+							roomId={roomId}
+							onAssetAdded={onAssetAdded}
+						/>
 					</li>
 				))}
 		</ul>
@@ -181,9 +197,11 @@ function AssetList({ roomId }: { roomId: Id<"rooms"> }) {
 function AssetCard({
 	asset,
 	roomId,
+	onAssetAdded,
 }: {
 	asset: NormalizedAsset
 	roomId: Id<"rooms">
+	onAssetAdded?: () => void
 }) {
 	const removeAsset = useMutation(api.assets.remove)
 	const updateAsset = useMutation(api.assets.update)
@@ -224,12 +242,13 @@ function AssetCard({
 			</MenuButton>
 			<MenuPanel gutter={0} getAnchorRect={() => menuPosition}>
 				<MenuItem
-					onClick={() =>
-						createRoomAsset({
+					onClick={async () => {
+						await createRoomAsset({
 							assetId: asset._id,
 							roomId,
 						})
-					}
+						onAssetAdded?.()
+					}}
 				>
 					<Icon icon="mingcute:classify-add-2-fill" className="size-5" />
 					<span>Add to scene</span>

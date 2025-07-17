@@ -31,13 +31,19 @@ export function Room({ slug }: { slug: string }) {
 	const chatInputRef = useRef<ChatInputHandle | null>(null)
 
 	const [backgroundBrightness, setBackgroundBrightness] =
-		useLocalStorageState<number>("backgroundBrightness", 25, (input) => {
+		useLocalStorageState<number>("backgroundBrightness", 50, (input) => {
 			const value = Number(input)
-			return isNaN(value) ? 25 : Math.max(0, Math.min(100, value))
+			return isNaN(value) ? 50 : Math.max(0, Math.min(100, value))
 		})
 
-	// Track viewport size to determine if we should show chat as tab or panel
-	const isLargeViewport = useMediaQuery("(min-width: 1280px)")
+	const isLargeViewport = useMediaQuery("(width > 1280px)")
+	const isSmallViewport = useMediaQuery("(width < 480px)")
+
+	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
+		string | undefined | null
+	>("Sidebar:selectedTabId", null, (input) =>
+		input == null ? null : String(input),
+	)
 
 	if (room === undefined || user === undefined) {
 		return (
@@ -80,7 +86,16 @@ export function Room({ slug }: { slug: string }) {
 		{
 			name: "Assets",
 			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
-			content: <AssetsPanel roomId={room._id} />,
+			content: (
+				<AssetsPanel
+					roomId={room._id}
+					onAssetAdded={() => {
+						if (isSmallViewport) {
+							setSelectedTabId(null)
+						}
+					}}
+				/>
+			),
 		},
 		{
 			name: "Settings",
@@ -118,7 +133,10 @@ export function Room({ slug }: { slug: string }) {
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
 			<SceneViewer room={room} backgroundBrightness={backgroundBrightness} />
 
-			<SidebarProvider>
+			<Ariakit.TabProvider
+				selectedId={selectedTabId}
+				setSelectedId={setSelectedTabId}
+			>
 				<div className="pointer-events-children fixed inset-0 flex flex-col gap-2 p-2">
 					<header className="pointer-events-children flex items-center gap-4">
 						<SidebarTabs tabs={sidebarTabs} />
@@ -147,7 +165,7 @@ export function Room({ slug }: { slug: string }) {
 						)}
 					</main>
 				</div>
-			</SidebarProvider>
+			</Ariakit.TabProvider>
 		</DocumentTitle>
 	)
 }
@@ -156,23 +174,6 @@ interface TabConfig {
 	name: string
 	icon: ReactNode
 	content: ReactNode
-}
-
-function SidebarProvider({ children }: { children: ReactNode }) {
-	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
-		string | undefined | null
-	>("Sidebar:selectedTabId", null, (input) =>
-		input == null ? null : String(input),
-	)
-
-	return (
-		<Ariakit.TabProvider
-			selectedId={selectedTabId}
-			setSelectedId={setSelectedTabId}
-		>
-			{children}
-		</Ariakit.TabProvider>
-	)
 }
 
 function SidebarTabs({ tabs }: { tabs: TabConfig[] }) {
