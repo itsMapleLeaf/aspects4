@@ -57,6 +57,14 @@ export function AuthScreen() {
 							{isSignUp ? "Create an account" : "Sign in to continue"}
 						</Heading>
 
+						<DiscordSignInButton />
+
+						<div className="my-6 flex items-center gap-4">
+							<div className="h-px flex-1 bg-gray-700"></div>
+							<span className="text-xs text-gray-500">OR</span>
+							<div className="h-px flex-1 bg-gray-700"></div>
+						</div>
+
 						<form action={formAction} className="flex flex-col gap-4">
 							<Input
 								type="email"
@@ -120,22 +128,6 @@ export function AuthScreen() {
 								</button>
 							</p>
 						</div>
-
-						<div className="mt-6 flex items-center gap-4">
-							<div className="h-px flex-1 bg-gray-700"></div>
-							<span className="text-xs text-gray-500">OR</span>
-							<div className="h-px flex-1 bg-gray-700"></div>
-						</div>
-
-						<DiscordSignInButton />
-
-						<div className="mt-4 flex items-center gap-4">
-							<div className="h-px flex-1 bg-gray-700"></div>
-							<span className="text-xs text-gray-500">OR</span>
-							<div className="h-px flex-1 bg-gray-700"></div>
-						</div>
-
-						<AnonymousSignInButton />
 					</div>
 				</div>
 			</HeadingLevel>
@@ -166,45 +158,6 @@ function DiscordSignInButton() {
 				pending={isPending}
 			>
 				Sign in with Discord
-			</Button>
-		</form>
-	)
-}
-
-function AnonymousSignInButton() {
-	const { signIn } = useAuthActions()
-	const [name, setName] = useState("")
-
-	const [error, anonymousAction, isPending] = useActionState(async () => {
-		if (!name) {
-			return "Please enter a display name."
-		}
-		try {
-			await signIn("anonymous", { name })
-		} catch (err) {
-			return err instanceof Error ?
-					err.message
-				:	"An error occurred during anonymous authentication"
-		}
-	}, null)
-
-	return (
-		<form action={anonymousAction} className="mt-4">
-			<Input
-				type="text"
-				label="Display name"
-				required
-				value={name}
-				onChange={(event) => setName(event.target.value)}
-			/>
-			{error && <p className="mt-2 text-sm text-red-400">{error}</p>}
-			<Button
-				type="submit"
-				icon={<Icon icon="mingcute:ghost-fill" />}
-				className="mt-4 w-full"
-				pending={isPending}
-			>
-				Sign in anonymously
 			</Button>
 		</form>
 	)

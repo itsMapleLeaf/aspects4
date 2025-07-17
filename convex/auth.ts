@@ -1,8 +1,6 @@
 import Discord from "@auth/core/providers/discord"
-import { Anonymous } from "@convex-dev/auth/providers/Anonymous"
 import { Password } from "@convex-dev/auth/providers/Password"
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server"
-import { DataModel } from "./_generated/dataModel"
 import { query } from "./_generated/server"
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
@@ -33,17 +31,6 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 				}
 
 				throw new Error(`Unknown auth flow "${params.flow}"`)
-			},
-		}),
-		Anonymous<DataModel>({
-			profile(params) {
-				if (typeof params.name !== "string") {
-					throw new Error("Name is required")
-				}
-				return {
-					name: params.name,
-					isAnonymous: true,
-				}
 			},
 		}),
 	],

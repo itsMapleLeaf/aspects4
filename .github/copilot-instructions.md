@@ -229,7 +229,7 @@ export const updateProfile = mutation({
 import Discord from "@auth/core/providers/discord"
 
 export default convexAuth({
-	providers: [Discord, Password, Anonymous],
+	providers: [Discord, Password],
 })
 ```
 
