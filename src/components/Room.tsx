@@ -141,6 +141,7 @@ export function Room({ slug }: { slug: string }) {
 							room={room}
 							playerName={user.name || "Anonymous"}
 							chatInputRef={chatInputRef}
+							className="max-w-[320px]"
 						/>
 					),
 				},
@@ -174,8 +175,11 @@ export function Room({ slug }: { slug: string }) {
 							<SceneViewerHelpButton />
 						</div>
 
-						<div className="pointer-events-children h-full *:size-full max-[480px]:flex-1">
-							<SidebarPanels tabs={sidebarTabs} />
+						<div className="pointer-events-children h-full flex-1">
+							<SidebarPanels
+								tabs={sidebarTabs}
+								className="pointer-events-children size-full"
+							/>
 						</div>
 
 						{isLargeViewport && (
@@ -284,7 +288,7 @@ function RoomSettings({
 	}, null)
 	return (
 		<Ariakit.HeadingLevel>
-			<section className={panel("flex flex-col gap-4 p-4")}>
+			<section className={panel("flex max-w-[360px] flex-col gap-4 p-4")}>
 				<Ariakit.Heading className="text-xl font-light">
 					Settings
 				</Ariakit.Heading>
