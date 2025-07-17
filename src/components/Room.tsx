@@ -1,7 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
-import { useActionState, useRef, useState } from "react"
+import { useActionState, useRef } from "react"
 import { useLocation } from "wouter"
 import { api } from "../../convex/_generated/api"
 import { Id, type Doc } from "../../convex/_generated/dataModel"
@@ -18,28 +18,17 @@ import { DocumentTitle } from "./DocumentTitle.tsx"
 import { EditableText } from "./EditableText.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
 import { Button } from "./ui/Button.tsx"
-import { Dialog, DialogPanel } from "./ui/Dialog.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
-import { Input } from "./ui/Input.tsx"
 import { UserButton } from "./UserButton.tsx"
 
 export function Room({ slug }: { slug: string }) {
 	const room = useQuery(api.rooms.getBySlug, { slug })
+	const user = useQuery(api.auth.me)
 	const updateRoom = useMutation(api.rooms.update)
 	const chatInputRef = useRef<ChatInputHandle | null>(null)
 
-	const [playerName, setPlayerName] = useLocalStorageState<string | null>(
-		"Room:playerName",
-		null,
-		(input) => (input == null ? null : String(input)),
-	)
-
-	if (playerName === null) {
-		return <PlayerNameDialog onSubmit={setPlayerName} />
-	}
-
-	if (room === undefined) {
+	if (room === undefined || user === undefined) {
 		return (
 			<div className="flex h-screen items-center justify-center">
 				Loading room...
@@ -51,6 +40,14 @@ export function Room({ slug }: { slug: string }) {
 		return (
 			<div className="flex h-screen items-center justify-center">
 				Room not found
+			</div>
+		)
+	}
+
+	if (user === null) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Please sign in to access this room
 			</div>
 		)
 	}
@@ -79,9 +76,7 @@ export function Room({ slug }: { slug: string }) {
 			icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
 			content: (
 				<RoomSettings
-					playerName={playerName}
 					onUpdateRoom={(name) => updateRoom({ roomId: room._id, name })}
-					onUpdatePlayerName={setPlayerName}
 					room={room}
 				/>
 			),
@@ -105,7 +100,7 @@ export function Room({ slug }: { slug: string }) {
 						<SidebarPanels tabs={sidebarTabs} />
 						<Chat
 							room={room}
-							playerName={playerName}
+							playerName={user.name || "Anonymous"}
 							chatInputRef={chatInputRef}
 							className="ml-auto w-72"
 						/>
@@ -200,16 +195,9 @@ function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
 interface RoomSettingsProps {
 	room: Doc<"rooms">
 	onUpdateRoom: (name: string) => void
-	playerName: string
-	onUpdatePlayerName: (name: string) => void
 }
 
-function RoomSettings({
-	room,
-	onUpdateRoom,
-	playerName,
-	onUpdatePlayerName,
-}: RoomSettingsProps) {
+function RoomSettings({ room, onUpdateRoom }: RoomSettingsProps) {
 	const leaveRoom = useMutation(api.rooms.leave)
 	const [, navigate] = useLocation()
 
@@ -244,19 +232,6 @@ function RoomSettings({
 
 				<Field label="Background">
 					<BackgroundUploader roomId={room._id} />
-				</Field>
-
-				<Field label="Your Name" htmlFor="localName">
-					<EditableText
-						id="localName"
-						value={playerName}
-						onChange={(value) => {
-							if (value.trim() && value !== playerName) {
-								onUpdatePlayerName(value.trim())
-							}
-						}}
-						placeholder="Enter your name"
-					/>
 				</Field>
 
 				<form action={leaveAction} className="contents">
@@ -370,42 +345,5 @@ function BackgroundUploader({ roomId }: { roomId: Id<"rooms"> }) {
 			)}
 			<p className="text-red-300 empty:hidden">{uploadError}</p>
 		</>
-	)
-}
-
-function PlayerNameDialog({ onSubmit }: { onSubmit: (name: string) => void }) {
-	const [nameInput, setNameInput] = useState("")
-
-	return (
-		<Dialog open>
-			<DialogPanel title="Enter Your Name">
-				<form
-					className="flex flex-col gap-4"
-					action={() => {
-						const name = nameInput.trim()
-						if (name) {
-							onSubmit(name)
-						}
-					}}
-				>
-					<Input
-						label="Your name"
-						placeholder="Enter your player name"
-						required
-						value={nameInput}
-						onChange={(e) => setNameInput(e.target.value)}
-						autoFocus
-					/>
-					<Button
-						type="submit"
-						appearance="default"
-						size="default"
-						className="w-full"
-					>
-						Enter Room
-					</Button>
-				</form>
-			</DialogPanel>
-		</Dialog>
 	)
 }
