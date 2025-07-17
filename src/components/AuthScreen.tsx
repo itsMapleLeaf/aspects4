@@ -127,11 +127,47 @@ export function AuthScreen() {
 							<div className="h-px flex-1 bg-gray-700"></div>
 						</div>
 
+						<DiscordSignInButton />
+
+						<div className="mt-4 flex items-center gap-4">
+							<div className="h-px flex-1 bg-gray-700"></div>
+							<span className="text-xs text-gray-500">OR</span>
+							<div className="h-px flex-1 bg-gray-700"></div>
+						</div>
+
 						<AnonymousSignInButton />
 					</div>
 				</div>
 			</HeadingLevel>
 		</div>
+	)
+}
+
+function DiscordSignInButton() {
+	const { signIn } = useAuthActions()
+
+	const [error, discordAction, isPending] = useActionState(async () => {
+		try {
+			await signIn("discord")
+		} catch (err) {
+			return err instanceof Error ?
+					err.message
+				:	"An error occurred during Discord authentication"
+		}
+	}, null)
+
+	return (
+		<form action={discordAction} className="mt-4">
+			{error && <p className="mb-2 text-sm text-red-400">{error}</p>}
+			<Button
+				type="submit"
+				icon={<Icon icon="ic:baseline-discord" />}
+				className="w-full bg-[#5865F2] text-white hover:bg-[#4752C4]"
+				pending={isPending}
+			>
+				Sign in with Discord
+			</Button>
+		</form>
 	)
 }
 
