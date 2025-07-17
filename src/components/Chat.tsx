@@ -202,7 +202,7 @@ export function Chat({
 		<section
 			aria-label="Chat"
 			className={twMerge(
-				"flex h-full flex-col gap-2 overflow-y-auto [scrollbar-gutter:stable]",
+				"flex h-full flex-col gap-2 overflow-y-auto",
 				className,
 			)}
 			ref={bottomScrollRef}
