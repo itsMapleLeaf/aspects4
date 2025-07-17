@@ -224,14 +224,10 @@ export const updateProfile = mutation({
 
 ### OAuth Integration
 
-```tsx
-// In convex/auth.ts
-import Discord from "@auth/core/providers/discord"
-
-export default convexAuth({
-	providers: [Discord, Password],
-})
-```
+- **Configure OAuth providers** in convex/auth.ts with custom profile mapping
+- **Preserve existing user data** when linking OAuth accounts - only fill in missing fields
+- **Use createOrUpdateUser callback** to handle account linking logic
+- **Check existing users by email** before creating new accounts
 
 ### File Upload with Storage
 

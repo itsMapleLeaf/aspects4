@@ -5,7 +5,19 @@ import { query } from "./_generated/server"
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 	providers: [
-		Discord,
+		Discord({
+			profile(profile, _tokens) {
+				return {
+					id: profile.id,
+					name: profile.global_name ?? profile.username,
+					email: profile.email,
+					image:
+						profile.avatar ?
+							`https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
+						:	null,
+				}
+			},
+		}),
 		Password({
 			profile(params) {
 				if (typeof params.email !== "string") {
@@ -34,6 +46,49 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 			},
 		}),
 	],
+	callbacks: {
+		async createOrUpdateUser(ctx, args) {
+			// Check if user already exists by email
+			const existingUser = await ctx.db
+				.query("users")
+				.filter((q) => q.eq(q.field("email"), args.profile.email))
+				.first()
+
+			if (existingUser) {
+				// User exists, only update if name/image are not set or if this is a Discord sign-in
+				const updates: Partial<{ name: string; image: string }> = {}
+
+				// Only update name and image from Discord if they're not already set
+				if (args.provider.id === "discord") {
+					if (
+						!existingUser.name &&
+						args.profile.name &&
+						typeof args.profile.name === "string"
+					) {
+						updates.name = args.profile.name
+					}
+					if (
+						!existingUser.image &&
+						args.profile.image &&
+						typeof args.profile.image === "string"
+					) {
+						updates.image = args.profile.image
+					}
+				}
+
+				if (Object.keys(updates).length > 0) {
+					await ctx.db.patch(existingUser._id, updates)
+				}
+
+				return existingUser._id
+			}
+
+			// Create new user with all profile data
+			return await ctx.db.insert("users", {
+				...args.profile,
+			})
+		},
+	},
 })
 
 export const me = query({
