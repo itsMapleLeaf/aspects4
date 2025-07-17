@@ -5,6 +5,7 @@ import { isEqual } from "es-toolkit"
 import { useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { Dialog, DialogButton, DialogPanel } from "~/components/ui/Dialog.tsx"
+import { Tooltip } from "~/components/ui/Tooltip.tsx"
 import { useValueRef } from "~/hooks/common.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
@@ -409,24 +410,21 @@ function useRemoveRoomAsset(roomId: Id<"rooms">) {
 export function SceneViewerHelpButton() {
 	return (
 		<Dialog>
-			<DialogButton
-				render={
-					<button className="opacity-50 transition-opacity hover:opacity-100" />
-				}
-				aria-label="Help"
-			>
-				<div className="group relative">
+			<Tooltip content="Help" placement="top">
+				<DialogButton
+					render={
+						<button className="opacity-50 transition-opacity hover:opacity-100" />
+					}
+					aria-label="Help"
+				>
 					<div className="rounded-full border border-gray-700 bg-gray-800 p-3 shadow-lg">
 						<Icon
 							icon="mingcute:question-fill"
 							className="size-5 text-gray-300"
 						/>
 					</div>
-					<div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
-						Help
-					</div>
-				</div>
-			</DialogButton>
+				</DialogButton>
+			</Tooltip>
 			<DialogPanel title="Scene Controls">
 				<HeadingLevel>
 					<div>
