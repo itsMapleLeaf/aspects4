@@ -153,6 +153,12 @@ export function SceneViewer({
 			onDrop={handleDrop}
 			onDragOver={handleDragOver}
 		>
+			{room.backgroundUrl && (
+				<div
+					className="pointer-events-none fixed inset-0 bg-cover bg-center brightness-25"
+					style={{ backgroundImage: `url(${room.backgroundUrl})` }}
+				/>
+			)}
 			<div
 				className="pointer-events-children absolute top-0 left-0 origin-top-left transition-[scale,translate] duration-100 ease-out"
 				style={{
@@ -160,14 +166,6 @@ export function SceneViewer({
 					scale: getViewportScale(viewportTransform.zoom),
 				}}
 			>
-				{room.backgroundUrl && (
-					<img
-						src={room.backgroundUrl}
-						alt=""
-						className="pointer-events-none w-[2048px] brightness-50"
-						draggable={false}
-					/>
-				)}
 				{assets
 					?.sort((a, b) => a.updateTime - b.updateTime)
 					.map((asset) => (
