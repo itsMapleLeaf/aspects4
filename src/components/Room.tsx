@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "convex/react"
 import type { ReactNode } from "react"
 import { useActionState, useRef } from "react"
 import { useLocation } from "wouter"
+import { SceneViewerHelpButton } from "~/components/SceneViewer"
 import { api } from "../../convex/_generated/api"
 import { Id, type Doc } from "../../convex/_generated/dataModel"
 import type { ClientRoom } from "../../convex/rooms.ts"
@@ -17,7 +18,7 @@ import { Chat } from "./Chat.tsx"
 import { ChatInputContext, ChatInputHandle } from "./ChatInputContext.tsx"
 import { DocumentTitle } from "./DocumentTitle.tsx"
 import { EditableText } from "./EditableText.tsx"
-import { SceneViewer, SceneViewerHelpButton } from "./SceneViewer.tsx"
+import { SceneViewer } from "./SceneViewer.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Field } from "./ui/Field.tsx"
 import { Icon } from "./ui/Icon.tsx"
@@ -107,7 +108,6 @@ export function Room({ slug }: { slug: string }) {
 							room={room}
 							playerName={user.name || "Anonymous"}
 							chatInputRef={chatInputRef}
-							className="h-full"
 						/>
 					),
 				},
@@ -127,13 +127,14 @@ export function Room({ slug }: { slug: string }) {
 							<UserButton />
 						</div>
 					</header>
+
 					<main className="pointer-events-children flex min-h-0 flex-1 items-end gap-2">
-						<div className="[&,&>*]:h-full">
-							<SidebarPanels tabs={sidebarTabs} />
+						<div className="pointer-events-children absolute right-0 bottom-0 px-2 min-[1280px]:right-72 min-[1280px]:mr-2">
+							<SceneViewerHelpButton />
 						</div>
 
-						<div className={isLargeViewport ? "ml-auto xl:mr-2" : "ml-auto"}>
-							<SceneViewerHelpButton />
+						<div className="h-full *:size-full max-[480px]:flex-1">
+							<SidebarPanels tabs={sidebarTabs} />
 						</div>
 
 						{isLargeViewport && (
@@ -141,7 +142,7 @@ export function Room({ slug }: { slug: string }) {
 								room={room}
 								playerName={user.name || "Anonymous"}
 								chatInputRef={chatInputRef}
-								className="w-72"
+								className="ml-auto w-72"
 							/>
 						)}
 					</main>
@@ -259,7 +260,7 @@ function RoomSettings({
 	}, null)
 	return (
 		<Ariakit.HeadingLevel>
-			<section className={panel("flex w-64 flex-col gap-4 p-4")}>
+			<section className={panel("flex flex-col gap-4 p-4")}>
 				<Ariakit.Heading className="text-xl font-light">
 					Settings
 				</Ariakit.Heading>

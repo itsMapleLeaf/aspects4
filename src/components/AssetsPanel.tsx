@@ -105,7 +105,7 @@ export function AssetsPanel({ roomId }: { roomId: Id<"rooms"> }) {
 	})
 
 	return (
-		<section className="isolate flex h-full w-64 flex-col gap-4 overflow-y-auto panel p-4 will-change-scroll [scrollbar-gutter:stable]">
+		<section className="isolate flex h-full flex-col gap-4 overflow-y-auto panel p-4 will-change-scroll [scrollbar-gutter:stable]">
 			<HeadingLevel>
 				<header className="sticky -top-4 z-10 -m-4 flex h-16 items-center justify-between bg-gray-900 px-4">
 					<Heading className="heading-xl">Assets</Heading>
