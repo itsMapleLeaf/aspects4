@@ -9,10 +9,10 @@ import { Route, Switch } from "wouter"
 import { AccountSettings } from "./components/AccountSettings.tsx"
 import { AuthScreen } from "./components/AuthScreen.tsx"
 import { DocumentTitle } from "./components/DocumentTitle.tsx"
-import { Room } from "./components/Room.tsx"
-import { RoomsList } from "./components/RoomsList.tsx"
 import { LoadingScreen } from "./components/ui/LoadingScreen.tsx"
 import { DragProvider } from "./contexts/DragContext.tsx"
+import { Room } from "./rooms/Room.tsx"
+import { RoomList } from "./rooms/RoomList.tsx"
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
 
@@ -27,7 +27,7 @@ export function Root() {
 					<Authenticated>
 						<Switch>
 							<Route path="/">
-								<RoomsList />
+								<RoomList />
 							</Route>
 							<Route path="/rooms/:slug">
 								{(params) => <Room slug={params.slug} />}
