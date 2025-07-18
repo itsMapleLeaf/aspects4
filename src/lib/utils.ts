@@ -84,3 +84,7 @@ export function typed<T>(value: T): T {
 export function raise(error: string | object): never {
 	throw typeof error === "string" ? new Error(error) : error
 }
+
+export function recordValues<const V>(object: Record<PropertyKey, V>) {
+	return Object.values(object) as V[]
+}
