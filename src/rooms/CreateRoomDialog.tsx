@@ -3,10 +3,10 @@ import { useMutation, useQuery } from "convex/react"
 import { useActionState, useState } from "react"
 import { useLocation } from "wouter"
 import { api } from "../../convex/_generated/api"
-import { Button } from "./ui/Button.tsx"
-import { Dialog, DialogButton, DialogPanel } from "./ui/Dialog.tsx"
-import { Icon } from "./ui/Icon.tsx"
-import { Input } from "./ui/Input.tsx"
+import { Button } from "../components/ui/Button.tsx"
+import { Dialog, DialogButton, DialogPanel } from "../components/ui/Dialog.tsx"
+import { Icon } from "../components/ui/Icon.tsx"
+import { Input } from "../components/ui/Input.tsx"
 
 export function CreateRoomDialog() {
 	const dialog = Ariakit.useDialogStore()
