@@ -10,4 +10,6 @@ declare module "react" {
 		dispatch: (input: Input) => void,
 		isPending: boolean,
 	]
+
+	export function createContext<T>(): Context<T | undefined>
 }
