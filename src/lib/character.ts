@@ -37,8 +37,8 @@ export function getAspects() {
 }
 
 export type Character = NormalizedCharacter
-export type CharacterItem = Character["items"][number]
-export type CharacterBond = Character["bonds"][number]
+export type CharacterItem = NonNullable<Character["items"]>[number]
+export type CharacterBond = NonNullable<Character["bonds"]>[number]
 
 const skillAttributes = new Map(
 	skillList.map((skill) => [skill.skill, skill.attribute]),
