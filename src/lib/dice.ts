@@ -46,7 +46,12 @@ export function rollDice(args: string[]): DiceRollResult {
 	}
 
 	const numericRollResult = rollNumericDice(diceCount, sides)
-	const rollMessage = `Rolled ${diceCount}d${sides}: ${numericRollResult.values.join(", ")} = ${numericRollResult.sum}`
+
+	let rollMessage = `Rolled ${diceCount}d${sides}: ${numericRollResult.values.join(", ")}`
+	if (numericRollResult.values.length > 1) {
+		rollMessage += ` = ${numericRollResult.sum}`
+	}
+
 	return { success: true, message: rollMessage }
 }
 
