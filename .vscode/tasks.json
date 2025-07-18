@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"label": "dev",
-			"dependsOn": ["dev:app", "dev:convex"],
+			"dependsOn": ["dev:app", "dev:convex", "dev:typecheck"],
 			"dependsOrder": "parallel",
 			"group": {
 				"kind": "build",
@@ -25,6 +25,13 @@
 			"args": ["run", "dev:convex"],
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "dev:typecheck",
+			"type": "shell",
+			"command": "bun tsc -b --watch --noEmit",
+			"problemMatcher": ["$tsc-watch"],
+			"isBackground": true
 		}
 	]
 }
