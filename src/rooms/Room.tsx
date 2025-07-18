@@ -26,7 +26,12 @@ import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { useMediaQuery } from "../hooks/useMediaQuery.ts"
 import { defaultViewportTransform, ViewportTransform } from "../lib/viewport.ts"
 import { panel } from "../styles/panel.ts"
-import { RoomProvider, useRoomContext } from "./context.tsx"
+import {
+	resolveRoomTabName,
+	RoomProvider,
+	RoomTabNames,
+	useRoomContext,
+} from "./context.tsx"
 
 export function Room({ slug }: { slug: string }) {
 	const room = useQuery(api.rooms.getBySlug, { slug })
@@ -104,13 +109,13 @@ function RoomInternal({
 
 	const sidebarTabs = [
 		{
-			name: "Characters",
+			name: RoomTabNames.Characters,
 			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
 			content: <CharacterManager roomId={room._id} />,
 		},
 
 		{
-			name: "Assets",
+			name: RoomTabNames.Assets,
 			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
 			content: (
 				<AssetsPanel
@@ -130,7 +135,7 @@ function RoomInternal({
 			[]
 		:	[
 				{
-					name: "Chat",
+					name: RoomTabNames.Chat,
 					icon: <Icon icon="mingcute:message-2-fill" className="size-5" />,
 					content: (
 						<Chat
@@ -143,7 +148,7 @@ function RoomInternal({
 			]),
 
 		{
-			name: "Settings",
+			name: RoomTabNames.Settings,
 			icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
 			content: (
 				<RoomSettings
@@ -167,7 +172,9 @@ function RoomInternal({
 
 			<Ariakit.TabProvider
 				selectedId={roomContext.selectedTabId}
-				setSelectedId={roomContext.setSelectedTabId}
+				setSelectedId={(id) =>
+					roomContext.setSelectedTabId(id ? resolveRoomTabName(id) : null)
+				}
 			>
 				<div className="pointer-events-children fixed inset-0 flex flex-col gap-2 p-2">
 					<header className="pointer-events-children flex items-center gap-4">
