@@ -7,6 +7,7 @@ import { Icon } from "../../components/ui/Icon.tsx"
 import { Tooltip } from "../../components/ui/Tooltip.tsx"
 import { useEditableNumber } from "../../components/useEditableNumber.ts"
 import { toTitleCase } from "../../lib/utils.ts"
+import { RoomTabNames, useRoomContext } from "../../rooms/context.tsx"
 
 export function SheetStatField({
 	resolved: field,
@@ -22,7 +23,8 @@ export function SheetStatField({
 	tooltip?: ReactNode
 	score?: number | null
 } & ComponentProps<"div">) {
-	const chat = useChatContext()
+	const chatContext = useChatContext()
+	const roomContext = useRoomContext()
 
 	const fieldId = useId()
 
@@ -61,9 +63,10 @@ export function SheetStatField({
 						className="flex h-full w-14 rounded-none p-0"
 						align="center"
 						onClick={() => {
-							chat.setInput(
+							chatContext.setInput(
 								`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
 							)
+							roomContext.setSelectedTabId(RoomTabNames.Chat)
 						}}
 					>
 						<DiceScoreIcon score={score} />
