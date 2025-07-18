@@ -1,5 +1,5 @@
 import { useQuery } from "convex/react"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { rollDice } from "~/lib/dice.ts"
 import { panel } from "~/styles/panel.ts"
@@ -121,8 +121,6 @@ export function Chat({
 	commandMap.set("r", commands.roll)
 	commandMap.set("rp", commands.rollpriv)
 
-	const textareaRef = useRef<HTMLTextAreaElement>(null)
-
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<{ value: string }>,
 	) => {
@@ -222,7 +220,6 @@ export function Chat({
 				)}
 			>
 				<textarea
-					ref={textareaRef}
 					placeholder="Say something!"
 					className="block field-sizing-content w-full resize-none px-3 py-2 focus:outline-none"
 					value={chat.input}
