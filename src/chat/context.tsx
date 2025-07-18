@@ -1,17 +1,12 @@
 import { useMutation } from "convex/react"
-import {
-	createContext,
-	use,
-	useState,
-	type Context as ChatContext,
-} from "react"
+import { createContext, use, useState } from "react"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import { raise } from "../lib/utils.ts"
 
-export type ChatController = ReturnType<typeof useChatController>
+export type ChatState = ReturnType<typeof useChatState>
 
-function useChatController(roomId: Id<"rooms">) {
+function useChatState(roomId: Id<"rooms">) {
 	const [input, setInput] = useState("")
 	const createMessage = useMutation(api.messages.create)
 
@@ -24,7 +19,7 @@ function useChatController(roomId: Id<"rooms">) {
 	}
 }
 
-const ChatContext = createContext<ChatController>()
+const ChatContext = createContext<ChatState>()
 
 export function ChatProvider({
 	roomId,
@@ -33,8 +28,8 @@ export function ChatProvider({
 	roomId: Id<"rooms">
 	children: React.ReactNode
 }) {
-	const controller = useChatController(roomId)
-	return <ChatContext value={controller}>{children}</ChatContext>
+	const state = useChatState(roomId)
+	return <ChatContext value={state}>{children}</ChatContext>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
