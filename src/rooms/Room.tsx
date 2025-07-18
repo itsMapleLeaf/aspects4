@@ -81,15 +81,8 @@ function RoomInternal({
 			return isNaN(value) ? 50 : Math.max(0, Math.min(100, value))
 		})
 
-	// const isSmallViewport = useMediaQuery("(width < 480px)")
-	const isMediumViewport = useMediaQuery("(width < 960px)")
-	const isLargeViewport = useMediaQuery("(width > 1280px)")
-
-	const [selectedTabId, setSelectedTabId] = useLocalStorageState<
-		string | undefined | null
-	>("Sidebar:selectedTabId", null, (input) =>
-		input == null ? null : String(input),
-	)
+	const fullWidthAssetPanel = useMediaQuery("(width < 540px)")
+	const standaloneChat = useMediaQuery("(width > 1280px)")
 
 	const [viewportTransform, setViewportTransform] =
 		useLocalStorageState<ViewportTransform>(
@@ -120,15 +113,16 @@ function RoomInternal({
 					roomId={room._id}
 					viewportTransform={viewportTransform}
 					onAssetAdded={() => {
-						if (isMediumViewport) {
-							setSelectedTabId(null)
+						if (fullWidthAssetPanel) {
+							roomContext.setSelectedTabId(null)
 						}
 					}}
+					className={fullWidthAssetPanel ? "" : "max-w-[20rem]"}
 				/>
 			),
 		},
 
-		...(isLargeViewport ?
+		...(standaloneChat ?
 			[]
 		:	[
 				{
@@ -138,7 +132,7 @@ function RoomInternal({
 						<Chat
 							room={room}
 							playerName={user.name || "Anonymous"}
-							className="max-w-[320px]"
+							className="min-[36rem]:max-w-[20rem]"
 						/>
 					),
 				},
@@ -192,7 +186,7 @@ function RoomInternal({
 							/>
 						</div>
 
-						{isLargeViewport && (
+						{standaloneChat && (
 							<Chat
 								room={room}
 								playerName={user.name || "Anonymous"}

@@ -10,6 +10,7 @@ import {
 	useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { twMerge } from "tailwind-merge"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedAsset } from "../../convex/assets.ts"
@@ -28,10 +29,12 @@ export function AssetsPanel({
 	roomId,
 	viewportTransform,
 	onAssetAdded,
+	className,
 }: {
 	roomId: Id<"rooms">
 	viewportTransform: ViewportTransform
 	onAssetAdded?: () => void
+	className?: string
 }) {
 	const createAsset = useMutation(api.assets.create)
 	const createRoomAsset = useMutation(api.roomAssets.place)
@@ -114,7 +117,12 @@ export function AssetsPanel({
 	})
 
 	return (
-		<section className="isolate flex h-full max-w-[320px] flex-col gap-4 overflow-y-auto panel p-4 will-change-scroll [scrollbar-gutter:stable]">
+		<section
+			className={twMerge(
+				"isolate flex h-full flex-col gap-4 overflow-y-auto panel p-4 will-change-scroll [scrollbar-gutter:stable]",
+				className,
+			)}
+		>
 			<HeadingLevel>
 				<header className="sticky -top-4 z-10 -m-4 flex h-16 items-center justify-between bg-gray-900 px-4">
 					<Heading className="heading-xl">Assets</Heading>
