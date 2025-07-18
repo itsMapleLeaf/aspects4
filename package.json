@@ -23,7 +23,7 @@
 		"@iconify/react": "^5.2.0",
 		"@notionhq/client": "^2.3.0",
 		"@tailwindcss/typography": "^0.5.16",
-		"arktype": "^2.1.8",
+		"arktype": "^2.1.20",
 		"convex": "^1.24.8",
 		"convex-helpers": "^0.1.79",
 		"date-fns": "^4.1.0",
