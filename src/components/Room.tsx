@@ -90,7 +90,7 @@ export function Room({ slug }: { slug: string }) {
 		return <RoomInvitation room={room} />
 	}
 
-	const baseSidebarTabs = [
+	const sidebarTabs = [
 		{
 			name: "Characters",
 			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
@@ -100,6 +100,7 @@ export function Room({ slug }: { slug: string }) {
 				</ChatInputContext>
 			),
 		},
+
 		{
 			name: "Assets",
 			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
@@ -115,6 +116,24 @@ export function Room({ slug }: { slug: string }) {
 				/>
 			),
 		},
+
+		...(isLargeViewport ?
+			[]
+		:	[
+				{
+					name: "Chat",
+					icon: <Icon icon="mingcute:message-2-fill" className="size-5" />,
+					content: (
+						<Chat
+							room={room}
+							playerName={user.name || "Anonymous"}
+							chatInputRef={chatInputRef}
+							className="max-w-[320px]"
+						/>
+					),
+				},
+			]),
+
 		{
 			name: "Settings",
 			icon: <Icon icon="mingcute:settings-2-fill" className="size-5" />,
@@ -128,25 +147,6 @@ export function Room({ slug }: { slug: string }) {
 			),
 		},
 	]
-
-	const sidebarTabs =
-		isLargeViewport ? baseSidebarTabs : (
-			[
-				...baseSidebarTabs,
-				{
-					name: "Chat",
-					icon: <Icon icon="mingcute:message-2-fill" className="size-5" />,
-					content: (
-						<Chat
-							room={room}
-							playerName={user.name || "Anonymous"}
-							chatInputRef={chatInputRef}
-							className="max-w-[320px]"
-						/>
-					),
-				},
-			]
-		)
 
 	return (
 		<DocumentTitle title={`${room.name} | Aspects VTT`}>
