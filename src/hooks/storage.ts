@@ -1,6 +1,37 @@
+import { ArkErrors, type, type Type } from "arktype"
 import { useEffect, useState } from "react"
 import type { JsonValue } from "type-fest"
 
+const ParsedJsonString = type("string.json.parse")
+
+export function useLocalStorageStateWithSchema<T>(options: {
+	key: string
+	schema: Type<T>
+	defaultValue: T
+}) {
+	// not SSR-safe but we don't care about that rn
+	const [value, setValue] = useState(() => {
+		const saved = window.localStorage.getItem(options.key)
+		const parsed = options.schema(ParsedJsonString(saved))
+		if (parsed instanceof ArkErrors) {
+			console.warn(`failed to load state from storage`, {
+				error: parsed,
+				saved,
+				key: options.key,
+			})
+			return options.defaultValue
+		}
+		return parsed as T
+	})
+
+	useEffect(() => {
+		window.localStorage.setItem(options.key, JSON.stringify(value))
+	}, [options.key, value])
+
+	return [value, setValue] as const
+}
+
+/** @deprecated - Use {@link useLocalStorageStateWithSchema} */
 export function useLocalStorageState<T>(
 	key: string,
 	defaultValue: T, // TODO: remove this argument, as this can be accomplished with `load()`
