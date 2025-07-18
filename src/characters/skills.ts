@@ -32,7 +32,7 @@ export function getUsedSkillPoints(sheet: FieldContext) {
 	)
 }
 
-export function getTotalSkillPoints(sheet: FieldContext) {
+export function getTotalSkillPoints(_sheet: FieldContext) {
 	const basePoints = 5
 	const bonusPoints = 0
 
