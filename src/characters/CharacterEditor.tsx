@@ -454,6 +454,7 @@ function BudgetField() {
 	)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function InfoField({
 	label,
 	children,
