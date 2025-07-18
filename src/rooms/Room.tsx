@@ -26,6 +26,7 @@ import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { useMediaQuery } from "../hooks/useMediaQuery.ts"
 import { defaultViewportTransform, ViewportTransform } from "../lib/viewport.ts"
 import { panel } from "../styles/panel.ts"
+import { RoomProvider, useRoomContext } from "./context.tsx"
 
 export function Room({ slug }: { slug: string }) {
 	const room = useQuery(api.rooms.getBySlug, { slug })
@@ -61,7 +62,9 @@ export function Room({ slug }: { slug: string }) {
 
 	return (
 		<ChatProvider roomId={room._id}>
-			<RoomInternal room={room} user={user} />
+			<RoomProvider>
+				<RoomInternal room={room} user={user} />
+			</RoomProvider>
 		</ChatProvider>
 	)
 }
@@ -73,6 +76,7 @@ function RoomInternal({
 	room: NonNullable<FunctionReturnType<typeof api.rooms.getBySlug>>
 	user: NonNullable<FunctionReturnType<typeof api.auth.me>>
 }) {
+	const roomContext = useRoomContext()
 	const updateRoom = useMutation(api.rooms.update)
 
 	const [backgroundBrightness, setBackgroundBrightness] =
@@ -162,8 +166,8 @@ function RoomInternal({
 			/>
 
 			<Ariakit.TabProvider
-				selectedId={selectedTabId}
-				setSelectedId={setSelectedTabId}
+				selectedId={roomContext.selectedTabId}
+				setSelectedId={roomContext.setSelectedTabId}
 			>
 				<div className="pointer-events-children fixed inset-0 flex flex-col gap-2 p-2">
 					<header className="pointer-events-children flex items-center gap-4">
