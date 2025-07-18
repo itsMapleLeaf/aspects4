@@ -81,6 +81,6 @@ export function typed<T>(value: T): T {
 	return value
 }
 
-export function raise(message: string): never {
-	throw new Error(message)
+export function raise(error: string | object): never {
+	throw typeof error === "string" ? new Error(error) : error
 }
