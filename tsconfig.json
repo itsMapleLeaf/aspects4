@@ -12,8 +12,8 @@
 		"target": "ESNext",
 		"lib": ["ESNext", "DOM", "DOM.Iterable"],
 		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
+		"noUnusedLocals": false, // handled by linter
+		"noUnusedParameters": false, // handled by linter
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
 		"allowImportingTsExtensions": true,
