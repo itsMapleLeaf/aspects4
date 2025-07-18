@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from "convex/react"
-import { useCallback, useImperativeHandle, useRef, useState } from "react"
+import { useQuery } from "convex/react"
+import { useCallback, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { rollDice } from "~/lib/dice.ts"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
-import type { ChatInputHandle } from "./ChatInputContext.tsx"
-import { Icon } from "./ui/Icon.tsx"
+import { Icon } from "../components/ui/Icon.tsx"
+import { useChatContext } from "./context.tsx"
 
 type LocalMessage = {
 	_id: string
@@ -38,16 +38,15 @@ const fullDateFormat = new Intl.DateTimeFormat(undefined, {
 export function Chat({
 	room,
 	playerName,
-	chatInputRef,
 	className,
 }: {
 	room: { _id: Id<"rooms">; name: string }
 	playerName: string
-	chatInputRef: React.RefObject<ChatInputHandle | null>
 	className?: string
 }) {
+	const chat = useChatContext()
 	const remoteMessages = useQuery(api.messages.list, { roomId: room._id })
-	const createMessage = useMutation(api.messages.create)
+
 	const [localMessages, setLocalMessages] = useState<LocalMessage[]>(() => [
 		createLocalMessage(
 			playerName,
@@ -96,11 +95,7 @@ export function Chat({
 			run: async (args) => {
 				const result = rollDice(args)
 				if (result.success) {
-					await createMessage({
-						sender: playerName,
-						content: result.message,
-						roomId: room._id,
-					})
+					await chat.sendMessage(result.message)
 				} else {
 					addLocalMessage(result.message)
 				}
@@ -128,23 +123,6 @@ export function Chat({
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-	useImperativeHandle(chatInputRef, () => ({
-		prefill: (value: string) => {
-			if (textareaRef.current) {
-				textareaRef.current.value = value
-				textareaRef.current.focus()
-			}
-		},
-		async sendMessage(text) {
-			await createMessage({
-				roomId: room._id,
-				sender: playerName,
-				content: text,
-			})
-		},
-		addLocalMessage,
-	}))
-
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<{ value: string }>,
 	) => {
@@ -153,8 +131,6 @@ export function Chat({
 
 			const content = event.currentTarget.value.trim()
 			if (!content) return
-
-			event.currentTarget.value = ""
 
 			try {
 				if (content.startsWith("/")) {
@@ -169,12 +145,9 @@ export function Chat({
 						)
 					}
 				} else {
-					await createMessage({
-						sender: playerName,
-						content,
-						roomId: room._id,
-					})
+					await chat.sendMessage(content)
 				}
+				chat.setInput("")
 			} catch (error) {
 				console.error(error)
 				addLocalMessage(
@@ -252,6 +225,8 @@ export function Chat({
 					ref={textareaRef}
 					placeholder="Say something!"
 					className="block field-sizing-content w-full resize-none px-3 py-2 focus:outline-none"
+					value={chat.input}
+					onChange={(event) => chat.setInput(event.target.value)}
 					onKeyDown={handleKeyDown}
 				/>
 			</footer>

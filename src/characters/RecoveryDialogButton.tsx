@@ -1,7 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { invariant } from "es-toolkit"
-import { use, useState } from "react"
-import { ChatInputContext } from "../components/ChatInputContext.tsx"
+import { useState } from "react"
+import { useChatContext } from "../chat/context.tsx"
 import { Button } from "../components/ui/Button.tsx"
 import { Dialog, DialogButton, DialogPanel } from "../components/ui/Dialog.tsx"
 import { SelectField } from "../components/ui/SelectField.tsx"
@@ -19,8 +19,10 @@ import { AspectName } from "./data.ts"
 export function RecoveryDialogButton() {
 	const sheet = useEditorCharacterSheet()
 	const aspectFields = resolveAspectFields(sheet)
-	const chatInputRef = use(ChatInputContext)
+
 	const [aspect, setAspect] = useState<AspectName>("Fire")
+
+	const chat = useChatContext()
 
 	type RecoveryTarget = {
 		label: string
@@ -43,18 +45,18 @@ export function RecoveryDialogButton() {
 				}
 
 				if (recoveryLevel === 0) {
-					chatInputRef.current?.sendMessage(
+					chat.sendMessage(
 						`${rollResult.message}\nHeal 1 stress from a chosen pool.`,
 					)
 				} else if (recoveryLevel === 4) {
-					chatInputRef.current?.sendMessage(
+					chat.sendMessage(
 						`${rollResult.message}\nHeal all stress from a chosen pool.`,
 					)
 				} else {
 					const recoveredAmount = rollNumericDice(recoveryLevel, 6)
 					const recoveryAmountDiceValueList = recoveredAmount.values.join(" + ")
 					const recoverySummary = `Heal ${recoveredAmount.sum} stress from a chosen pool.`
-					chatInputRef.current?.sendMessage(
+					chat.sendMessage(
 						`${rollResult.message}\n${recoverySummary} (${recoveryLevel}d6 -> ${recoveryAmountDiceValueList})\n`,
 					)
 				}
@@ -75,7 +77,7 @@ export function RecoveryDialogButton() {
 					experienceCount += 1
 				}
 
-				chatInputRef.current?.sendMessage(
+				chat.sendMessage(
 					`${rollResult.message}\nRecover ${experienceCount} experience(s).`,
 				)
 			},

@@ -1,7 +1,7 @@
-import { ComponentProps, ReactNode, use, useId } from "react"
+import { ComponentProps, ReactNode, useId } from "react"
 import { twMerge } from "tailwind-merge"
 import { ResolvedNumberField } from "../../characters/sheet/fields.ts"
-import { ChatInputContext } from "../../components/ChatInputContext.tsx"
+import { useChatContext } from "../../chat/context.tsx"
 import { Button } from "../../components/ui/Button.tsx"
 import { Icon } from "../../components/ui/Icon.tsx"
 import { Tooltip } from "../../components/ui/Tooltip.tsx"
@@ -22,7 +22,8 @@ export function SheetStatField({
 	tooltip?: ReactNode
 	score?: number | null
 } & ComponentProps<"div">) {
-	const chatInputRef = use(ChatInputContext)
+	const chat = useChatContext()
+
 	const fieldId = useId()
 
 	const editable = useEditableNumber({
@@ -60,7 +61,7 @@ export function SheetStatField({
 						className="flex h-full w-14 rounded-none p-0"
 						align="center"
 						onClick={() => {
-							chatInputRef.current?.prefill(
+							chat.setInput(
 								`/roll aspects ${score} [${label ?? toTitleCase(field.id)}]`,
 							)
 						}}

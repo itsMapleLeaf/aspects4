@@ -1,13 +1,16 @@
 import * as Ariakit from "@ariakit/react"
 import { ArkErrors } from "arktype"
 import { useMutation, useQuery } from "convex/react"
+import type { FunctionReturnType } from "convex/server"
 import type { ReactNode } from "react"
-import { useActionState, useRef } from "react"
+import { useActionState } from "react"
 import { useLocation } from "wouter"
 import { SceneViewerHelpButton } from "~/components/SceneViewer"
 import { api } from "../../convex/_generated/api"
 import { Id, type Doc } from "../../convex/_generated/dataModel"
 import type { ClientRoom } from "../../convex/rooms.ts"
+import { Chat } from "../chat/Chat.tsx"
+import { ChatProvider } from "../chat/context.tsx"
 import { useLocalStorageState } from "../hooks/storage.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { useMediaQuery } from "../hooks/useMediaQuery.ts"
@@ -16,8 +19,6 @@ import { panel } from "../styles/panel.ts"
 import { AppLogoLink } from "./AppLogoLink.tsx"
 import { AssetsPanel } from "./AssetsPanel.tsx"
 import { CharacterManager } from "./CharacterManager.tsx"
-import { Chat } from "./Chat.tsx"
-import { ChatInputContext, ChatInputHandle } from "./ChatInputContext.tsx"
 import { DocumentTitle } from "./DocumentTitle.tsx"
 import { EditableText } from "./EditableText.tsx"
 import { SceneViewer } from "./SceneViewer.tsx"
@@ -29,8 +30,50 @@ import { UserButton } from "./UserButton.tsx"
 export function Room({ slug }: { slug: string }) {
 	const room = useQuery(api.rooms.getBySlug, { slug })
 	const user = useQuery(api.auth.me)
+
+	if (room === undefined || user === undefined) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Loading room...
+			</div>
+		)
+	}
+
+	if (room === null) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Room not found
+			</div>
+		)
+	}
+
+	if (user === null) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Please sign in to access this room
+			</div>
+		)
+	}
+
+	if (!room.isMember) {
+		return <RoomInvitation room={room} />
+	}
+
+	return (
+		<ChatProvider roomId={room._id}>
+			<RoomInternal room={room} user={user} />
+		</ChatProvider>
+	)
+}
+
+function RoomInternal({
+	room,
+	user,
+}: {
+	room: NonNullable<FunctionReturnType<typeof api.rooms.getBySlug>>
+	user: NonNullable<FunctionReturnType<typeof api.auth.me>>
+}) {
 	const updateRoom = useMutation(api.rooms.update)
-	const chatInputRef = useRef<ChatInputHandle | null>(null)
 
 	const [backgroundBrightness, setBackgroundBrightness] =
 		useLocalStorageState<number>("backgroundBrightness", 50, (input) => {
@@ -62,43 +105,11 @@ export function Room({ slug }: { slug: string }) {
 			},
 		)
 
-	if (room === undefined || user === undefined) {
-		return (
-			<div className="flex h-screen items-center justify-center">
-				Loading room...
-			</div>
-		)
-	}
-
-	if (room === null) {
-		return (
-			<div className="flex h-screen items-center justify-center">
-				Room not found
-			</div>
-		)
-	}
-
-	if (user === null) {
-		return (
-			<div className="flex h-screen items-center justify-center">
-				Please sign in to access this room
-			</div>
-		)
-	}
-
-	if (!room.isMember) {
-		return <RoomInvitation room={room} />
-	}
-
 	const sidebarTabs = [
 		{
 			name: "Characters",
 			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
-			content: (
-				<ChatInputContext value={chatInputRef}>
-					<CharacterManager roomId={room._id} />
-				</ChatInputContext>
-			),
+			content: <CharacterManager roomId={room._id} />,
 		},
 
 		{
@@ -127,7 +138,6 @@ export function Room({ slug }: { slug: string }) {
 						<Chat
 							room={room}
 							playerName={user.name || "Anonymous"}
-							chatInputRef={chatInputRef}
 							className="max-w-[320px]"
 						/>
 					),
@@ -186,7 +196,6 @@ export function Room({ slug }: { slug: string }) {
 							<Chat
 								room={room}
 								playerName={user.name || "Anonymous"}
-								chatInputRef={chatInputRef}
 								className="ml-auto w-72"
 							/>
 						)}
