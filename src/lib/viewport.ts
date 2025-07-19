@@ -23,7 +23,7 @@ export function handleViewportZoom(
 	event: { clientX: number; clientY: number; deltaY: number },
 ): ViewportTransform {
 	const scale = getViewportScale(transform.zoom)
-	const newZoom = clamp(transform.zoom - Math.sign(event.deltaY), -10, 10)
+	const newZoom = clamp(transform.zoom - event.deltaY, -10, 10)
 	const newScale = 1 * scaleCoefficient ** newZoom
 
 	const newOffsetX =

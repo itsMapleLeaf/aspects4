@@ -1,16 +1,15 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
+import { useGesture } from "@use-gesture/react"
 import { type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { isEqual } from "es-toolkit"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { Dialog, DialogButton, DialogPanel } from "~/components/ui/Dialog.tsx"
 import { Tooltip } from "~/components/ui/Tooltip.tsx"
-import { useValueRef } from "~/hooks/common.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
-import { handleDrag } from "../lib/drag.ts"
 import {
 	getViewportScale,
 	handleViewportZoom,
@@ -39,73 +38,174 @@ export function SceneViewer({
 	const createRoomAsset = useMutation(api.roomAssets.place)
 	const removeRoomAsset = useRemoveRoomAsset(room._id)
 	const updateRoomAsset = useUpdateRoomAsset(room._id)
-	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"roomAssets">>()
-	const pointers = useRef(new Set<number>())
+	const moveRoomAssetToFront = useMoveRoomAssetToFront(room._id)
+	const [selectedAssetId, setSelectedAssetId] = useState<Id<"roomAssets">>()
+	const [assetDragCursor, setAssetDragOffset] = useState({ x: 0, y: 0 })
+	const [assetDragAction, setAssetDragAction] = useState<"move" | "resize">(
+		"move",
+	)
 
-	const handlePointerDown = (event: React.PointerEvent) => {
-		pointers.current.add(event.pointerId)
+	const bindPointerGestures = useGesture(
+		{
+			onPointerDown({ touches, ...info }) {
+				const event = info.event as unknown as React.PointerEvent
 
-		if (event.button === 0 && event.target === event.currentTarget) {
-			setSelectedAsssetId(undefined)
-		}
+				if (event.button === 0 && touches === 1) {
+					let selectedAssetId, isResizing
+					for (const target of event.nativeEvent.composedPath()) {
+						if (target instanceof HTMLElement && target.dataset.assetResize) {
+							isResizing = true
+							console.log("resize")
+						}
+						if (target instanceof HTMLElement && target.dataset.assetId) {
+							selectedAssetId = target.dataset.assetId as Id<"roomAssets">
+						}
+					}
+					setSelectedAssetId(selectedAssetId)
+					setAssetDragAction(isResizing ? "resize" : "move")
+				}
 
-		if (event.button === 2 || pointers.current.size >= 2) {
-			event.preventDefault()
-			handleDrag({
-				onDrag: (event) => {
-					if (!(event.buttons & 2)) return
+				if (event.button === 2) {
+					// prevent context menu from opening after drag finish
+					window.addEventListener(
+						"contextmenu",
+						(event) => event.preventDefault(),
+						{ once: true },
+					)
+				}
+			},
+
+			onDragStart() {
+				// if (selectedAssetId) {
+				// 	moveRoomAssetToFront({ roomAssetId: selectedAssetId })
+				// }
+			},
+
+			onDrag({ buttons, touches, delta: [deltaX, deltaY] }) {
+				if (touches === 1 && buttons === 1 && selectedAssetId) {
+					setAssetDragOffset((offset) => ({
+						x: offset.x + deltaX / getViewportScale(viewportTransform.zoom),
+						y: offset.y + deltaY / getViewportScale(viewportTransform.zoom),
+					}))
+				} else if (
+					// single-touch secondary pointer (right click)
+					(touches === 1 && buttons === 2) ||
+					// double-touch primary pointer (multi-touch)
+					(touches === 2 && buttons === 1)
+				) {
 					setViewportTransform((transform) => ({
 						...transform,
 						offset: {
-							x: transform.offset.x + event.movementX,
-							y: transform.offset.y + event.movementY,
+							x: transform.offset.x + deltaX,
+							y: transform.offset.y + deltaY,
 						},
 					}))
+				}
+			},
+
+			onDragEnd: () => {
+				const selectedAsset = assets?.find((it) => it._id === selectedAssetId)
+				if (!selectedAsset) {
+					return
+				}
+
+				if (assetDragAction === "move") {
+					updateRoomAsset({
+						roomAssetId: selectedAsset._id,
+						data: {
+							position: {
+								x: selectedAsset.position.x + assetDragCursor.x,
+								y: selectedAsset.position.y + assetDragCursor.y,
+							},
+						},
+					})
+				}
+
+				if (assetDragAction === "resize") {
+					const newWidth = (selectedAsset?.size?.x ?? 0) + assetDragCursor.x
+					const newHeight = (selectedAsset?.size?.y ?? 0) + assetDragCursor.y
+
+					updateRoomAsset({
+						roomAssetId: selectedAsset._id,
+						data: {
+							size: {
+								x: newWidth,
+								y: newHeight,
+							},
+						},
+					})
+				}
+
+				setAssetDragOffset({ x: 0, y: 0 })
+				setBodyCursor(null)
+			},
+
+			onWheel({ event }) {
+				setViewportTransform((transform) =>
+					handleViewportZoom(transform, {
+						clientX: event.clientX,
+						clientY: event.clientY,
+						deltaY: Math.sign(event.deltaY),
+					}),
+				)
+			},
+
+			onPinch({ memo, da: [distance] }) {
+				const distanceDelta = (memo ?? distance) - distance
+
+				setViewportTransform((transform) =>
+					handleViewportZoom(transform, {
+						clientX: window.innerWidth / 2,
+						clientY: window.innerHeight / 2,
+						deltaY: distanceDelta / 100,
+					}),
+				)
+
+				return distance
+			},
+
+			onDragOver({ event }) {
+				if (event.dataTransfer!.types.includes("application/json")) {
+					event.preventDefault()
+					event.dataTransfer!.dropEffect = "move"
+				}
+			},
+
+			onDrop({ event }) {
+				event.preventDefault()
+				event.stopPropagation()
+
+				try {
+					const result = AssetDropData(
+						event.dataTransfer!.getData("application/json"),
+					)
+					if (result instanceof type.errors) {
+						console.warn(result)
+						return
+					}
+
+					const scale = getViewportScale(viewportTransform.zoom)
+					const dropX = (event.clientX - viewportTransform.offset.x) / scale
+					const dropY = (event.clientY - viewportTransform.offset.y) / scale
+					createRoomAsset({
+						roomId: room._id,
+						assetId: result.assetId as Id<"assets">,
+						position: { x: dropX, y: dropY },
+					})
+				} catch (err) {
+					console.error("Error processing dropped asset:", err)
+				}
+			},
+		},
+		{
+			drag: {
+				pointer: {
+					buttons: [1, 2],
 				},
-			})
-		}
-	}
-
-	const handlePointerUp = (event: React.PointerEvent) => {
-		pointers.current.delete(event.pointerId)
-	}
-
-	const handleWheel = (event: React.WheelEvent) => {
-		setViewportTransform((transform) => handleViewportZoom(transform, event))
-	}
-
-	const handleDragOver = (event: React.DragEvent) => {
-		if (event.dataTransfer.types.includes("application/json")) {
-			event.preventDefault()
-			event.dataTransfer.dropEffect = "move"
-		}
-	}
-
-	const handleDrop = async (event: React.DragEvent) => {
-		event.preventDefault()
-		event.stopPropagation()
-
-		try {
-			const result = AssetDropData(
-				event.dataTransfer.getData("application/json"),
-			)
-			if (result instanceof type.errors) {
-				console.warn(result)
-				return
-			}
-
-			const scale = getViewportScale(viewportTransform.zoom)
-			const dropX = (event.clientX - viewportTransform.offset.x) / scale
-			const dropY = (event.clientY - viewportTransform.offset.y) / scale
-			createRoomAsset({
-				roomId: room._id,
-				assetId: result.assetId as Id<"assets">,
-				position: { x: dropX, y: dropY },
-			})
-		} catch (err) {
-			console.error("Error processing dropped asset:", err)
-		}
-	}
+				threshold: 4,
+			},
+		},
+	)
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -115,29 +215,50 @@ export function SceneViewer({
 
 			if (
 				event.key === "Delete" &&
-				selectedAsssetId &&
+				selectedAssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
-				removeRoomAsset({ roomAssetId: selectedAsssetId })
-				setSelectedAsssetId(undefined)
+				removeRoomAsset({ roomAssetId: selectedAssetId })
+				setSelectedAssetId(undefined)
 			}
 
 			if (
 				event.key === "l" &&
-				selectedAsssetId &&
+				selectedAssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
 				const selectedAsset = assets?.find(
-					(asset) => asset._id === selectedAsssetId,
+					(asset) => asset._id === selectedAssetId,
 				)
 				if (selectedAsset) {
 					updateRoomAsset({
-						roomAssetId: selectedAsssetId,
+						roomAssetId: selectedAssetId,
 						data: {
 							locked: !selectedAsset.locked,
 						},
 					})
 				}
+			}
+
+			// shitty layering workaround i guess
+			if (
+				event.key === "t" &&
+				selectedAssetId &&
+				!document.activeElement?.matches("input, textarea")
+			) {
+				moveRoomAssetToFront({ roomAssetId: selectedAssetId })
+			}
+			if (
+				event.key === "b" &&
+				selectedAssetId &&
+				!document.activeElement?.matches("input, textarea")
+			) {
+				updateRoomAsset({
+					roomAssetId: selectedAssetId,
+					data: {
+						updateTime: 0,
+					},
+				})
 			}
 		}
 
@@ -149,12 +270,8 @@ export function SceneViewer({
 
 	return (
 		<div
-			className="relative h-dvh w-dvw overflow-clip select-none [:root:has(&)]:touch-none [:root:has(&)]:overscroll-none"
-			onPointerDown={handlePointerDown}
-			onPointerUp={handlePointerUp}
-			onWheel={handleWheel}
-			onDrop={handleDrop}
-			onDragOver={handleDragOver}
+			{...bindPointerGestures()}
+			className="relative h-dvh w-dvw touch-none overflow-clip select-none"
 		>
 			{room.backgroundUrl && (
 				<div
@@ -179,8 +296,17 @@ export function SceneViewer({
 							key={asset._id}
 							asset={asset}
 							viewportTransform={viewportTransform}
-							isSelected={selectedAsssetId === asset._id}
-							onPrimaryPointerDown={() => setSelectedAsssetId(asset._id)}
+							isSelected={selectedAssetId === asset._id}
+							dragOffset={
+								selectedAssetId === asset._id && assetDragAction === "move" ?
+									assetDragCursor
+								:	{ x: 0, y: 0 }
+							}
+							resizeOffset={
+								selectedAssetId === asset._id && assetDragAction === "resize" ?
+									assetDragCursor
+								:	{ x: 0, y: 0 }
+							}
 						/>
 					))}
 			</div>
@@ -188,38 +314,33 @@ export function SceneViewer({
 	)
 }
 
+const setBodyCursor = (cursor: string | null) => {
+	if (cursor) {
+		document.body.style.cursor = cursor
+	} else {
+		document.body.style.removeProperty("cursor")
+	}
+}
+
 function AssetImage({
 	asset,
 	viewportTransform,
 	isSelected,
-	onPrimaryPointerDown,
+	dragOffset,
+	resizeOffset,
 }: {
 	asset: NormalizedRoomAsset
 	viewportTransform: ViewportTransform
 	isSelected: boolean
-	onPrimaryPointerDown: () => void
+	dragOffset: { x: number; y: number }
+	resizeOffset: { x: number; y: number }
 }) {
-	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
-	const dragOffsetRef = useValueRef(dragOffset)
-	const [resizeOffset, setResizeOffset] = useState({ x: 0, y: 0 })
-	const resizeOffsetRef = useValueRef(resizeOffset)
-
-	const updateRoomAsset = useUpdateRoomAsset(asset.roomId)
-	const moveToFront = useMoveRoomAssetToFront(asset.roomId)
-
-	const setBodyCursor = (cursor: string | null) => {
-		if (cursor) {
-			document.body.style.cursor = cursor
-		} else {
-			document.body.style.removeProperty("cursor")
-		}
-	}
-
 	const isIdle =
 		isEqual(dragOffset, { x: 0, y: 0 }) && isEqual(resizeOffset, { x: 0, y: 0 })
 
 	return (
 		<div
+			data-asset-id={asset._id}
 			className={twMerge(
 				"absolute top-0 left-0 origin-top-left touch-none transition-[translate_rotate] ease-out",
 				isIdle ? "duration-300" : "duration-50",
@@ -231,58 +352,19 @@ function AssetImage({
 				width: `${asset.size.x + resizeOffset.x}px`,
 				height: `${asset.size.y + resizeOffset.y}px`,
 			}}
-			onPointerDown={(event) => {
-				event.preventDefault()
-
-				if (event.button !== 0) return
-
-				onPrimaryPointerDown()
-
-				if (asset.locked) return
-
-				handleDrag({
-					onDragStart: () => {
-						moveToFront({ roomAssetId: asset._id })
-						setBodyCursor("move")
-					},
-					onDrag: (event) => {
-						setDragOffset((offset) => ({
-							x:
-								offset.x +
-								event.movementX / getViewportScale(viewportTransform.zoom),
-							y:
-								offset.y +
-								event.movementY / getViewportScale(viewportTransform.zoom),
-						}))
-					},
-					onDragEnd: () => {
-						updateRoomAsset({
-							roomAssetId: asset._id,
-							data: {
-								position: {
-									x: asset.position.x + dragOffsetRef.current.x,
-									y: asset.position.y + dragOffsetRef.current.y,
-								},
-							},
-						})
-						setDragOffset({ x: 0, y: 0 })
-						setBodyCursor(null)
-					},
-				})
-			}}
 		>
 			<div className="relative size-full">
 				<img
 					src={asset.url || ""}
 					alt=""
-					className="size-full object-contain"
+					className="size-full touch-none object-contain"
 					draggable={false}
 				/>
 
 				{isSelected && (
 					<div
 						className={twMerge(
-							"absolute inset-0 bg-primary-800/10 outline outline-primary-400",
+							"pointer-events-none absolute inset-0 bg-primary-800/10 outline outline-primary-400",
 						)}
 						style={{
 							outlineWidth: 2 / getViewportScale(viewportTransform.zoom),
@@ -303,56 +385,17 @@ function AssetImage({
 
 						{!asset.locked && (
 							<div
-								className="absolute cursor-nwse-resize bg-primary-400"
+								className="absolute right-0 bottom-0 flex items-center justify-center transition-[scale]"
 								style={{
-									width: 16 / getViewportScale(viewportTransform.zoom),
-									height: 16 / getViewportScale(viewportTransform.zoom),
-									right: -8 / getViewportScale(viewportTransform.zoom),
-									bottom: -8 / getViewportScale(viewportTransform.zoom),
+									scale: 1 / getViewportScale(viewportTransform.zoom),
 								}}
-								onPointerDown={(event) => {
-									if (event.button !== 0) return
-
-									event.stopPropagation()
-									event.preventDefault()
-
-									moveToFront({ roomAssetId: asset._id })
-									setBodyCursor("nwse-resize")
-
-									handleDrag({
-										onDrag: (event) => {
-											setResizeOffset((offset) => ({
-												x:
-													offset.x +
-													event.movementX /
-														getViewportScale(viewportTransform.zoom),
-												y:
-													offset.y +
-													event.movementY /
-														getViewportScale(viewportTransform.zoom),
-											}))
-										},
-										onDragEnd: () => {
-											const newWidth =
-												(asset?.size?.x ?? 0) + resizeOffsetRef.current.x
-											const newHeight =
-												(asset?.size?.y ?? 0) + resizeOffsetRef.current.y
-
-											updateRoomAsset({
-												roomAssetId: asset._id,
-												data: {
-													size: {
-														x: newWidth,
-														y: newHeight,
-													},
-												},
-											})
-											setResizeOffset({ x: 0, y: 0 })
-											setBodyCursor(null)
-										},
-									})
-								}}
-							/>
+							>
+								<div className="absolute size-4 bg-primary-400"></div>
+								<div
+									data-asset-resize
+									className="pointer-events-auto absolute size-10 cursor-nwse-resize touch-none ease-out"
+								></div>
+							</div>
 						)}
 					</div>
 				)}
@@ -377,13 +420,13 @@ function useUpdateRoomAsset(roomId: Id<"rooms">) {
 }
 
 function useMoveRoomAssetToFront(roomId: Id<"rooms">) {
+	const assets = useQuery(api.roomAssets.list, { roomId })
 	return useMutation(api.roomAssets.moveToFront).withOptimisticUpdate(
 		(store, args) => {
-			const items = store.getQuery(api.roomAssets.list, { roomId })
 			store.setQuery(
 				api.roomAssets.list,
 				{ roomId },
-				items?.map((item) =>
+				assets?.map((item) =>
 					item._id === args.roomAssetId ?
 						{ ...item, updateTime: Date.now() }
 					:	item,
@@ -423,22 +466,39 @@ export function SceneViewerHelpButton() {
 			</DialogButton>
 			<DialogPanel title="Scene Controls">
 				<HeadingLevel>
-					<div>
-						<Heading className="mb-2 heading-xl">Navigation</Heading>
-						<ul className="list-disc space-y-1 pl-6">
-							<li>Right-click and drag to pan the scene</li>
-							<li>Scroll wheel to zoom in/out</li>
-							<li>Ctrl+0 to reset view to center</li>
-						</ul>
-						<Heading className="mt-4 mb-2 heading-xl">Assets</Heading>
-						<ul className="list-disc space-y-1 pl-6">
-							<li>Drag assets from the Assets panel to place them</li>
-							<li>Click an asset to select it</li>
-							<li>Drag selected assets to move them</li>
-							<li>Drag the resize handle to change size</li>
-							<li>Press Delete to remove selected asset</li>
-							<li>Press L to lock/unlock selected asset</li>
-						</ul>
+					<div className="grid gap-4">
+						<section>
+							<Heading className="mb-2 heading-xl">
+								Navigation (Desktop)
+							</Heading>
+							<ul className="list-disc space-y-1 pl-6">
+								<li>Right-click and drag to pan the scene</li>
+								<li>Scroll wheel to zoom in/out</li>
+								<li>Ctrl+0 to reset view to center</li>
+							</ul>
+						</section>
+						<section>
+							<Heading className="mb-2 heading-xl">Navigation (Touch)</Heading>
+							<ul className="list-disc space-y-1 pl-6">
+								<li>Use two fingers to zoom and pan the scene</li>
+							</ul>
+						</section>
+						<section>
+							<Heading className="mb-2 heading-xl">Assets</Heading>
+							<ul className="list-disc space-y-1 pl-6">
+								<li>
+									Drag assets from the Assets panel to place them in the scene
+								</li>
+								<li>Tap an asset in the scene to select it</li>
+								<li>Drag selected assets to move and resize them</li>
+								<li>Press Delete to remove selected asset from the scene</li>
+								<li>
+									Press L to lock/unlock the size/position of the selected asset
+								</li>
+								<li>Press T to move an asset to the top</li>
+								<li>Press B to move an asset to the bottom</li>
+							</ul>
+						</section>
 					</div>
 				</HeadingLevel>
 			</DialogPanel>
