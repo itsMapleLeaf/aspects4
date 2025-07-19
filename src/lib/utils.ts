@@ -88,3 +88,10 @@ export function raise(error: string | object): never {
 export function recordValues<const V>(object: Record<PropertyKey, V>) {
 	return Object.values(object) as V[]
 }
+
+// the URL constructor and URLSearchParams encode param values which sometimes breaks things
+export function urlSearchParams(params: Record<string, string | number>) {
+	return Object.entries(params)
+		.map(([k, v]) => `${k}=${v}`)
+		.join("&")
+}

@@ -15,6 +15,7 @@ import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedAsset } from "../../convex/assets.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
+import { getThumbnailUrl } from "../lib/images.ts"
 import { getViewportCenter, ViewportTransform } from "../lib/viewport.ts"
 import { Icon } from "./ui/Icon.tsx"
 import { LoadingSpinner } from "./ui/LoadingSpinner.tsx"
@@ -237,10 +238,7 @@ function AssetCard({
 	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 
-	const url =
-		asset.url &&
-		`/.netlify/images?` +
-			urlSearchParams({ url: asset.url, w: 150, h: 150, quality: 100 })
+	const url = asset.url && getThumbnailUrl(asset.url, 150)
 
 	return (
 		<Menu placement="bottom-start">
@@ -304,11 +302,4 @@ function AssetCard({
 			</MenuPanel>
 		</Menu>
 	)
-}
-
-// the URL constructor and URLSearchParams encode param values which sometimes breaks things
-function urlSearchParams(params: Record<string, string | number>) {
-	return Object.entries(params)
-		.map(([k, v]) => `${k}=${v}`)
-		.join("&")
 }
