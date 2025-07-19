@@ -80,7 +80,10 @@ export function CharacterManager({ roomId }: { roomId: Id<"rooms"> }) {
 						</Ariakit.TabList>
 					)}
 
-					<div className="isolate h-full max-w-[640px] flex-1 overflow-y-auto panel p-3 will-change-scroll [scrollbar-gutter:stable]">
+					<div
+						className="isolate h-full max-w-[640px] flex-1 overflow-y-auto panel p-3 will-change-scroll [scrollbar-gutter:stable]"
+						hidden={!activeCharacterId}
+					>
 						{isMediumViewport && (
 							<Ariakit.TabList className="sticky -top-3 z-10 -mx-3 -mt-3 flex items-center gap-2 bg-gray-900 p-3">
 								<Ariakit.PopoverProvider
