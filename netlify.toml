@@ -11,4 +11,5 @@ remote_images = [
 	"http://127.0.0.1:3210/api/storage/.*",
 	"https://elegant-eel-777.convex.site/.*",
 	"https://elegant-eel-777.convex.cloud/api/storage/.*",
+	"https://laudable-jaguar-594.convex.cloud/api/storage/.*",
 ]
