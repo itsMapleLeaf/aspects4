@@ -1,5 +1,6 @@
 [dev]
 command = "vite"
+autoLaunch = false
 
 [build]
 command = "bun run predeploy"
