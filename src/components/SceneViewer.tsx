@@ -10,6 +10,7 @@ import { Tooltip } from "~/components/ui/Tooltip.tsx"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
+import { getThumbnailUrl } from "../lib/images.ts"
 import {
 	getViewportScale,
 	handleViewportZoom,
@@ -310,6 +311,24 @@ export function SceneViewer({
 						/>
 					))}
 			</div>
+			<OffScreenAssetIndicators
+				assets={assets ?? []}
+				viewportTransform={viewportTransform}
+				selectedAssetId={selectedAssetId}
+				onAssetClick={(assetId: Id<"roomAssets">) => {
+					setSelectedAssetId(assetId)
+					const asset = assets?.find((a) => a._id === assetId)
+					if (asset) {
+						const scale = getViewportScale(viewportTransform.zoom)
+						const centerX = window.innerWidth / 2 - asset.position.x * scale
+						const centerY = window.innerHeight / 2 - asset.position.y * scale
+						setViewportTransform(() => ({
+							...viewportTransform,
+							offset: { x: centerX, y: centerY },
+						}))
+					}
+				}}
+			/>
 		</div>
 	)
 }
@@ -401,6 +420,93 @@ function AssetImage({
 				)}
 			</div>
 		</div>
+	)
+}
+
+function OffScreenAssetIndicators({
+	assets,
+	viewportTransform,
+	selectedAssetId,
+	onAssetClick,
+}: {
+	assets: NormalizedRoomAsset[]
+	viewportTransform: ViewportTransform
+	selectedAssetId: Id<"roomAssets"> | undefined
+	onAssetClick: (assetId: Id<"roomAssets">) => void
+}) {
+	const scale = getViewportScale(viewportTransform.zoom)
+	const viewportWidth = window.innerWidth
+	const viewportHeight = window.innerHeight
+
+	const offScreenAssets = assets.filter((asset) => {
+		const screenX = asset.position.x * scale + viewportTransform.offset.x
+		const screenY = asset.position.y * scale + viewportTransform.offset.y
+		const assetWidth = (asset.size?.x ?? 0) * scale
+		const assetHeight = (asset.size?.y ?? 0) * scale
+
+		return (
+			screenX + assetWidth < 0 ||
+			screenX > viewportWidth ||
+			screenY + assetHeight < 0 ||
+			screenY > viewportHeight
+		)
+	})
+
+	return (
+		<>
+			{offScreenAssets.map((asset) => {
+				const screenX = asset.position.x * scale + viewportTransform.offset.x
+				const screenY = asset.position.y * scale + viewportTransform.offset.y
+				const assetWidth = (asset.size?.x ?? 0) * scale
+				const assetHeight = (asset.size?.y ?? 0) * scale
+
+				const assetCenterX = screenX + assetWidth / 2
+				const assetCenterY = screenY + assetHeight / 2
+
+				let indicatorX = assetCenterX
+				let indicatorY = assetCenterY
+
+				const margin = 24
+
+				if (assetCenterX < margin) {
+					indicatorX = margin
+				} else if (assetCenterX > viewportWidth - margin) {
+					indicatorX = viewportWidth - margin
+				}
+
+				if (assetCenterY < margin) {
+					indicatorY = margin
+				} else if (assetCenterY > viewportHeight - margin) {
+					indicatorY = viewportHeight - margin
+				}
+
+				const url = asset.url && getThumbnailUrl(asset.url, 32)
+
+				return (
+					<button
+						key={asset._id}
+						type="button"
+						className={twMerge(
+							"absolute top-0 left-0 size-8 rounded-full border bg-gray-800/80 transition-[translate] ease-out hover:scale-110",
+							selectedAssetId === asset._id ?
+								"border-primary-400 shadow-lg shadow-primary-400/25"
+							:	"border-gray-600",
+						)}
+						style={{
+							translate: `${indicatorX - 16}px ${indicatorY - 16}px`,
+						}}
+						onClick={() => onAssetClick(asset._id)}
+					>
+						<img
+							src={url ?? ""}
+							alt=""
+							className="size-full rounded-full object-cover"
+							draggable={false}
+						/>
+					</button>
+				)
+			})}
+		</>
 	)
 }
 
@@ -497,6 +603,10 @@ export function SceneViewerHelpButton() {
 								</li>
 								<li>Press T to move an asset to the top</li>
 								<li>Press B to move an asset to the bottom</li>
+								<li>
+									Click off-screen asset indicators (shown on screen edges) to
+									center them in view
+								</li>
 							</ul>
 						</section>
 					</div>
