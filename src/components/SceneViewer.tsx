@@ -2,7 +2,7 @@ import { Heading, HeadingLevel } from "@ariakit/react"
 import { type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import { isEqual } from "es-toolkit"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { Dialog, DialogButton, DialogPanel } from "~/components/ui/Dialog.tsx"
 import { Tooltip } from "~/components/ui/Tooltip.tsx"
@@ -40,13 +40,16 @@ export function SceneViewer({
 	const removeRoomAsset = useRemoveRoomAsset(room._id)
 	const updateRoomAsset = useUpdateRoomAsset(room._id)
 	const [selectedAsssetId, setSelectedAsssetId] = useState<Id<"roomAssets">>()
+	const pointers = useRef(new Set<number>())
 
 	const handlePointerDown = (event: React.PointerEvent) => {
+		pointers.current.add(event.pointerId)
+
 		if (event.button === 0 && event.target === event.currentTarget) {
 			setSelectedAsssetId(undefined)
 		}
 
-		if (event.button === 2) {
+		if (event.button === 2 || pointers.current.size >= 2) {
 			event.preventDefault()
 			handleDrag({
 				onDrag: (event) => {
@@ -61,6 +64,10 @@ export function SceneViewer({
 				},
 			})
 		}
+	}
+
+	const handlePointerUp = (event: React.PointerEvent) => {
+		pointers.current.delete(event.pointerId)
 	}
 
 	const handleWheel = (event: React.WheelEvent) => {
@@ -142,8 +149,9 @@ export function SceneViewer({
 
 	return (
 		<div
-			className="relative h-dvh w-dvw overflow-clip select-none"
+			className="relative h-dvh w-dvw overflow-clip select-none [:root:has(&)]:touch-none [:root:has(&)]:overscroll-none"
 			onPointerDown={handlePointerDown}
+			onPointerUp={handlePointerUp}
 			onWheel={handleWheel}
 			onDrop={handleDrop}
 			onDragOver={handleDragOver}
@@ -213,7 +221,7 @@ function AssetImage({
 	return (
 		<div
 			className={twMerge(
-				"absolute top-0 left-0 origin-top-left touch-none transition-[translate_rotate] ease-out [:root:has(&)]:overscroll-none",
+				"absolute top-0 left-0 origin-top-left touch-none transition-[translate_rotate] ease-out",
 				isIdle ? "duration-300" : "duration-50",
 				asset.locked ? "" : "cursor-move",
 			)}
