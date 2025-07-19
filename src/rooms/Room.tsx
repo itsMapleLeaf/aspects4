@@ -91,7 +91,7 @@ function RoomInternal({
 		})
 
 	const fullWidthAssetPanel = useMediaQuery("(width < 540px)")
-	const standaloneChat = useMediaQuery("(width > 1280px)")
+	const standaloneChat = useMediaQuery("(width > 1176px)")
 
 	const [viewportTransform, setViewportTransform] =
 		useLocalStorageState<ViewportTransform>(
@@ -138,11 +138,13 @@ function RoomInternal({
 					name: RoomTabNames.Chat,
 					icon: <Icon icon="mingcute:message-2-fill" className="size-5" />,
 					content: (
-						<Chat
-							room={room}
-							playerName={user.name || "Anonymous"}
-							className="min-[36rem]:max-w-[20rem]"
-						/>
+						<div className="pointer-events-children flex h-full flex-col justify-end">
+							<Chat
+								room={room}
+								playerName={user.name || "Anonymous"}
+								className="flex-1"
+							/>
+						</div>
 					),
 				},
 			]),
@@ -176,36 +178,43 @@ function RoomInternal({
 					roomContext.setSelectedTabId(id ? resolveRoomTabName(id) : null)
 				}
 			>
-				<div className="pointer-events-children fixed inset-0 flex flex-col gap-2 p-2">
-					<header className="pointer-events-children flex items-center gap-4">
-						<SidebarTabs tabs={sidebarTabs} />
-						<AppLogoLink />
-						<div className="ml-auto px-3">
-							<UserButton />
-						</div>
-					</header>
+				<header className="pointer-events-children fixed inset-x-0 top-0 flex h-14 items-center gap-4 px-2">
+					<SidebarTabs tabs={sidebarTabs} />
+					<AppLogoLink />
+					<div className="ml-auto px-1">
+						<UserButton />
+					</div>
+				</header>
 
-					<main className="pointer-events-children flex min-h-0 flex-1 items-end gap-2">
-						<div className="pointer-events-children absolute right-0 bottom-0 px-2 min-[1280px]:right-72 min-[1280px]:mr-2">
+				<main className="pointer-events-children">
+					{standaloneChat ? null : (
+						<div className="pointer-events-children fixed right-0 bottom-0 p-3">
 							<SceneViewerHelpButton />
 						</div>
+					)}
 
-						<div className="pointer-events-children h-full flex-1">
-							<SidebarPanels
-								tabs={sidebarTabs}
-								className="pointer-events-children size-full"
-							/>
-						</div>
+					{sidebarTabs.map((tab) => (
+						<Ariakit.TabPanel
+							key={tab.name}
+							id={tab.name}
+							className="pointer-events-children fixed top-12 bottom-0 left-0 p-2 max-[540px]:right-0"
+							unmountOnHide
+						>
+							{tab.content}
+						</Ariakit.TabPanel>
+					))}
 
-						{standaloneChat && (
+					{standaloneChat && (
+						<div className="pointer-events-children fixed top-10 right-0 bottom-0 flex items-end gap-2 p-3">
+							<SceneViewerHelpButton />
 							<Chat
 								room={room}
 								playerName={user.name || "Anonymous"}
-								className="ml-auto w-72"
+								className="w-72"
 							/>
-						)}
-					</main>
-				</div>
+						</div>
+					)}
+				</main>
 			</Ariakit.TabProvider>
 		</DocumentTitle>
 	)
@@ -225,25 +234,6 @@ function SidebarTabs({ tabs }: { tabs: TabConfig[] }) {
 			))}
 		</Ariakit.TabList>
 	)
-}
-
-function SidebarPanels({
-	tabs,
-	className,
-}: {
-	tabs: TabConfig[]
-	className?: string
-}) {
-	return tabs.map((tab) => (
-		<Ariakit.TabPanel
-			key={tab.name}
-			id={tab.name}
-			className={className}
-			unmountOnHide
-		>
-			{tab.content}
-		</Ariakit.TabPanel>
-	))
 }
 
 function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {

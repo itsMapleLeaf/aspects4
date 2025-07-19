@@ -173,12 +173,12 @@ export function Chat({
 		<section
 			aria-label="Chat"
 			className={twMerge(
-				"flex h-full flex-col gap-2 overflow-y-auto",
+				"pointer-events-children -m-3 flex h-full flex-col gap-2 overflow-y-auto p-3",
 				className,
 			)}
 			ref={bottomScrollRef}
 		>
-			<ul className="flex flex-1 flex-col justify-end gap-2">
+			<ul className="mt-auto grid gap-2">
 				{allMessages.map((message) => (
 					<li key={message._id} className={panel("flex flex-col")}>
 						{"isLocal" in message ? null : (

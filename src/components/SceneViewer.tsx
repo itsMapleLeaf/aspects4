@@ -404,12 +404,12 @@ export function SceneViewerHelpButton() {
 			<DialogButton
 				render={<Tooltip content="Help" placement="top" />}
 				aria-label="Help"
-				className="opacity-50 transition-opacity hover:opacity-100"
+				className="opacity-75 transition-opacity hover:opacity-100"
 			>
-				<div className="rounded-full border border-gray-700 bg-gray-800 p-3 shadow-lg">
+				<div className="flex size-10 items-center justify-center rounded-full border border-gray-700 bg-gray-800 shadow-lg">
 					<Icon
-						icon="mingcute:question-fill"
-						className="size-5 text-gray-300"
+						icon="mingcute:question-line"
+						className="size-6 text-gray-300"
 					/>
 				</div>
 			</DialogButton>
