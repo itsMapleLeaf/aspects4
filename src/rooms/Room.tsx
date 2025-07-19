@@ -181,7 +181,7 @@ function RoomInternal({
 				<header className="pointer-events-children fixed inset-x-0 top-0 flex h-14 items-center gap-4 px-2">
 					<SidebarTabs tabs={sidebarTabs} />
 					<AppLogoLink />
-					<div className="ml-auto px-1">
+					<div className="ml-auto px-3">
 						<UserButton />
 					</div>
 				</header>
