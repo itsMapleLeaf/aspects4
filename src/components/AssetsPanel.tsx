@@ -14,6 +14,7 @@ import { twMerge } from "tailwind-merge"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedAsset } from "../../convex/assets.ts"
+import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { getThumbnailUrl } from "../lib/images.ts"
 import { getViewportCenter, ViewportTransform } from "../lib/viewport.ts"
@@ -21,6 +22,7 @@ import { Icon } from "./ui/Icon.tsx"
 import { LoadingSpinner } from "./ui/LoadingSpinner.tsx"
 import { Menu, MenuButton, MenuItem, MenuPanel } from "./ui/Menu.tsx"
 import { SmallIconButton } from "./ui/SmallIconButton.tsx"
+import { Tooltip } from "./ui/Tooltip.tsx"
 
 export const AssetDropData = type("string.json.parse").to({
 	assetId: "string",
@@ -209,17 +211,19 @@ function AssetList({
 					<LoadingSpinner />
 				</div>
 			)}
-			{assets
-				?.filter((asset) => !roomAssetsByAssetId.has(asset._id))
-				?.map((asset) => (
+			{assets?.map((asset) => {
+				const roomAsset = roomAssetsByAssetId.get(asset._id)
+				return (
 					<li key={asset._id}>
 						<AssetCard
 							asset={asset}
 							roomId={roomId}
+							roomAsset={roomAsset}
 							onAddToScene={() => onAssetAdded?.(asset._id)}
 						/>
 					</li>
-				))}
+				)
+			})}
 		</ul>
 	)
 }
@@ -227,18 +231,22 @@ function AssetList({
 function AssetCard({
 	asset,
 	roomId,
+	roomAsset,
 	onAddToScene,
 }: {
 	asset: NormalizedAsset
 	roomId: Id<"rooms">
+	roomAsset?: NormalizedRoomAsset
 	onAddToScene?: () => void
 }) {
 	const removeAsset = useMutation(api.assets.remove)
 	const updateAsset = useMutation(api.assets.update)
 	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
+	const removeRoomAsset = useMutation(api.roomAssets.remove)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 
 	const url = asset.url && getThumbnailUrl(asset.url, 150)
+	const isInScene = Boolean(roomAsset)
 
 	return (
 		<Menu placement="bottom-start">
@@ -256,21 +264,48 @@ function AssetCard({
 					event.dataTransfer.dropEffect = "move"
 				}}
 			>
-				<img
-					src={url ?? ""}
-					alt=""
-					className="aspect-square w-full rounded-xs object-cover object-top transition"
-					draggable={false}
-				/>
+				<div className="relative">
+					<img
+						src={url ?? ""}
+						alt=""
+						className={twMerge(
+							"aspect-square w-full rounded-xs object-cover object-top transition",
+							isInScene && "brightness-50",
+						)}
+						draggable={false}
+					/>
+					{isInScene && (
+						<div className="absolute right-0 bottom-0 flex gap-1 p-1 opacity-75">
+							<Tooltip content="Currently present in the scene">
+								<Icon
+									icon="mingcute:classify-2-fill"
+									className="size-4 text-white"
+								/>
+							</Tooltip>
+						</div>
+					)}
+				</div>
 				<p className="truncate px-2 py-1 text-center text-xs leading-none font-medium">
 					{asset.name}
 				</p>
 			</MenuButton>
 			<MenuPanel gutter={0} getAnchorRect={() => menuPosition}>
-				<MenuItem onClick={onAddToScene}>
-					<Icon icon="mingcute:classify-add-2-fill" className="size-5" />
-					<span>Add to scene</span>
-				</MenuItem>
+				{isInScene ?
+					<MenuItem
+						onClick={() => {
+							if (roomAsset) {
+								removeRoomAsset({ roomAssetId: roomAsset._id })
+							}
+						}}
+					>
+						<Icon icon="mingcute:classify-2-fill" className="size-5" />
+						<span>Remove from scene</span>
+					</MenuItem>
+				:	<MenuItem onClick={onAddToScene}>
+						<Icon icon="mingcute:classify-add-2-fill" className="size-5" />
+						<span>Add to scene</span>
+					</MenuItem>
+				}
 				<MenuItem
 					onClick={() =>
 						setAsRoomBackground({
