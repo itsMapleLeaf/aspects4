@@ -71,22 +71,25 @@ export const update = mutation({
 	args: {
 		roomId: v.id("rooms"),
 		name: v.optional(v.string()),
-		backgroundId: v.optional(v.union(v.id("_storage"), v.null())),
+		backgroundAssetId: v.optional(v.union(v.id("assets"), v.null())),
 	},
 	async handler(ctx, { roomId, ...args }) {
 		const room = await ctx.db.get(roomId)
-		if (
-			args.backgroundId !== undefined &&
-			room?.backgroundId &&
-			room.backgroundId !== args.backgroundId
-		) {
+
+		if (room?.backgroundId) {
 			try {
 				await ctx.storage.delete(room.backgroundId)
 			} catch (error) {
 				console.error("Failed to delete room image", error, room)
 			}
 		}
-		await ctx.db.patch(roomId, args)
+
+		await ctx.db.patch(roomId, {
+			...args,
+			backgroundAssetId: args.backgroundAssetId,
+			backgroundId: undefined,
+		})
+
 		return roomId
 	},
 })
@@ -157,8 +160,16 @@ export const leave = mutation({
 
 export type ClientRoom = Awaited<ReturnType<typeof toClientRoom>>
 async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
-	const backgroundUrl =
-		room.backgroundId && (await ctx.storage.getUrl(room.backgroundId))
+	let backgroundUrl: string | null = null
+
+	if (room.backgroundAssetId) {
+		const backgroundAsset = await ctx.db.get(room.backgroundAssetId)
+		if (backgroundAsset) {
+			backgroundUrl = await ctx.storage.getUrl(backgroundAsset.storageId)
+		}
+	} else if (room.backgroundId) {
+		backgroundUrl = await ctx.storage.getUrl(room.backgroundId)
+	}
 
 	const userId = await getAuthUserId(ctx)
 
@@ -167,6 +178,7 @@ async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
 	return {
 		...pick(room, ["_id", "_creationTime", "name", "slug"]),
 		backgroundUrl,
+		backgroundAssetId: room.backgroundAssetId || null,
 		isMember: userId != null && members.includes(userId),
 	}
 }

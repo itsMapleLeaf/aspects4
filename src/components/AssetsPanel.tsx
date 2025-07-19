@@ -1,6 +1,6 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
 import { type } from "arktype"
-import { useAction, useMutation, useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import {
 	startTransition,
 	useActionState,
@@ -29,12 +29,15 @@ export const AssetDropData = type("string.json.parse").to({
 })
 
 export function AssetsPanel({
-	roomId,
+	room,
 	viewportTransform,
 	onAssetAdded,
 	className,
 }: {
-	roomId: Id<"rooms">
+	room: {
+		_id: Id<"rooms">
+		backgroundAssetId: Id<"assets"> | null | undefined
+	}
 	viewportTransform: ViewportTransform
 	onAssetAdded?: () => void
 	className?: string
@@ -155,7 +158,7 @@ export function AssetsPanel({
 					/>
 				</header>
 				<AssetList
-					roomId={roomId}
+					room={room}
 					onAssetAdded={async (assetId) => {
 						const viewportSize = {
 							width: window.innerWidth,
@@ -167,7 +170,7 @@ export function AssetsPanel({
 						)
 						await createRoomAsset({
 							assetId,
-							roomId,
+							roomId: room._id,
 							position: centerPosition,
 						})
 						onAssetAdded?.()
@@ -189,17 +192,20 @@ export function AssetsPanel({
 }
 
 function AssetList({
-	roomId,
+	room,
 	onAssetAdded,
 }: {
-	roomId: Id<"rooms">
+	room: {
+		_id: Id<"rooms">
+		backgroundAssetId: Id<"assets"> | null | undefined
+	}
 	onAssetAdded?: (assetId: Id<"assets">) => void
 }) {
 	const originalAssets = useQuery(api.assets.list, {})
 	const assets = useDeferredValue(originalAssets)
 	const isPending = assets !== originalAssets
 
-	const roomAssets = useQuery(api.roomAssets.list, { roomId })
+	const roomAssets = useQuery(api.roomAssets.list, { roomId: room._id })
 	const roomAssetsByAssetId = new Map(
 		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
 	)
@@ -217,7 +223,7 @@ function AssetList({
 					<li key={asset._id}>
 						<AssetCard
 							asset={asset}
-							roomId={roomId}
+							room={room}
 							roomAsset={roomAsset}
 							onAddToScene={() => onAssetAdded?.(asset._id)}
 						/>
@@ -230,23 +236,27 @@ function AssetList({
 
 function AssetCard({
 	asset,
-	roomId,
+	room,
 	roomAsset,
 	onAddToScene,
 }: {
 	asset: NormalizedAsset
-	roomId: Id<"rooms">
+	room: {
+		_id: Id<"rooms">
+		backgroundAssetId: Id<"assets"> | null | undefined
+	}
 	roomAsset?: NormalizedRoomAsset
 	onAddToScene?: () => void
 }) {
 	const removeAsset = useMutation(api.assets.remove)
 	const updateAsset = useMutation(api.assets.update)
-	const setAsRoomBackground = useAction(api.assets.setAsRoomBackground)
 	const removeRoomAsset = useMutation(api.roomAssets.remove)
+	const updateRoom = useMutation(api.rooms.update)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 
 	const url = asset.url && getThumbnailUrl(asset.url, 150)
 	const isInScene = Boolean(roomAsset)
+	const isRoomBackground = asset._id === room.backgroundAssetId
 
 	return (
 		<Menu placement="bottom-start">
@@ -274,16 +284,18 @@ function AssetCard({
 						)}
 						draggable={false}
 					/>
-					{isInScene && (
-						<div className="absolute right-0 bottom-0 flex gap-1 p-1 opacity-75">
+					<div className="absolute right-0 bottom-0 flex gap-1 p-1 text-white *:opacity-60 *:transition-opacity *:hover:opacity-100">
+						{isInScene && (
 							<Tooltip content="Currently present in the scene">
-								<Icon
-									icon="mingcute:classify-2-fill"
-									className="size-4 text-white"
-								/>
+								<Icon icon="mingcute:classify-2-fill" className="size-4" />
 							</Tooltip>
-						</div>
-					)}
+						)}
+						{isRoomBackground && (
+							<Tooltip content="Set as room background">
+								<Icon icon="mingcute:pic-fill" className="size-4" />
+							</Tooltip>
+						)}
+					</div>
 				</div>
 				<p className="truncate px-2 py-1 text-center text-xs leading-none font-medium">
 					{asset.name}
@@ -307,15 +319,24 @@ function AssetCard({
 					</MenuItem>
 				}
 				<MenuItem
-					onClick={() =>
-						setAsRoomBackground({
-							assetId: asset._id,
-							roomId,
-						})
-					}
+					onClick={() => {
+						if (isRoomBackground) {
+							updateRoom({
+								roomId: room._id,
+								backgroundAssetId: null,
+							})
+						} else {
+							updateRoom({
+								roomId: room._id,
+								backgroundAssetId: asset._id,
+							})
+						}
+					}}
 				>
 					<Icon icon="mingcute:pic-fill" className="size-5" />
-					<span>Set as background</span>
+					<span>
+						{isRoomBackground ? "Clear background" : "Set as background"}
+					</span>
 				</MenuItem>
 				<MenuItem
 					onClick={() => {

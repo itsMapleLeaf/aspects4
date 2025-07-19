@@ -41,7 +41,8 @@ export default defineSchema({
 	rooms: defineTable({
 		name: v.string(),
 		slug: v.string(),
-		backgroundId: optionull(v.id("_storage")),
+		backgroundAssetId: optionull(v.id("assets")),
+		backgroundId: optionull(v.id("_storage")), // TODO: Remove this legacy field after migration
 		ownerId: v.optional(v.id("users")),
 		memberUserIds: v.optional(v.array(v.id("users"))),
 	})

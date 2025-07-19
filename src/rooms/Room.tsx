@@ -7,7 +7,6 @@ import { useActionState } from "react"
 import { useLocation } from "wouter"
 import { SceneViewerHelpButton } from "~/components/SceneViewer"
 import { api } from "../../convex/_generated/api"
-import { Id, type Doc } from "../../convex/_generated/dataModel"
 import type { ClientRoom } from "../../convex/rooms.ts"
 import { Chat } from "../chat/Chat.tsx"
 import { ChatProvider } from "../chat/context.tsx"
@@ -22,7 +21,6 @@ import { Field } from "../components/ui/Field.tsx"
 import { Icon } from "../components/ui/Icon.tsx"
 import { UserButton } from "../components/UserButton.tsx"
 import { useLocalStorageState } from "../hooks/storage.ts"
-import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { useMediaQuery } from "../hooks/useMediaQuery.ts"
 import { defaultViewportTransform, ViewportTransform } from "../lib/viewport.ts"
 import { panel } from "../styles/panel.ts"
@@ -119,7 +117,7 @@ function RoomInternal({
 			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
 			content: (
 				<AssetsPanel
-					roomId={room._id}
+					room={room}
 					viewportTransform={viewportTransform}
 					onAssetAdded={() => {
 						if (fullWidthAssetPanel) {
@@ -266,7 +264,7 @@ function SidebarTab({ name, icon }: { name: string; icon: ReactNode }) {
 }
 
 interface RoomSettingsProps {
-	room: Doc<"rooms">
+	room: ClientRoom
 	onUpdateRoom: (name: string) => void
 	backgroundBrightness: number
 	onBackgroundBrightnessChange: (value: number) => void
@@ -308,10 +306,6 @@ function RoomSettings({
 						}}
 						placeholder="Enter room name"
 					/>
-				</Field>
-
-				<Field label="Background">
-					<BackgroundUploader roomId={room._id} />
 				</Field>
 
 				<Field label="Background Brightness" htmlFor="backgroundBrightness">
@@ -379,70 +373,5 @@ function RoomInvitation({ room }: { room: ClientRoom }) {
 				</Button>
 			</form>
 		</div>
-	)
-}
-
-function BackgroundUploader({ roomId }: { roomId: Id<"rooms"> }) {
-	const updateRoom = useMutation(api.rooms.update)
-	const room = useQuery(api.rooms.get, { roomId })
-	const uploadFile = useFileUpload()
-
-	const [uploadError, handleFileChange, isUploading] = useActionState(
-		async (
-			_state: string | void,
-			event: React.ChangeEvent<HTMLInputElement>,
-		) => {
-			const file = event.target.files?.[0]
-			if (!file) return
-
-			try {
-				const storageId = await uploadFile(file)
-				await updateRoom({ roomId, backgroundId: storageId })
-			} catch (error) {
-				return error instanceof Error ? error.message : String(error)
-			}
-		},
-	)
-
-	return (
-		<>
-			<div className="group relative aspect-video w-full overflow-hidden rounded border border-gray-800 bg-gray-950/25 transition focus-within:ring-2 focus-within:ring-primary-500/50 hover:border-gray-700 hover:bg-gray-950/50">
-				{room?.backgroundUrl && (
-					<div
-						className={`h-full w-full bg-cover bg-center brightness-25 transition group-hover:brightness-50`}
-						style={{ backgroundImage: `url(${room.backgroundUrl})` }}
-					/>
-				)}
-				<label className="absolute inset-0 flex items-center justify-center gap-2 p-2">
-					<Icon
-						icon={
-							isUploading ? "mingcute:loading-3-fill" : "mingcute:upload-2-fill"
-						}
-						className={`size-5 ${isUploading ? "animate-spin" : ""}`}
-						aria-hidden
-					/>
-					<span className="text-sm font-medium">
-						{room?.backgroundUrl ? "Change Background" : "Upload Background"}
-					</span>
-					<input
-						type="file"
-						accept="image/*"
-						className="hidden"
-						onChange={handleFileChange}
-					/>
-				</label>
-			</div>
-			{room?.backgroundUrl && (
-				<Button
-					icon={<Icon icon="mingcute:close-fill" />}
-					onClick={() => {
-						updateRoom({ roomId, backgroundId: null })
-					}}
-				>
-					Remove Background
-				</Button>
-			)}
-			<p className="text-red-300 empty:hidden">{uploadError}</p>
-		</>
 	)
 }
