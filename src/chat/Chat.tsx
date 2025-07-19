@@ -5,7 +5,9 @@ import { rollDice } from "~/lib/dice.ts"
 import { panel } from "~/styles/panel.ts"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
+import { Button } from "../components/ui/Button.tsx"
 import { Icon } from "../components/ui/Icon.tsx"
+import { Tooltip } from "../components/ui/Tooltip.tsx"
 import { useChatContext } from "./context.tsx"
 
 type LocalMessage = {
@@ -121,38 +123,37 @@ export function Chat({
 	commandMap.set("r", commands.roll)
 	commandMap.set("rp", commands.rollpriv)
 
+	const submit = async () => {
+		try {
+			if (chat.input.startsWith("/")) {
+				const commandParts = chat.input.slice(1).split(/\s+/)
+				const commandName = commandParts[0]?.toLowerCase()
+				const command = commandName && commandMap.get(commandName)
+				if (command) {
+					await command.run(commandParts.slice(1))
+				} else {
+					addLocalMessage(
+						`Unknown command "/${commandName}". Type "/help" for available commands.`,
+					)
+				}
+			} else {
+				await chat.sendMessage(chat.input)
+			}
+			chat.setInput("")
+		} catch (error) {
+			console.error(error)
+			addLocalMessage(
+				`Error: ${error instanceof Error ? error.message : "Something went wrong. Try again."}`,
+			)
+		}
+	}
+
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<{ value: string }>,
 	) => {
 		if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey) {
 			event.preventDefault()
-
-			const content = event.currentTarget.value.trim()
-			if (!content) return
-
-			try {
-				if (content.startsWith("/")) {
-					const commandParts = content.slice(1).split(/\s+/)
-					const commandName = commandParts[0]?.toLowerCase()
-					const command = commandName && commandMap.get(commandName)
-					if (command) {
-						await command.run(commandParts.slice(1))
-					} else {
-						addLocalMessage(
-							`Unknown command "/${commandName}". Type "/help" for available commands.`,
-						)
-					}
-				} else {
-					await chat.sendMessage(content)
-				}
-				chat.setInput("")
-			} catch (error) {
-				console.error(error)
-				addLocalMessage(
-					`Error: ${error instanceof Error ? error.message : "Something went wrong. Try again."}`,
-				)
-				event.currentTarget.value = content
-			}
+			submit()
 		}
 	}
 
@@ -214,17 +215,21 @@ export function Chat({
 				))}
 			</ul>
 
-			<footer
-				className={panel(
-					"sticky bottom-0 p-0 shadow-[0_0_8px_black] focus-within:border-gray-700",
-				)}
-			>
-				<textarea
-					placeholder="Say something!"
-					className="block field-sizing-content w-full resize-none px-3 py-2 focus:outline-none"
-					value={chat.input}
-					onChange={(event) => chat.setInput(event.target.value)}
-					onKeyDown={handleKeyDown}
+			<footer className="sticky bottom-0 flex gap-2">
+				<div className="flex-1 panel shadow-[0_0_8px_black] focus-within:border-gray-700">
+					<textarea
+						placeholder="Say something!"
+						className="block field-sizing-content w-full resize-none px-3 py-2 focus:outline-none"
+						value={chat.input}
+						onChange={(event) => chat.setInput(event.target.value)}
+						onKeyDown={handleKeyDown}
+					/>
+				</div>
+				<Button
+					icon="mingcute:send-fill"
+					className="h-[unset] border-gray-800 bg-gray-900 shadow-[0_0_8px_black]"
+					render={<Tooltip content="Send" />}
+					onClick={submit}
 				/>
 			</footer>
 		</section>
