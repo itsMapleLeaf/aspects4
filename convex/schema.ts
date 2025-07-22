@@ -55,7 +55,7 @@ export default defineSchema({
 		characterId: v.id("characters"),
 	}).index("roomId", ["roomId", "characterId"]),
 
-	roomAssets: defineTable({
+	sprites: defineTable({
 		roomId: v.id("rooms"),
 		assetId: v.id("assets"),
 		position: vector(),

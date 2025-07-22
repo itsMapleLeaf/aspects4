@@ -9,7 +9,7 @@ import { Dialog, DialogButton, DialogPanel } from "~/components/ui/Dialog.tsx"
 import { Tooltip } from "~/components/ui/Tooltip.tsx"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
-import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
+import type { NormalizedSprite } from "../../convex/sprites.ts"
 import { getThumbnailUrl } from "../lib/images.ts"
 import {
 	getViewportScale,
@@ -35,12 +35,12 @@ export function SceneViewer({
 		next: (prev: ViewportTransform) => ViewportTransform,
 	) => void
 }) {
-	const assets = useQuery(api.roomAssets.list, { roomId: room._id })
-	const createRoomAsset = useMutation(api.roomAssets.place)
-	const removeRoomAsset = useRemoveRoomAsset(room._id)
-	const updateRoomAsset = useUpdateRoomAsset(room._id)
-	const moveRoomAssetToFront = useMoveRoomAssetToFront(room._id)
-	const [selectedAssetId, setSelectedAssetId] = useState<Id<"roomAssets">>()
+	const assets = useQuery(api.sprites.list, { roomId: room._id })
+	const createSprite = useMutation(api.sprites.place)
+	const removeSprite = useRemoveSprite(room._id)
+	const updateSprite = useUpdateSprite(room._id)
+	const moveSpritesToFront = useMoveSpritesToFront(room._id)
+	const [selectedAssetId, setSelectedAssetId] = useState<Id<"sprites">>()
 	const [assetDragCursor, setAssetDragOffset] = useState({ x: 0, y: 0 })
 	const [assetDragAction, setAssetDragAction] = useState<"move" | "resize">(
 		"move",
@@ -59,7 +59,7 @@ export function SceneViewer({
 							console.log("resize")
 						}
 						if (target instanceof HTMLElement && target.dataset.assetId) {
-							selectedAssetId = target.dataset.assetId as Id<"roomAssets">
+							selectedAssetId = target.dataset.assetId as Id<"sprites">
 						}
 					}
 					setSelectedAssetId(selectedAssetId)
@@ -111,8 +111,8 @@ export function SceneViewer({
 				}
 
 				if (assetDragAction === "move") {
-					updateRoomAsset({
-						roomAssetId: selectedAsset._id,
+					updateSprite({
+						spriteId: selectedAsset._id,
 						data: {
 							position: {
 								x: selectedAsset.position.x + assetDragCursor.x,
@@ -126,8 +126,8 @@ export function SceneViewer({
 					const newWidth = (selectedAsset?.size?.x ?? 0) + assetDragCursor.x
 					const newHeight = (selectedAsset?.size?.y ?? 0) + assetDragCursor.y
 
-					updateRoomAsset({
-						roomAssetId: selectedAsset._id,
+					updateSprite({
+						spriteId: selectedAsset._id,
 						data: {
 							size: {
 								x: newWidth,
@@ -188,7 +188,7 @@ export function SceneViewer({
 					const scale = getViewportScale(viewportTransform.zoom)
 					const dropX = (event.clientX - viewportTransform.offset.x) / scale
 					const dropY = (event.clientY - viewportTransform.offset.y) / scale
-					createRoomAsset({
+					createSprite({
 						roomId: room._id,
 						assetId: result.assetId as Id<"assets">,
 						position: { x: dropX, y: dropY },
@@ -219,7 +219,7 @@ export function SceneViewer({
 				selectedAssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
-				removeRoomAsset({ roomAssetId: selectedAssetId })
+				removeSprite({ spriteId: selectedAssetId })
 				setSelectedAssetId(undefined)
 			}
 
@@ -232,8 +232,8 @@ export function SceneViewer({
 					(asset) => asset._id === selectedAssetId,
 				)
 				if (selectedAsset) {
-					updateRoomAsset({
-						roomAssetId: selectedAssetId,
+					updateSprite({
+						spriteId: selectedAssetId,
 						data: {
 							locked: !selectedAsset.locked,
 						},
@@ -247,15 +247,15 @@ export function SceneViewer({
 				selectedAssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
-				moveRoomAssetToFront({ roomAssetId: selectedAssetId })
+				moveSpritesToFront({ spriteId: selectedAssetId })
 			}
 			if (
 				event.key === "b" &&
 				selectedAssetId &&
 				!document.activeElement?.matches("input, textarea")
 			) {
-				updateRoomAsset({
-					roomAssetId: selectedAssetId,
+				updateSprite({
+					spriteId: selectedAssetId,
 					data: {
 						updateTime: 0,
 					},
@@ -315,7 +315,7 @@ export function SceneViewer({
 				assets={assets ?? []}
 				viewportTransform={viewportTransform}
 				selectedAssetId={selectedAssetId}
-				onAssetClick={(assetId: Id<"roomAssets">) => {
+				onAssetClick={(assetId: Id<"sprites">) => {
 					setSelectedAssetId(assetId)
 					const asset = assets?.find((a) => a._id === assetId)
 					if (asset) {
@@ -348,7 +348,7 @@ function AssetImage({
 	dragOffset,
 	resizeOffset,
 }: {
-	asset: NormalizedRoomAsset
+	asset: NormalizedSprite
 	viewportTransform: ViewportTransform
 	isSelected: boolean
 	dragOffset: { x: number; y: number }
@@ -429,10 +429,10 @@ function OffScreenAssetIndicators({
 	selectedAssetId,
 	onAssetClick,
 }: {
-	assets: NormalizedRoomAsset[]
+	assets: NormalizedSprite[]
 	viewportTransform: ViewportTransform
-	selectedAssetId: Id<"roomAssets"> | undefined
-	onAssetClick: (assetId: Id<"roomAssets">) => void
+	selectedAssetId: Id<"sprites"> | undefined
+	onAssetClick: (assetId: Id<"sprites">) => void
 }) {
 	const scale = getViewportScale(viewportTransform.zoom)
 	const viewportWidth = window.innerWidth
@@ -510,30 +510,28 @@ function OffScreenAssetIndicators({
 	)
 }
 
-function useUpdateRoomAsset(roomId: Id<"rooms">) {
-	return useMutation(api.roomAssets.update).withOptimisticUpdate(
-		(store, args) => {
-			const items = store.getQuery(api.roomAssets.list, { roomId })
-			store.setQuery(
-				api.roomAssets.list,
-				{ roomId },
-				items?.map((item) =>
-					item._id === args.roomAssetId ? { ...item, ...args.data } : item,
-				),
-			)
-		},
-	)
+function useUpdateSprite(roomId: Id<"rooms">) {
+	return useMutation(api.sprites.update).withOptimisticUpdate((store, args) => {
+		const items = store.getQuery(api.sprites.list, { roomId })
+		store.setQuery(
+			api.sprites.list,
+			{ roomId },
+			items?.map((item) =>
+				item._id === args.spriteId ? { ...item, ...args.data } : item,
+			),
+		)
+	})
 }
 
-function useMoveRoomAssetToFront(roomId: Id<"rooms">) {
-	const assets = useQuery(api.roomAssets.list, { roomId })
-	return useMutation(api.roomAssets.moveToFront).withOptimisticUpdate(
+function useMoveSpritesToFront(roomId: Id<"rooms">) {
+	const assets = useQuery(api.sprites.list, { roomId })
+	return useMutation(api.sprites.moveToFront).withOptimisticUpdate(
 		(store, args) => {
 			store.setQuery(
-				api.roomAssets.list,
+				api.sprites.list,
 				{ roomId },
 				assets?.map((item) =>
-					item._id === args.roomAssetId ?
+					item._id === args.spriteId ?
 						{ ...item, updateTime: Date.now() }
 					:	item,
 				),
@@ -542,17 +540,15 @@ function useMoveRoomAssetToFront(roomId: Id<"rooms">) {
 	)
 }
 
-function useRemoveRoomAsset(roomId: Id<"rooms">) {
-	return useMutation(api.roomAssets.remove).withOptimisticUpdate(
-		(store, args) => {
-			const items = store.getQuery(api.roomAssets.list, { roomId })
-			store.setQuery(
-				api.roomAssets.list,
-				{ roomId },
-				items?.filter((item) => item._id !== args.roomAssetId),
-			)
-		},
-	)
+function useRemoveSprite(roomId: Id<"rooms">) {
+	return useMutation(api.sprites.remove).withOptimisticUpdate((store, args) => {
+		const items = store.getQuery(api.sprites.list, { roomId })
+		store.setQuery(
+			api.sprites.list,
+			{ roomId },
+			items?.filter((item) => item._id !== args.spriteId),
+		)
+	})
 }
 
 export function SceneViewerHelpButton() {

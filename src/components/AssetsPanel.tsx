@@ -14,7 +14,7 @@ import { twMerge } from "tailwind-merge"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import type { NormalizedAsset } from "../../convex/assets.ts"
-import type { NormalizedRoomAsset } from "../../convex/roomAssets.ts"
+import type { NormalizedSprite } from "../../convex/sprites.ts"
 import { useFileUpload } from "../hooks/useFileUpload.ts"
 import { getThumbnailUrl } from "../lib/images.ts"
 import { getViewportCenter, ViewportTransform } from "../lib/viewport.ts"
@@ -43,7 +43,7 @@ export function AssetsPanel({
 	className?: string
 }) {
 	const createAsset = useMutation(api.assets.create)
-	const createRoomAsset = useMutation(api.roomAssets.place)
+	const createSprite = useMutation(api.sprites.place)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 	const uploadFile = useFileUpload()
 
@@ -168,7 +168,7 @@ export function AssetsPanel({
 							viewportTransform,
 							viewportSize,
 						)
-						await createRoomAsset({
+						await createSprite({
 							assetId,
 							roomId: room._id,
 							position: centerPosition,
@@ -205,9 +205,9 @@ function AssetList({
 	const assets = useDeferredValue(originalAssets)
 	const isPending = assets !== originalAssets
 
-	const roomAssets = useQuery(api.roomAssets.list, { roomId: room._id })
-	const roomAssetsByAssetId = new Map(
-		roomAssets?.map((asset) => [asset.assetId, asset]) ?? [],
+	const sprites = useQuery(api.sprites.list, { roomId: room._id })
+	const spritesByAssetId = new Map(
+		sprites?.map((asset) => [asset.assetId, asset]) ?? [],
 	)
 
 	return (
@@ -218,13 +218,13 @@ function AssetList({
 				</div>
 			)}
 			{assets?.map((asset) => {
-				const roomAsset = roomAssetsByAssetId.get(asset._id)
+				const sprite = spritesByAssetId.get(asset._id)
 				return (
 					<li key={asset._id}>
 						<AssetCard
 							asset={asset}
 							room={room}
-							roomAsset={roomAsset}
+							sprite={sprite}
 							onAddToScene={() => onAssetAdded?.(asset._id)}
 						/>
 					</li>
@@ -237,7 +237,7 @@ function AssetList({
 function AssetCard({
 	asset,
 	room,
-	roomAsset,
+	sprite,
 	onAddToScene,
 }: {
 	asset: NormalizedAsset
@@ -245,17 +245,17 @@ function AssetCard({
 		_id: Id<"rooms">
 		backgroundAssetId: Id<"assets"> | null | undefined
 	}
-	roomAsset?: NormalizedRoomAsset
+	sprite?: NormalizedSprite
 	onAddToScene?: () => void
 }) {
 	const removeAsset = useMutation(api.assets.remove)
 	const updateAsset = useMutation(api.assets.update)
-	const removeRoomAsset = useMutation(api.roomAssets.remove)
+	const removeSprite = useMutation(api.sprites.remove)
 	const updateRoom = useMutation(api.rooms.update)
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 
 	const url = asset.url && getThumbnailUrl(asset.url, 150)
-	const isInScene = Boolean(roomAsset)
+	const isInScene = Boolean(sprite)
 	const isRoomBackground = asset._id === room.backgroundAssetId
 
 	return (
@@ -305,8 +305,8 @@ function AssetCard({
 				{isInScene ?
 					<MenuItem
 						onClick={() => {
-							if (roomAsset) {
-								removeRoomAsset({ roomAssetId: roomAsset._id })
+							if (sprite) {
+								removeSprite({ spriteId: sprite._id })
 							}
 						}}
 					>

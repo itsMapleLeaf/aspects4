@@ -19,8 +19,10 @@ import type * as characters from "../characters.js";
 import type * as http from "../http.js";
 import type * as lib_validators from "../lib/validators.js";
 import type * as messages from "../messages.js";
+import type * as migration from "../migration.js";
 import type * as roomAssets from "../roomAssets.js";
 import type * as rooms from "../rooms.js";
+import type * as sprites from "../sprites.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 
@@ -39,8 +41,10 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/validators": typeof lib_validators;
   messages: typeof messages;
+  migration: typeof migration;
   roomAssets: typeof roomAssets;
   rooms: typeof rooms;
+  sprites: typeof sprites;
   storage: typeof storage;
   users: typeof users;
 }>;
