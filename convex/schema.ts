@@ -1,4 +1,5 @@
 import { authTables } from "@convex-dev/auth/server"
+import { deprecated } from "convex-helpers/validators"
 import { defineSchema, defineTable } from "convex/server"
 import { v } from "convex/values"
 import { optionull, vector } from "./lib/validators.ts"
@@ -45,6 +46,7 @@ export default defineSchema({
 		backgroundId: optionull(v.id("_storage")), // TODO: Remove this legacy field after migration
 		ownerId: v.optional(v.id("users")),
 		memberUserIds: v.optional(v.array(v.id("users"))),
+		activeSceneId: v.optional(v.id("scenes")),
 	})
 		.index("name", ["name"])
 		.index("slug", ["slug"])
@@ -55,16 +57,26 @@ export default defineSchema({
 		characterId: v.id("characters"),
 	}).index("roomId", ["roomId", "characterId"]),
 
+	scenes: defineTable({
+		name: v.string(),
+		roomId: v.id("rooms"),
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	}).index("roomId", ["roomId", "createdAt"]),
+
 	sprites: defineTable({
 		roomId: v.id("rooms"),
+		sceneId: v.optional(v.id("scenes")),
 		assetId: v.id("assets"),
 		position: vector(),
 		size: vector(),
 		rotation: v.number(),
 		locked: v.boolean(),
-		inScene: v.boolean(),
+		inScene: deprecated,
 		updateTime: v.number(),
-	}).index("roomId", ["roomId", "assetId"]),
+	})
+		.index("roomId", ["roomId", "assetId"])
+		.index("sceneId", ["sceneId", "assetId"]),
 
 	messages: defineTable({
 		sender: v.string(),

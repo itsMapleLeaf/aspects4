@@ -18,6 +18,7 @@ export function useRoomContext() {
 export const RoomTabNames = {
 	Characters: "Characters",
 	Assets: "Assets",
+	Scenes: "Scenes",
 	Chat: "Chat",
 	Settings: "Settings",
 } as const

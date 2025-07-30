@@ -21,24 +21,27 @@ async function normalizeSprite(ctx: QueryCtx, doc: Doc<"sprites">) {
 export const list = query({
 	args: {
 		roomId: v.id("rooms"),
+		sceneId: v.optional(v.id("scenes")),
 	},
-	async handler(ctx, { roomId }) {
-		const assets = await ctx.db
+	async handler(ctx, { roomId, sceneId }) {
+		const query = ctx.db
 			.query("sprites")
 			.withIndex("roomId", (q) => q.eq("roomId", roomId))
-			.collect()
 
-		const normalized = await Array.fromAsync(assets, (asset) =>
+		const assets = await query.collect()
+
+		const filteredAssets =
+			sceneId === undefined ? assets
+			: sceneId === null ? assets.filter((asset) => !asset.sceneId)
+			: assets.filter((asset) => asset.sceneId === sceneId)
+
+		const normalized = await Array.fromAsync(filteredAssets, (asset) =>
 			normalizeSprite(ctx, asset),
 		)
 
-		return normalized
-			.sort((a, b) =>
-				(a.name ?? "")
-					.toLowerCase()
-					.localeCompare((b.name ?? "").toLowerCase()),
-			)
-			.filter((asset) => asset.inScene)
+		return normalized.sort((a, b) =>
+			(a.name ?? "").toLowerCase().localeCompare((b.name ?? "").toLowerCase()),
+		)
 	},
 })
 
@@ -54,15 +57,22 @@ export const place = mutation({
 			throw new Error("Not signed in")
 		}
 
+		const room = await ctx.db.get(roomId)
+		if (!room) {
+			throw new Error(`Room with ID "${roomId}" not found`)
+		}
+
 		const existing = await ctx.db
 			.query("sprites")
-			.withIndex("roomId", (q) => q.eq("roomId", roomId).eq("assetId", assetId))
+			.withIndex("sceneId", (q) =>
+				q.eq("sceneId", room.activeSceneId).eq("assetId", assetId),
+			)
 			.first()
 
 		if (existing) {
 			await ctx.db.patch(existing._id, {
 				...args,
-				inScene: true,
+				sceneId: room.activeSceneId,
 				position: {
 					x: position.x - existing.size.x / 2,
 					y: position.y - existing.size.y / 2,
@@ -92,7 +102,7 @@ export const place = mutation({
 				x: position.x - defaultSize.x / 2,
 				y: position.y - defaultSize.y / 2,
 			},
-			inScene: true,
+			sceneId: room.activeSceneId,
 			roomId,
 			assetId,
 		})
@@ -123,6 +133,41 @@ export const remove = mutation({
 		spriteId: v.id("sprites"),
 	},
 	async handler(ctx, { spriteId }) {
-		await ctx.db.patch(spriteId, { inScene: false })
+		await ctx.db.delete(spriteId)
+	},
+})
+
+export const addToScene = mutation({
+	args: {
+		spriteId: v.id("sprites"),
+		sceneId: v.id("scenes"),
+	},
+	async handler(ctx, { spriteId, sceneId }) {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) {
+			throw new Error("Not signed in")
+		}
+
+		await ctx.db.patch(spriteId, {
+			sceneId,
+			updateTime: Date.now(),
+		})
+	},
+})
+
+export const removeFromScene = mutation({
+	args: {
+		spriteId: v.id("sprites"),
+	},
+	async handler(ctx, { spriteId }) {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) {
+			throw new Error("Not signed in")
+		}
+
+		await ctx.db.patch(spriteId, {
+			sceneId: undefined,
+			updateTime: Date.now(),
+		})
 	},
 })

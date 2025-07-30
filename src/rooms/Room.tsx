@@ -114,7 +114,7 @@ function RoomInternal({
 
 		{
 			name: RoomTabNames.Assets,
-			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
+			icon: <Icon icon="mingcute:file-fill" className="size-5" />,
 			content: (
 				<AssetsPanel
 					room={room}
@@ -124,10 +124,25 @@ function RoomInternal({
 							roomContext.setSelectedTabId(null)
 						}
 					}}
-					className={fullWidthAssetPanel ? "" : "max-w-[20rem]"}
+					className={fullWidthAssetPanel ? "" : "w-[20rem]"}
 				/>
 			),
 		},
+
+		// ...(room.isOwner ?
+		// 	[
+		// 		{
+		// 			name: RoomTabNames.Scenes,
+		// 			icon: <Icon icon="mingcute:pic-fill" className="size-5" />,
+		// 			content: (
+		// 				<ScenesPanel
+		// 					room={room}
+		// 					className={fullWidthAssetPanel ? "" : "w-[20rem]"}
+		// 				/>
+		// 			),
+		// 		},
+		// 	]
+		// :	[]),
 
 		...(standaloneChat ?
 			[]

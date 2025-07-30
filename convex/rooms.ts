@@ -176,10 +176,11 @@ async function toClientRoom(ctx: QueryCtx, room: Doc<"rooms">) {
 	const members = getRoomMembers(room)
 
 	return {
-		...pick(room, ["_id", "_creationTime", "name", "slug"]),
+		...pick(room, ["_id", "_creationTime", "name", "slug", "activeSceneId"]),
 		backgroundUrl,
 		backgroundAssetId: room.backgroundAssetId || null,
 		isMember: userId != null && members.includes(userId),
+		isOwner: userId === room.ownerId,
 	}
 }
 

@@ -198,6 +198,7 @@ function AssetList({
 	room: {
 		_id: Id<"rooms">
 		backgroundAssetId: Id<"assets"> | null | undefined
+		activeSceneId?: Id<"scenes">
 	}
 	onAssetAdded?: (assetId: Id<"assets">) => void
 }) {
@@ -205,7 +206,11 @@ function AssetList({
 	const assets = useDeferredValue(originalAssets)
 	const isPending = assets !== originalAssets
 
-	const sprites = useQuery(api.sprites.list, { roomId: room._id })
+	const sprites = useQuery(api.sprites.list, {
+		roomId: room._id,
+		sceneId: room.activeSceneId,
+	})
+
 	const spritesByAssetId = new Map(
 		sprites?.map((asset) => [asset.assetId, asset]) ?? [],
 	)

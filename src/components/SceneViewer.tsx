@@ -28,6 +28,7 @@ export function SceneViewer({
 	room: {
 		_id: Id<"rooms">
 		backgroundUrl: string | null | undefined
+		activeSceneId?: Id<"scenes">
 	}
 	backgroundBrightness: number
 	viewportTransform: ViewportTransform
@@ -35,11 +36,14 @@ export function SceneViewer({
 		next: (prev: ViewportTransform) => ViewportTransform,
 	) => void
 }) {
-	const assets = useQuery(api.sprites.list, { roomId: room._id })
+	const assets = useQuery(api.sprites.list, {
+		roomId: room._id,
+		sceneId: room.activeSceneId,
+	})
 	const createSprite = useMutation(api.sprites.place)
-	const removeSprite = useRemoveSprite(room._id)
-	const updateSprite = useUpdateSprite(room._id)
-	const moveSpritesToFront = useMoveSpritesToFront(room._id)
+	const removeSprite = useRemoveSprite()
+	const updateSprite = useUpdateSprite()
+	const moveSpritesToFront = useMoveSpritesToFront()
 	const [selectedAssetId, setSelectedAssetId] = useState<Id<"sprites">>()
 	const [assetDragCursor, setAssetDragOffset] = useState({ x: 0, y: 0 })
 	const [assetDragAction, setAssetDragAction] = useState<"move" | "resize">(
@@ -510,44 +514,50 @@ function OffScreenAssetIndicators({
 	)
 }
 
-function useUpdateSprite(roomId: Id<"rooms">) {
+function useUpdateSprite() {
 	return useMutation(api.sprites.update).withOptimisticUpdate((store, args) => {
-		const items = store.getQuery(api.sprites.list, { roomId })
-		store.setQuery(
-			api.sprites.list,
-			{ roomId },
-			items?.map((item) =>
-				item._id === args.spriteId ? { ...item, ...args.data } : item,
-			),
-		)
+		const queries = store.getAllQueries(api.sprites.list)
+		for (const query of queries) {
+			store.setQuery(
+				api.sprites.list,
+				query.args,
+				query.value?.map((item) =>
+					item._id === args.spriteId ? { ...item, ...args.data } : item,
+				),
+			)
+		}
 	})
 }
 
-function useMoveSpritesToFront(roomId: Id<"rooms">) {
-	const assets = useQuery(api.sprites.list, { roomId })
+function useMoveSpritesToFront() {
 	return useMutation(api.sprites.moveToFront).withOptimisticUpdate(
 		(store, args) => {
-			store.setQuery(
-				api.sprites.list,
-				{ roomId },
-				assets?.map((item) =>
-					item._id === args.spriteId ?
-						{ ...item, updateTime: Date.now() }
-					:	item,
-				),
-			)
+			const queries = store.getAllQueries(api.sprites.list)
+			for (const query of queries) {
+				store.setQuery(
+					api.sprites.list,
+					query.args,
+					query.value?.map((item) =>
+						item._id === args.spriteId ?
+							{ ...item, updateTime: Date.now() }
+						:	item,
+					),
+				)
+			}
 		},
 	)
 }
 
-function useRemoveSprite(roomId: Id<"rooms">) {
+function useRemoveSprite() {
 	return useMutation(api.sprites.remove).withOptimisticUpdate((store, args) => {
-		const items = store.getQuery(api.sprites.list, { roomId })
-		store.setQuery(
-			api.sprites.list,
-			{ roomId },
-			items?.filter((item) => item._id !== args.spriteId),
-		)
+		const queries = store.getAllQueries(api.sprites.list)
+		for (const query of queries) {
+			store.setQuery(
+				api.sprites.list,
+				query.args,
+				query.value?.filter((item) => item._id !== args.spriteId),
+			)
+		}
 	})
 }
 
