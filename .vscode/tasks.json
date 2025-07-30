@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"label": "dev",
-			"dependsOn": ["dev:app", "dev:convex", "dev:typecheck"],
+			"dependsOn": ["dev:typecheck", "dev:convex", "dev:app"],
 			"dependsOrder": "parallel",
 			"group": {
 				"kind": "build",
