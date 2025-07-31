@@ -29,7 +29,8 @@
 		{
 			"label": "dev:typecheck",
 			"type": "shell",
-			"command": "bun tsc -b --watch --noEmit",
+			"command": "bun",
+			"args": ["tsc", "--watch", "--noEmit"],
 			"problemMatcher": ["$tsc-watch"],
 			"isBackground": true
 		}
