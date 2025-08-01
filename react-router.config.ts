@@ -5,5 +5,6 @@ export default {
 	appDirectory: "src",
 	future: {
 		unstable_optimizeDeps: true,
+		unstable_viteEnvironmentApi: true,
 	},
 } satisfies Config
