@@ -30,6 +30,9 @@ export function Root() {
 						<Route path="/rooms/:slug">
 							{(params) => <Room slug={params.slug} />}
 						</Route>
+						<Route path="/templates">
+							<p>Work in progress</p>
+						</Route>
 						<Route path="/account/settings">
 							<AccountSettings />
 						</Route>
