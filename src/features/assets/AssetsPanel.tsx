@@ -1,5 +1,4 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
-import { type } from "arktype"
 import { useMutation, useQuery } from "convex/react"
 import {
 	startTransition,
@@ -23,10 +22,7 @@ import { LoadingSpinner } from "../ui/LoadingSpinner.tsx"
 import { Menu, MenuButton, MenuItem, MenuPanel } from "../ui/Menu.tsx"
 import { SmallIconButton } from "../ui/SmallIconButton.tsx"
 import { Tooltip } from "../ui/Tooltip.tsx"
-
-export const AssetDropData = type("string.json.parse").to({
-	assetId: "string",
-})
+import type { AssetDropData } from "./AssetDropData.ts"
 
 export function AssetsPanel({
 	room,
@@ -276,7 +272,6 @@ function AssetCard({
 						assetId: asset._id,
 					}
 					event.dataTransfer.setData("application/json", JSON.stringify(data))
-					event.dataTransfer.dropEffect = "move"
 				}}
 			>
 				<div className="relative">

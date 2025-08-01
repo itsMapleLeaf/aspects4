@@ -14,7 +14,7 @@ import {
 	handleViewportZoom,
 	ViewportTransform,
 } from "../../lib/viewport.ts"
-import { AssetDropData } from "../assets/AssetsPanel.tsx"
+import { AssetDropData } from "../assets/AssetDropData.ts"
 import { Dialog, DialogButton, DialogPanel } from "../ui/Dialog.tsx"
 import { Icon } from "../ui/Icon.tsx"
 import { Tooltip } from "../ui/Tooltip.tsx"
@@ -78,12 +78,6 @@ export function SceneViewer({
 						{ once: true },
 					)
 				}
-			},
-
-			onDragStart() {
-				// if (selectedAssetId) {
-				// 	moveRoomAssetToFront({ roomAssetId: selectedAssetId })
-				// }
 			},
 
 			onDrag({ buttons, touches, delta: [deltaX, deltaY] }) {
@@ -168,39 +162,6 @@ export function SceneViewer({
 
 				return distance
 			},
-
-			onDragOver({ event }) {
-				if (event.dataTransfer!.types.includes("application/json")) {
-					event.preventDefault()
-					event.dataTransfer!.dropEffect = "move"
-				}
-			},
-
-			onDrop({ event }) {
-				event.preventDefault()
-				event.stopPropagation()
-
-				try {
-					const result = AssetDropData(
-						event.dataTransfer!.getData("application/json"),
-					)
-					if (result instanceof type.errors) {
-						console.warn(result)
-						return
-					}
-
-					const scale = getViewportScale(viewportTransform.zoom)
-					const dropX = (event.clientX - viewportTransform.offset.x) / scale
-					const dropY = (event.clientY - viewportTransform.offset.y) / scale
-					createSprite({
-						roomId: room._id,
-						assetId: result.assetId as Id<"assets">,
-						position: { x: dropX, y: dropY },
-					})
-				} catch (err) {
-					console.error("Error processing dropped asset:", err)
-				}
-			},
 		},
 		{
 			drag: {
@@ -277,6 +238,37 @@ export function SceneViewer({
 		<div
 			{...bindPointerGestures()}
 			className="relative h-dvh w-dvw touch-none overflow-clip select-none"
+			onDragOver={(event) => {
+				if (event.dataTransfer!.types.includes("application/json")) {
+					event.preventDefault()
+					event.dataTransfer!.dropEffect = "move"
+				}
+			}}
+			onDrop={async (event) => {
+				event.preventDefault()
+				event.stopPropagation()
+
+				try {
+					const result = AssetDropData(
+						event.dataTransfer!.getData("application/json"),
+					)
+					if (result instanceof type.errors) {
+						console.warn(result)
+						return
+					}
+
+					const scale = getViewportScale(viewportTransform.zoom)
+					const dropX = (event.clientX - viewportTransform.offset.x) / scale
+					const dropY = (event.clientY - viewportTransform.offset.y) / scale
+					await createSprite({
+						roomId: room._id,
+						assetId: result.assetId as Id<"assets">,
+						position: { x: dropX, y: dropY },
+					})
+				} catch (err) {
+					console.error("Error processing dropped asset:", err)
+				}
+			}}
 		>
 			{room.backgroundUrl && (
 				<div
