@@ -1,7 +1,7 @@
 import { mapValues } from "es-toolkit"
-import { ASPECTS } from "~/characters/data.ts"
-import { resolveMilestoneListFieldItems } from "~/characters/milestones.ts"
-import { FieldContext, resolveNumberField } from "~/characters/sheet/fields.ts"
+import { ASPECTS } from "./data.ts"
+import { resolveMilestoneListFieldItems } from "./milestones.ts"
+import { FieldContext, resolveNumberField } from "./sheet/fields.ts"
 
 export function resolveAspectFields(sheet: FieldContext) {
 	const milestones = resolveMilestoneListFieldItems(sheet)

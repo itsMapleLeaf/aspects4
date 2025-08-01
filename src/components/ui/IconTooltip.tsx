@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge"
-import { Icon } from "~/components/ui/Icon.tsx"
-import { Tooltip, type TooltipProps } from "~/components/ui/Tooltip.tsx"
+import { Icon } from "./Icon.tsx"
+import { Tooltip, type TooltipProps } from "./Tooltip.tsx"
 
 export function IconTooltip({ children, className, ...props }: TooltipProps) {
 	return (

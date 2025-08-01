@@ -1,5 +1,5 @@
 import { useId, type ComponentPropsWithoutRef, type ReactNode } from "react"
-import { Icon } from "~/components/ui/Icon.tsx"
+import { Icon } from "./Icon.tsx"
 import { Tooltip } from "./Tooltip.tsx"
 
 type TextAreaProps = {

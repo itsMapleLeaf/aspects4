@@ -1,6 +1,6 @@
 import { clamp } from "es-toolkit"
 import { ComponentProps, useState } from "react"
-import { parseNumberSafe } from "~/lib/utils.ts"
+import { parseNumberSafe } from "../lib/utils.ts"
 
 export type EditableNumberConfig = {
 	min?: number

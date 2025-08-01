@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
-import { Icon } from "~/components/ui/Icon.tsx"
+import { Icon } from "./Icon.tsx"
 
 export type LoadingSpinnerProps = Partial<ComponentProps<typeof Icon>>
 

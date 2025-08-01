@@ -1,7 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { useState } from "react"
-import { CharacterEditor } from "~/characters/CharacterEditor.tsx"
+import { CharacterEditor } from "../characters/CharacterEditor.tsx"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 import { useLocalStorageState } from "../hooks/storage.ts"

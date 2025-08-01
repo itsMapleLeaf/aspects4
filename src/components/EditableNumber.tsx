@@ -1,8 +1,8 @@
 import { useId, type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
-import { Button } from "~/components/ui/Button.tsx"
-import { Field } from "~/components/ui/Field.tsx"
-import { Input } from "~/components/ui/Input.tsx"
+import { Button } from "./ui/Button.tsx"
+import { Field } from "./ui/Field.tsx"
+import { Input } from "./ui/Input.tsx"
 import {
 	useEditableNumber,
 	type EditableNumberConfig,

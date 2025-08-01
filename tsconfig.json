@@ -4,9 +4,6 @@
 		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"moduleDetection": "force",
-		"paths": {
-			"~/*": ["./src/*"]
-		},
 
 		/* checks */
 		"target": "ESNext",

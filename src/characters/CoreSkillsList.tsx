@@ -1,6 +1,6 @@
 import { Heading, HeadingLevel } from "@ariakit/react"
 import { sum } from "es-toolkit"
-import { resolveMilestoneListFieldItems } from "~/characters/milestones.ts"
+import { resolveMilestoneListFieldItems } from "./milestones.ts"
 import { useEditorCharacterSheet } from "./context.tsx"
 import { SKILLS } from "./data.ts"
 import { resolveNumberField } from "./sheet/fields.ts"

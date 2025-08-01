@@ -2,7 +2,7 @@ import * as Ariakit from "@ariakit/react"
 import type { ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { Except } from "type-fest"
-import { Icon } from "~/components/ui/Icon"
+import { Icon } from "./Icon.tsx"
 
 export function Dialog(props: Ariakit.DialogProviderProps) {
 	return <Ariakit.DialogProvider {...props} />

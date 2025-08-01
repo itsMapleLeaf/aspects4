@@ -1,4 +1,4 @@
-import type { CharacterItem } from "~/lib/character.ts"
+import type { CharacterItem } from "../lib/character.ts"
 import { EditableTextField } from "./EditableTextField.tsx"
 import { Button } from "./ui/Button.tsx"
 import { Icon } from "./ui/Icon.tsx"

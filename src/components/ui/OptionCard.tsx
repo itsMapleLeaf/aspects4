@@ -1,6 +1,6 @@
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
-import { Icon } from "~/components/ui/Icon.tsx"
+import { Icon } from "./Icon.tsx"
 
 export function OptionCard({
 	type,

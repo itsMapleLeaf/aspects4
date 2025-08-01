@@ -6,8 +6,8 @@ import {
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
 import type { Except } from "type-fest"
-import { Icon } from "~/components/ui/Icon.tsx"
-import { useLocalStorageState } from "~/hooks/storage"
+import { Icon } from "./Icon.tsx"
+import { useLocalStorageState } from "../../hooks/storage.ts"
 
 export function ToggleSection({
 	title,

@@ -2,7 +2,7 @@ import * as Ariakit from "@ariakit/react"
 import { omit } from "es-toolkit"
 import { type ReactElement } from "react"
 import { twMerge } from "tailwind-merge"
-import { Icon } from "~/components/ui/Icon.tsx"
+import { Icon } from "./Icon.tsx"
 
 const appearanceClasses = {
 	default: twMerge(

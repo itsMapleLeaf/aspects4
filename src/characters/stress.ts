@@ -1,5 +1,5 @@
 import { startCase, sum } from "es-toolkit"
-import { resolveNumberField } from "~/characters/sheet/fields.ts"
+import { resolveNumberField } from "./sheet/fields.ts"
 import type { FieldContext } from "./sheet/fields.ts"
 
 export function resolveStress(sheet: FieldContext) {

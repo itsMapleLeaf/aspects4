@@ -1,6 +1,6 @@
 import { type ComponentProps, type ReactNode } from "react"
 import { twMerge } from "tailwind-merge"
-import { IconTooltip } from "~/components/ui/IconTooltip.tsx"
+import { IconTooltip } from "./IconTooltip.tsx"
 
 type InputProps = {
 	label?: string

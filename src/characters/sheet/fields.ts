@@ -1,5 +1,5 @@
 import { clamp } from "es-toolkit"
-import { parseNumberSafe } from "~/lib/utils.ts"
+import { parseNumberSafe } from "../../lib/utils.ts"
 import type { SelectChoice } from "../../components/ui/SelectField.tsx"
 
 export type FieldContext = {
