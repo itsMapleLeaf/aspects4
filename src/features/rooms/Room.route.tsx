@@ -4,8 +4,7 @@ import { useMutation, useQuery } from "convex/react"
 import type { FunctionReturnType } from "convex/server"
 import type { ReactNode } from "react"
 import { useActionState } from "react"
-import { useLocation } from "wouter"
-
+import { useNavigate } from "react-router"
 import { api } from "../../../convex/_generated/api"
 import { ClientRoom } from "../../../convex/rooms.ts"
 import {
@@ -27,6 +26,7 @@ import { EditableText } from "../ui/EditableText.tsx"
 import { Field } from "../ui/Field.tsx"
 import { Icon } from "../ui/Icon.tsx"
 import { UserButton } from "../user/UserButton.tsx"
+import type { Route } from "./+types/Room.route.ts"
 import {
 	resolveRoomTabName,
 	RoomProvider,
@@ -34,8 +34,8 @@ import {
 	useRoomContext,
 } from "./context.tsx"
 
-export function Room({ slug }: { slug: string }) {
-	const room = useQuery(api.rooms.getBySlug, { slug })
+export default function Room({ params }: Route.ComponentProps) {
+	const room = useQuery(api.rooms.getBySlug, { slug: params.slug as string })
 	const user = useQuery(api.auth.me)
 
 	if (room === undefined || user === undefined) {
@@ -295,7 +295,7 @@ function RoomSettings({
 	onBackgroundBrightnessChange,
 }: RoomSettingsProps) {
 	const leaveRoom = useMutation(api.rooms.leave)
-	const [, navigate] = useLocation()
+	const navigate = useNavigate()
 
 	const [, leaveAction, isLeaving] = useActionState(async () => {
 		try {

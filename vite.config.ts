@@ -1,15 +1,22 @@
+import netlifyPlugin from "@netlify/vite-plugin-react-router"
+import { reactRouter } from "@react-router/dev/vite"
 import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
+import babel from "vite-plugin-babel"
 import { defineConfig } from "vitest/config"
 
 export default defineConfig({
 	plugins: [
-		react({
-			babel: {
+		reactRouter(),
+		tailwindcss(),
+		babel({
+			filter: /\.[jt]sx?$/,
+			include: ["src/**"],
+			babelConfig: {
+				presets: ["@babel/preset-typescript"],
 				plugins: ["babel-plugin-react-compiler"],
 			},
 		}),
-		tailwindcss(),
+		netlifyPlugin(),
 	],
 	test: {
 		environment: "jsdom",

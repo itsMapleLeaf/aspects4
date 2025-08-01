@@ -1,13 +1,13 @@
 import * as Ariakit from "@ariakit/react"
 import { useQuery } from "convex/react"
-import { Link } from "wouter"
+import { Link } from "react-router"
 import { api } from "../../../convex/_generated/api"
 import { AppHeader } from "../app/AppHeader.tsx"
 import { ListCard } from "../ui/ListCard.tsx"
 import { RelativeTimestamp } from "../ui/RelativeTimestamp.tsx"
 import { CreateRoomDialog } from "./CreateRoomDialog.tsx"
 
-export function RoomList() {
+export default function RoomList() {
 	const rooms = useQuery(api.rooms.list) ?? []
 	return (
 		<Ariakit.HeadingLevel>

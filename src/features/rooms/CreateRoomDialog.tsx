@@ -1,7 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { useActionState, useState } from "react"
-import { useLocation } from "wouter"
+import { useNavigate } from "react-router"
 import { api } from "../../../convex/_generated/api"
 import { Button } from "../ui/Button.tsx"
 import { Dialog, DialogButton, DialogPanel } from "../ui/Dialog.tsx"
@@ -17,7 +17,7 @@ export function CreateRoomDialog() {
 	const existingRoom = useQuery(api.rooms.getBySlug, { slug })
 	const createRoom = useMutation(api.rooms.create)
 
-	const [, navigate] = useLocation()
+	const navigate = useNavigate()
 
 	const [error, action, isPending] = useActionState(async () => {
 		if (!roomName.trim()) {

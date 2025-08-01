@@ -1,5 +1,5 @@
 import * as Ariakit from "@ariakit/react"
-import { Link } from "wouter"
+import { Link } from "react-router"
 
 export function AppLogoLink() {
 	return (

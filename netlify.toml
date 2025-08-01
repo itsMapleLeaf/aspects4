@@ -1,10 +1,10 @@
-[dev]
-command = "vite"
-autoLaunch = false
-
 [build]
-command = "bun run predeploy"
-publish = "dist"
+command = "convex deploy --cmd 'bun run build' --cmd-url-env-var-name VITE_CONVEX_URL"
+publish = "build/client"
+
+[dev]
+command = "react-router dev"
+autoLaunch = false
 
 [images]
 remote_images = [

@@ -1,4 +1,4 @@
-import { Link } from "wouter"
+import { Link } from "react-router"
 import { Button } from "../ui/Button.tsx"
 import { UserButton } from "../user/UserButton.tsx"
 import { AppLogoLink } from "./AppLogoLink.tsx"

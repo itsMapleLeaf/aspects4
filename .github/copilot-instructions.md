@@ -7,9 +7,9 @@ This document provides guidelines for GitHub Copilot when working on the Aspects
 Aspects VTT is a virtual tabletop application built with:
 
 - **Frontend**: React 19 with TypeScript
-- **Backend**: Convex (real-time database with auth)
-- **UI Library**: Ariakit for accessibility
-- **Routing**: Wouter
+- **Backend**: Convex
+- **UI Library**: Ariakit
+- **Routing**: React Router
 - **Styling**: Tailwind CSS
 - **Icons**: Iconify (mingcute icon set)
 - **Build Tool**: Vite

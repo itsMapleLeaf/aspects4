@@ -1,7 +1,7 @@
 import * as Ariakit from "@ariakit/react"
 import { useMutation, useQuery } from "convex/react"
 import { startTransition, useActionState, useRef, useState } from "react"
-import { Link } from "wouter"
+import { Link } from "react-router"
 import { api } from "../../../convex/_generated/api"
 import { AppHeader } from "../app/AppHeader.tsx"
 import { useFileUpload } from "../files/useFileUpload.ts"
@@ -12,7 +12,7 @@ import { Icon } from "../ui/Icon.tsx"
 import { Input } from "../ui/Input.tsx"
 import { LoadingScreen } from "../ui/LoadingScreen.tsx"
 
-export function AccountSettings() {
+export default function AccountSettings() {
 	const user = useQuery(api.auth.me)
 
 	if (user === undefined) {
