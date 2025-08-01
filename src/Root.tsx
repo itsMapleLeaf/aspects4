@@ -6,13 +6,13 @@ import {
 	Unauthenticated,
 } from "convex/react"
 import { Route, Switch } from "wouter"
-import { AccountSettings } from "./components/AccountSettings.tsx"
-import { AuthScreen } from "./components/AuthScreen.tsx"
-import { DocumentTitle } from "./components/DocumentTitle.tsx"
-import { LoadingScreen } from "./components/ui/LoadingScreen.tsx"
-import { DragProvider } from "./contexts/DragContext.tsx"
-import { Room } from "./rooms/Room.tsx"
-import { RoomList } from "./rooms/RoomList.tsx"
+import { DocumentTitle } from "./features/app/DocumentTitle.tsx"
+import { DragProvider } from "./features/dnd/DragContext.tsx"
+import { Room } from "./features/rooms/Room.tsx"
+import { RoomList } from "./features/rooms/RoomList.tsx"
+import { LoadingScreen } from "./features/ui/LoadingScreen.tsx"
+import { AccountSettings } from "./features/user/AccountSettings.tsx"
+import { AuthScreen } from "./features/user/AuthScreen.tsx"
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
 
