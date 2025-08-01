@@ -1,5 +1,5 @@
 import { authTables } from "@convex-dev/auth/server"
-import { deprecated } from "convex-helpers/validators"
+import { deprecated, literals } from "convex-helpers/validators"
 import { defineSchema, defineTable } from "convex/server"
 import { v } from "convex/values"
 import { optionull, vector } from "./lib/validators.ts"
@@ -83,4 +83,73 @@ export default defineSchema({
 		content: v.string(),
 		roomId: v.id("rooms"),
 	}).index("roomId", ["roomId"]),
+
+	templates: defineTable({
+		name: v.string(),
+		ownerId: v.id("users"),
+		fields: v.optional(
+			v.array(
+				v.object({
+					key: v.string(),
+					name: v.string(),
+					description: v.optional(v.string()),
+					type: literals("number", "string", "boolean", "select", "list"),
+					number: v.optional(
+						v.object({
+							value: v.number(),
+							min: optionull(v.number()),
+							max: optionull(v.number()),
+							step: optionull(v.number()),
+						}),
+					),
+					string: v.optional(
+						v.object({
+							value: v.string(),
+							multiline: v.optional(v.boolean()),
+						}),
+					),
+					boolean: v.optional(
+						v.object({
+							value: v.boolean(),
+						}),
+					),
+					select: v.optional(
+						v.object({
+							selectedKey: v.string(),
+							choices: v.array(
+								v.object({
+									key: v.string(),
+									name: v.string(),
+									description: v.string(),
+								}),
+							),
+						}),
+					),
+					list: v.optional(
+						v.object({
+							templateId: v.id("templates"),
+							items: v.array(
+								v.object({
+									key: v.string(),
+									data: v.record(v.string(), v.any()),
+								}),
+							),
+						}),
+					),
+				}),
+			),
+		),
+	})
+		.index("ownerId", ["ownerId", "name"])
+		.searchIndex("name", { searchField: "name" }),
+
+	sheets: defineTable({
+		name: v.optional(v.string()),
+		data: v.optional(v.record(v.string(), v.any())),
+		templateId: v.id("templates"),
+		roomId: v.id("rooms"),
+		ownerId: v.id("users"),
+	})
+		.index("ownerId_roomId", ["ownerId", "roomId", "name"])
+		.searchIndex("name", { searchField: "name" }),
 })

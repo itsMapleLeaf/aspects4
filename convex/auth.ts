@@ -1,7 +1,8 @@
 import Discord from "@auth/core/providers/discord"
 import { Password } from "@convex-dev/auth/providers/Password"
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server"
-import { query } from "./_generated/server"
+import { ConvexError } from "convex/values"
+import { query, type QueryCtx } from "./_generated/server"
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 	providers: [
@@ -97,3 +98,9 @@ export const me = query({
 		return userId && (await ctx.db.get(userId))
 	},
 })
+
+export async function ensureAuthUserId(ctx: QueryCtx) {
+	const userId = await getAuthUserId(ctx)
+	if (!userId) throw new ConvexError({ userMessage: "Not signed in" })
+	return userId
+}
