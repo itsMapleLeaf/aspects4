@@ -11,6 +11,7 @@ import { EditableTextField } from "../ui/EditableTextField.tsx"
 import { Icon } from "../ui/Icon.tsx"
 import { SelectField } from "../ui/SelectField.tsx"
 import { SummaryCard } from "../ui/SummaryCard.tsx"
+import { Tooltip } from "../ui/Tooltip.tsx"
 import { resolveAspectFields } from "./aspects.ts"
 import {
 	EditorCharacterContext,
@@ -250,7 +251,7 @@ function ItemListField() {
 									{fields.description.value && (
 										<p>{fields.description.value}</p>
 									)}
-									<Ariakit.Tooltip
+									<Tooltip
 										className="flex items-center gap-1"
 										content={fields.price.currentOption?.hint}
 									>
@@ -258,7 +259,7 @@ function ItemListField() {
 										<p className="text-sm font-medium text-gray-300">
 											{fields.price.value}
 										</p>
-									</Ariakit.Tooltip>
+									</Tooltip>
 								</div>
 							</SummaryCard>
 						)
@@ -324,12 +325,12 @@ function ExperienceListField() {
 						heading={
 							<div className="flex items-center gap-1.5">
 								{fields.name.value}
-								<Ariakit.Tooltip
+								<Tooltip
 									content={`${fields.aura.value} - ${fields.aura.currentOption?.hint}`}
 									className="translate-y-px opacity-60 transition *:size-4.5 hover:opacity-100"
 								>
 									{auraProps?.icon}
-								</Ariakit.Tooltip>
+								</Tooltip>
 							</div>
 						}
 						className={twMerge(
