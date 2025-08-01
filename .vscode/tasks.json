@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"label": "dev",
-			"dependsOn": ["dev:typecheck", "dev:convex", "dev:app"],
+			"dependsOn": ["tsc: watch", "dev: app", "dev: convex"],
 			"dependsOrder": "parallel",
 			"group": {
 				"kind": "build",
@@ -11,7 +11,7 @@
 			}
 		},
 		{
-			"label": "dev:app",
+			"label": "dev: app",
 			"type": "shell",
 			"command": "bun",
 			"args": ["run", "dev:app"],
@@ -19,7 +19,7 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "dev:convex",
+			"label": "dev: convex",
 			"type": "shell",
 			"command": "bun",
 			"args": ["run", "dev:convex"],
@@ -27,7 +27,7 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "dev:typecheck",
+			"label": "tsc: watch",
 			"type": "shell",
 			"command": "bun",
 			"args": ["tsc", "--watch", "--noEmit"],
