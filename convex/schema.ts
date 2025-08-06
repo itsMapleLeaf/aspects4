@@ -7,29 +7,6 @@ import { optionull, vector } from "./lib/validators.ts"
 export default defineSchema({
 	...authTables,
 
-	characters: defineTable({
-		name: v.optional(v.string()),
-		data: v.optional(v.record(v.string(), v.any())),
-		bonds: v.optional(
-			v.array(
-				v.object({
-					name: v.string(),
-					description: v.string(),
-					strength: v.number(),
-					aura: v.optional(v.string()),
-				}),
-			),
-		),
-		items: v.optional(
-			v.array(v.object({ name: v.string(), description: v.string() })),
-		),
-		ownerId: v.id("users"),
-		roomId: v.optional(v.id("rooms")),
-		isPublic: v.optional(v.boolean()),
-	})
-		.index("ownerId", ["ownerId", "name"])
-		.index("roomId", ["roomId", "name"]),
-
 	assets: defineTable({
 		name: v.string(),
 		type: v.string(),
@@ -51,11 +28,6 @@ export default defineSchema({
 		.index("name", ["name"])
 		.index("slug", ["slug"])
 		.index("ownerId", ["ownerId"]),
-
-	roomCharacters: defineTable({
-		roomId: v.id("rooms"),
-		characterId: v.id("characters"),
-	}).index("roomId", ["roomId", "characterId"]),
 
 	scenes: defineTable({
 		name: v.string(),
