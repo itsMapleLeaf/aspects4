@@ -12,26 +12,20 @@ import {
 	ViewportTransform,
 } from "../../lib/viewport.ts"
 import { panel } from "../../styles/panel.ts"
-import { AppLogoLink } from "../app/AppLogoLink.tsx"
+import { AppHeader } from "../app/AppHeader.tsx"
 import { DocumentTitle } from "../app/DocumentTitle.tsx"
 import { AssetsPanel } from "../assets/AssetsPanel.tsx"
 import { Chat } from "../chat/Chat.tsx"
 import { ChatProvider } from "../chat/context.tsx"
 import { useLocalStorageState } from "../dom/storage.ts"
 import { useMediaQuery } from "../dom/useMediaQuery.ts"
-import { SceneViewer, SceneViewerHelpButton } from "../scenes/SceneViewer.tsx"
+import { SceneViewer } from "../scenes/SceneViewer.tsx"
 import { Button } from "../ui/Button.tsx"
 import { EditableText } from "../ui/EditableText.tsx"
 import { Field } from "../ui/Field.tsx"
 import { Icon } from "../ui/Icon.tsx"
-import { UserButton } from "../user/UserButton.tsx"
 import type { Route } from "./+types/Room.route.ts"
-import {
-	resolveRoomTabName,
-	RoomProvider,
-	RoomTabNames,
-	useRoomContext,
-} from "./context.tsx"
+import { RoomProvider, RoomTabNames, useRoomContext } from "./context.tsx"
 
 export default function Room({ params }: Route.ComponentProps) {
 	const room = useQuery(api.rooms.getBySlug, { slug: params.slug as string })
@@ -181,21 +175,20 @@ function RoomInternal({
 				updateViewportTransform={setViewportTransform}
 			/>
 
-			<Ariakit.TabProvider
+			{/* <Ariakit.TabProvider
 				selectedId={roomContext.selectedTabId}
 				setSelectedId={(id) =>
 					roomContext.setSelectedTabId(id ? resolveRoomTabName(id) : null)
 				}
-			>
-				<header className="pointer-events-children fixed inset-x-0 top-0 flex h-14 items-center gap-4 px-2">
-					<SidebarTabs tabs={sidebarTabs} />
+			> */}
+			{/* <header className="pointer-events-children fixed inset-x-0 top-0 flex h-14 items-center gap-4 px-2">
 					<AppLogoLink />
 					<div className="ml-auto px-3">
 						<UserButton />
 					</div>
-				</header>
+				</header> */}
 
-				<main className="pointer-events-children">
+			{/* <main className="pointer-events-children">
 					{standaloneChat ? null : (
 						<div className="pointer-events-children fixed right-0 bottom-0 p-3">
 							<SceneViewerHelpButton />
@@ -223,8 +216,48 @@ function RoomInternal({
 							/>
 						</div>
 					)}
-				</main>
-			</Ariakit.TabProvider>
+				</main> */}
+			{/* </Ariakit.TabProvider> */}
+
+			<div className="pointer-events-children fixed inset-0 flex flex-col">
+				<AppHeader />
+				<div className="pointer-events-children min-h-0 flex-1 p-2 sm:w-64 sm:self-start">
+					<section
+						aria-label="Control Panel"
+						className="flex h-full min-h-0 flex-col divide-y divide-gray-800 panel bg-gray-900/75 shadow shadow-black/50 backdrop-blur"
+					>
+						<div className="flex justify-center gap-1 p-1">
+							<button
+								type="button"
+								className="flex size-8 items-center justify-center rounded bg-gray-800 transition"
+							>
+								<Icon icon="mingcute:document-2-fill" className="size-6" />
+							</button>
+							<button
+								type="button"
+								className="flex size-8 items-center justify-center rounded transition hover:bg-gray-800 hover:text-primary-300 active:bg-gray-700 active:duration-0"
+							>
+								<Icon icon="mingcute:pic-fill" className="size-6" />
+							</button>
+							<button
+								type="button"
+								className="flex size-8 items-center justify-center rounded transition hover:bg-gray-800 hover:text-primary-300 active:bg-gray-700 active:duration-0"
+							>
+								<Icon icon="mingcute:chat-3-fill" className="size-6" />
+							</button>
+							<button
+								type="button"
+								className="flex size-8 items-center justify-center rounded transition hover:bg-gray-800 hover:text-primary-300 active:bg-gray-700 active:duration-0"
+							>
+								<Icon icon="mingcute:settings-2-line" className="size-6" />
+							</button>
+						</div>
+						<div className="min-h-0 flex-1 overflow-y-auto">
+							<div className="h-[200vh]">body</div>
+						</div>
+					</section>
+				</div>
+			</div>
 		</DocumentTitle>
 	)
 }
