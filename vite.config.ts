@@ -6,11 +6,8 @@ import { defineConfig } from "vitest/config"
 
 export default defineConfig({
 	plugins: [
-		// @ts-expect-error: vite version conflict
 		reactRouter(),
-		// @ts-expect-error: vite version conflict
 		tailwindcss(),
-		// @ts-expect-error: vite version conflict
 		babel({
 			filter: /\.[jt]sx?$/,
 			include: ["src/**"],
@@ -19,7 +16,6 @@ export default defineConfig({
 				plugins: ["babel-plugin-react-compiler"],
 			},
 		}),
-		// @ts-expect-error: vite version conflict
 		netlifyPlugin(),
 	],
 	test: {
