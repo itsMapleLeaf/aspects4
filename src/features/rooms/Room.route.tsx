@@ -15,7 +15,6 @@ import { panel } from "../../styles/panel.ts"
 import { AppLogoLink } from "../app/AppLogoLink.tsx"
 import { DocumentTitle } from "../app/DocumentTitle.tsx"
 import { AssetsPanel } from "../assets/AssetsPanel.tsx"
-import { CharacterManager } from "../characters/CharacterManager.tsx"
 import { Chat } from "../chat/Chat.tsx"
 import { ChatProvider } from "../chat/context.tsx"
 import { useLocalStorageState } from "../dom/storage.ts"
@@ -109,12 +108,6 @@ function RoomInternal({
 		)
 
 	const sidebarTabs = [
-		{
-			name: RoomTabNames.Characters,
-			icon: <Icon icon="mingcute:group-2-fill" className="size-5" />,
-			content: <CharacterManager roomId={room._id} />,
-		},
-
 		{
 			name: RoomTabNames.Assets,
 			icon: <Icon icon="mingcute:file-fill" className="size-5" />,
