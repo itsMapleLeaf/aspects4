@@ -1,8 +1,7 @@
 import { type RouteConfig, index, route } from "@react-router/dev/routes"
 
 export default [
-	index("./features/rooms/RoomList.route.tsx"),
-	route("rooms/:slug", "./features/rooms/Room.route.tsx"),
-	// route("/templates", "./features/templates/TemplatesHome.route.tsx"),
-	route("account/settings", "./features/user/AccountSettings.route.tsx"),
+	index("./routes/home.route.tsx"),
+	route("rooms/:slug", "./routes/room.route.tsx"),
+	route("account/settings", "./routes/account-settings.route.tsx"),
 ] satisfies RouteConfig

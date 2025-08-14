@@ -5,27 +5,28 @@ import type { FunctionReturnType } from "convex/server"
 import type { ReactNode } from "react"
 import { useActionState } from "react"
 import { useNavigate } from "react-router"
-import { api } from "../../../convex/_generated/api"
-import { ClientRoom } from "../../../convex/rooms.ts"
+import { api } from "../../convex/_generated/api"
+import { ClientRoom } from "../../convex/rooms.ts"
+import { AppHeader } from "../features/app/AppHeader.tsx"
+import { DocumentTitle } from "../features/app/DocumentTitle.tsx"
+import { AssetsPanel } from "../features/assets/AssetsPanel.tsx"
+import { Chat } from "../features/chat/Chat.tsx"
+import { ChatProvider } from "../features/chat/context.tsx"
+import { useLocalStorageState } from "../features/dom/storage.ts"
+import { useMediaQuery } from "../features/dom/useMediaQuery.ts"
 import {
-	defaultViewportTransform,
-	ViewportTransform,
-} from "../../lib/viewport.ts"
-import { panel } from "../../styles/panel.ts"
-import { AppHeader } from "../app/AppHeader.tsx"
-import { DocumentTitle } from "../app/DocumentTitle.tsx"
-import { AssetsPanel } from "../assets/AssetsPanel.tsx"
-import { Chat } from "../chat/Chat.tsx"
-import { ChatProvider } from "../chat/context.tsx"
-import { useLocalStorageState } from "../dom/storage.ts"
-import { useMediaQuery } from "../dom/useMediaQuery.ts"
-import { SceneViewer } from "../scenes/SceneViewer.tsx"
-import { Button } from "../ui/Button.tsx"
-import { EditableText } from "../ui/EditableText.tsx"
-import { Field } from "../ui/Field.tsx"
-import { Icon } from "../ui/Icon.tsx"
-import type { Route } from "./+types/Room.route.ts"
-import { RoomProvider, RoomTabNames, useRoomContext } from "./context.tsx"
+	RoomProvider,
+	RoomTabNames,
+	useRoomContext,
+} from "../features/rooms/context.tsx"
+import { SceneViewer } from "../features/scenes/SceneViewer.tsx"
+import { Button } from "../features/ui/Button.tsx"
+import { EditableText } from "../features/ui/EditableText.tsx"
+import { Field } from "../features/ui/Field.tsx"
+import { Icon } from "../features/ui/Icon.tsx"
+import { defaultViewportTransform, ViewportTransform } from "../lib/viewport.ts"
+import { panel } from "../styles/panel.ts"
+import type { Route } from "./+types/room.route.tsx"
 
 export default function Room({ params }: Route.ComponentProps) {
 	const room = useQuery(api.rooms.getBySlug, { slug: params.slug as string })
