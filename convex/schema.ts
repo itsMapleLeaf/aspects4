@@ -84,72 +84,14 @@ export default defineSchema({
 		roomId: v.id("rooms"),
 	}).index("roomId", ["roomId"]),
 
-	templates: defineTable({
-		name: v.string(),
-		ownerId: v.id("users"),
-		fields: v.optional(
-			v.array(
-				v.object({
-					key: v.string(),
-					name: v.string(),
-					description: v.optional(v.string()),
-					type: literals("number", "string", "boolean", "select", "list"),
-					number: v.optional(
-						v.object({
-							value: v.number(),
-							min: optionull(v.number()),
-							max: optionull(v.number()),
-							step: optionull(v.number()),
-						}),
-					),
-					string: v.optional(
-						v.object({
-							value: v.string(),
-							multiline: v.optional(v.boolean()),
-						}),
-					),
-					boolean: v.optional(
-						v.object({
-							value: v.boolean(),
-						}),
-					),
-					select: v.optional(
-						v.object({
-							selectedKey: v.string(),
-							choices: v.array(
-								v.object({
-									key: v.string(),
-									name: v.string(),
-									description: v.string(),
-								}),
-							),
-						}),
-					),
-					list: v.optional(
-						v.object({
-							templateId: v.id("templates"),
-							items: v.array(
-								v.object({
-									key: v.string(),
-									data: v.record(v.string(), v.any()),
-								}),
-							),
-						}),
-					),
-				}),
-			),
-		),
-	})
-		.index("ownerId", ["ownerId", "name"])
-		.searchIndex("name", { searchField: "name" }),
-
-	sheets: defineTable({
-		name: v.optional(v.string()),
+	blocks: defineTable({
+		type: v.string(),
 		data: v.optional(v.record(v.string(), v.any())),
-		templateId: v.id("templates"),
-		roomId: v.id("rooms"),
+		visibility: v.optional(literals("public", "private")),
 		ownerId: v.id("users"),
+		sceneId: v.id("scenes"),
+		parentId: optionull(v.id("blocks")),
 	})
-		.index("ownerId_roomId", ["ownerId", "roomId", "name"])
-		.searchIndex("name", { searchField: "name" }),
+		.index("sceneId", ["sceneId"])
+		.index("parentId", ["parentId"]),
 })

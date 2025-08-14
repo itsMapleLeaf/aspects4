@@ -9,69 +9,68 @@ import { throwUserError } from "./lib/errors.ts"
 import schema from "./schema.ts"
 
 export const list = query({
-	args: {},
-	async handler(ctx) {
+	args: {
+		sceneId: v.id("scenes"),
+	},
+	async handler(ctx, { sceneId }) {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) return []
 
 		return ctx.db
-			.query("templates")
-			.withIndex("ownerId", (q) => q.eq("ownerId", userId))
+			.query("blocks")
+			.withIndex("sceneId", (q) => q.eq("sceneId", sceneId))
 			.collect()
 	},
 })
 
 export const get = query({
 	args: {
-		templateId: v.id("templates"),
+		id: v.id("blocks"),
 	},
-	async handler(ctx, { templateId }) {
-		return await ctx.db.get(templateId)
+	async handler(ctx, { id }) {
+		return await ctx.db.get(id)
 	},
 })
 
 export const create = mutation({
-	args: omit(schema.tables.templates.validator.fields, ["ownerId"]),
+	args: omit(schema.tables.blocks.validator.fields, ["ownerId"]),
 	async handler(ctx, args) {
 		const userId = await ensureAuthUserId(ctx)
-		const templateId = await ctx.db.insert("templates", {
+		const blockId = await ctx.db.insert("blocks", {
 			ownerId: userId,
 			...args,
 		})
-		return templateId
+		return blockId
 	},
 })
 
 export const update = mutation({
 	args: {
-		id: v.id("templates"),
+		id: v.id("blocks"),
 		data: v.object(
-			partial(omit(schema.tables.templates.validator.fields, ["ownerId"])),
+			partial(omit(schema.tables.blocks.validator.fields, ["ownerId"])),
 		),
 	},
 	async handler(ctx, { id, data }) {
-		await ensureOwnedTemplate(ctx, id)
+		await ensureOwnedBlock(ctx, id)
 		await ctx.db.patch(id, data)
 	},
 })
 
 export const remove = mutation({
 	args: {
-		id: v.id("templates"),
+		id: v.id("blocks"),
 	},
 	async handler(ctx, { id }) {
-		await ensureOwnedTemplate(ctx, id)
+		await ensureOwnedBlock(ctx, id)
 		await ctx.db.delete(id)
 	},
 })
 
-async function ensureOwnedTemplate(ctx: QueryCtx, id: Id<"templates">) {
+async function ensureOwnedBlock(ctx: QueryCtx, id: Id<"blocks">) {
 	const userId = await ensureAuthUserId(ctx)
-
-	const template =
-		(await ctx.db.get(id)) ?? throwUserError("Template not found")
-
-	if (template.ownerId !== userId) {
+	const block = (await ctx.db.get(id)) ?? throwUserError("Block not found")
+	if (block.ownerId !== userId) {
 		throwUserError("Unauthorized")
 	}
 }
